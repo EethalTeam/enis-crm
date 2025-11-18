@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%; /* White */
+    --card: 224 71% 4%;
+    --card-foreground: 210 40% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 300 80% 60%; /* More vibrant pink/purple */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 250 30% 20%; /* Darker secondary for contrast */
+    --secondary-foreground: 210 40% 98%;
+    --muted: 250 30% 20%;
+    --muted-foreground: 240 10% 80%; /* Lighter greyish purple for better visibility */
+    --accent: 250 30% 20%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 40%; /* Red */
+    --destructive-foreground: 210 40% 98%;
+    --border: 250 20% 30%; /* Dark purple border */
+    --input: 250 20% 30%;
+    --ring: 300 80% 60%;
+    --radius: 0.8rem;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%;
+    --card: 224 71% 4%;
+    --card-foreground: 210 40% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 300 80% 60%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 250 30% 20%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 250 30% 20%;
+    --muted-foreground: 240 10% 80%;
+    --accent: 250 30% 20%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 40%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 250 20% 30%;
+    --input: 250 20% 30%;
+    --ring: 300 80% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  .glass-card {
+    @apply bg-clip-padding backdrop-filter backdrop-blur-xl bg-opacity-30 border border-gray-200/20;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .text-glow {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5), 0 0 20px rgba(200, 50, 255, 0.6); /* Adjusted glow color */
+  }
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+}
