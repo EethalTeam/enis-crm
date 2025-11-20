@@ -1,0 +1,342 @@
+.AddbtnDiv {
+  height: 30px;
+  width: auto;
+}
+
+.AddbtnDivMain {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.WeeklyTaskSeacrhInput {
+  width: 220px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: transparent !important;
+  outline: none !important;
+  border: 1px solid lightgray;
+  display: flex;
+  position: relative !important;
+  /* justify-content: end; */
+}
+.WeeklyTaskSerFil:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.FaSearchdiv {
+  position: absolute;
+  top: 7px;
+  right: 6px;
+}
+
+#searchTableInput {
+  /* height: 100% !important; */
+  border: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 85%;
+  padding-left: 5px;
+  margin-bottom: 0px;
+}
+#Productsharinginput{
+  margin-bottom: 0px;
+  width: 70px;
+  text-align: center;
+}
+.entryParentDiv {
+  margin: 5px;
+  padding: 5px;
+}
+
+.Stackstyle {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.ButtonStyle {
+  padding: 3px 5px !important;
+  /* background-color: #9B9B9B;
+  color: #fff; */
+}
+
+.entrymain {
+  display: flex;
+  /* height: 45px; */
+  width: 100%;
+  flex-direction: column;
+}
+.LoaderDiv{
+  /* max-width: 1050px; */
+  height: 100%;
+  overflow-y: auto;
+  padding: 10px;
+}
+.TabelAndAddDiv {
+  margin-top: 0px;
+  padding: 5px;
+}
+
+.TabelAndAddDivActive {
+  margin-top: 40px;
+
+}
+.EmployeeTabelAndAddDivActive{
+  margin-top: 100px;
+}
+.MenuTabelAndAddDivActive{
+  margin-top: 10px;
+}
+.VisitorTabelAndAddDivActive{
+   margin-top: 500px;
+}
+.PlotTabelAndAddDivActive{
+  margin-top: 200px;
+}
+.CustomerTabelAndAddDivActive{
+  margin-top: 650px;
+}
+
+.fieldsmain .MuiTextField-root {
+  width: 100%;
+  height: 100%;
+}
+
+.fieldsmain .MuiOutlinedInput-root {
+  height: 100%;
+}
+
+.fieldsmain .MuiOutlinedInput-input {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.color-input {
+  cursor: pointer;
+}
+
+.input-wrapperinput {
+  padding-left: 30px;
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.input-wrappernoinput {
+  padding-left: 10px;
+  height: 32px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.iconprops {
+  position: absolute;
+  left: 8px;
+  top: 23%;
+  transform: translateY(-50%);
+  color: gray;
+}
+
+.FilterClearIcon {
+  font-size: 16px !important;
+  color: red !important;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 6px;
+  opacity: 0.8;
+}
+
+/* Parent Container */
+.entryfirstcolmn {
+  display: grid;
+  /* grid-template-columns: 80% 10% 10%; */
+  grid-template-columns: 100%;
+  width: 100%;
+  gap: 16px;
+  border-radius: 8px;
+  /* min-height: 150px; */
+  max-height: 200px;
+}
+
+/* Fields Container */
+.fieldsmain {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Two equal columns */
+  gap: 16px;
+}
+
+.Threefieldsmain {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  /* Two equal columns */
+  gap: 16px;
+}
+
+.FilterdownIcon {
+  font-size: 10px !important;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 12px;
+  opacity: 0.8;
+}
+
+/* Buttons Container */
+.savebtndiv {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  height: 30px;
+  /* margin-top: 28px; */
+}
+
+/* Buttons Styling */
+.savebtndiv .saveBtn {
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+  padding: 8px 16px;
+}
+
+.savebtndiv .saveBtn:hover {
+  background-color: #0056b3;
+}
+
+.savebtndiv .closeBtn {
+  border-color: #d9534f;
+  color: #d9534f;
+  font-weight: 600;
+  padding: 8px 16px;
+}
+
+.savebtndiv .closeBtn:hover {
+  background-color: #f2dede;
+  border-color: #d43f3a;
+}
+
+.nodataDiv {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Reduce Popup Size */
+.small-popup {
+  width: 450px !important;
+  font-size: 14px !important;
+}
+
+.small-title {
+  font-size: 16px !important;
+}
+
+.small-text {
+  font-size: 14px !important;
+}
+
+.small-button {
+  font-size: 14px !important;
+  padding: 10px 15px !important;
+}
+
+.Entry-Checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hideen {
+  display: none;
+}
+
+.iconCommonstyle {
+  width: 15px !important;
+  height: 15px !important;
+  margin: 0px 10px !important;
+}
+
+.optionStyle {
+  height: auto;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.DropdownDiv:hover {
+  background-color: #f0f0f0;
+}
+
+.searchsplitter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.test {
+  color: #0353ff;
+}
+
+.leftsideContent {
+  /* border: 1px solid red; */
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.ExcelExportButton {
+  width: auto;
+  height: 30px;
+  background-color: #f7f7f7;
+  color: #4b4b4b;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 0px 10px;
+}
+
+.ExcelExportButton:hover {
+  background-color: #e1e1e1;
+}
+
+
+.WeeklyTaskRefreshParent {
+  width: auto;
+  height: 34px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f7f7f7;
+  border-radius: 4px;
+  gap: 6px;
+  cursor: pointer !important;
+  padding: 0px 10px;
+}
+
+.WeeklyTaskRefreshParent:hover {
+  background-color: #e1e1e1;
+  cursor: pointer !important;
+}
+
+.WeeklyRefreshIcon {
+  font-size: 20px;
+  color: #5e5e5e;
+  cursor: pointer;
+}

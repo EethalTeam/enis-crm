@@ -1,0 +1,272 @@
+.vendorMain {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.MainFormHeader {
+    width: 100%;
+    height: 50px;
+    border-bottom: 1px solid rgb(180 177 177 / 18%);
+    align-items: center;
+    display: flex;
+    gap: 20px;
+}
+
+.menuItem {
+    padding: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.menuItem.active {
+    border-bottom: 3px solid blue;
+    font-weight: bold;
+}
+
+.MainFormContent {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    height: auto
+}
+
+.MandatorySection {
+    width: 100%;
+    /* height: 100%; */
+    display: flex;
+    align-items: center;
+}
+
+.Mandatory-Main {
+    width: 100%;
+    /* height: 100%; */
+    padding: 20px;
+}
+
+.Fields-main {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.fieldDiv {
+    display: flex;
+    align-items: center;
+    width: 60%;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.ContractfieldDiv {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.headingDiv {
+    width: 25%;
+    display: flex;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.headingstyle {
+    text-transform: capitalize;
+    font-size: 12px;
+}
+
+.singlefieldDiv {
+    display: flex;
+    align-items: center;
+    width: 60%;
+    gap: 10px;
+    justify-content: space-between;
+}
+.singlefieldDivNew {
+    display: flex;
+    align-items: center;
+    width: 73%;
+    gap: 10px;
+    justify-content: space-between;
+}
+.singleheadingDiv {
+    width: 25%;
+    display: flex;
+    gap: 5px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.remarks {
+    margin: 0 !important;
+}
+
+.AddressFields-main {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.AddresssingleheadingDiv {
+    width: 40%;
+    cursor: pointer;
+}
+
+.AddresssinglefieldDiv {
+    width: 60%;
+}
+
+.iconprops {
+    position: relative;
+}
+
+.iconcommon {
+    position: absolute;
+}
+
+.scrollableSection {
+    width: 100%;
+    height: calc(100vh - 175px);
+    overflow-y: auto;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.itemscrollableSection {
+    width: 100%;
+    height: calc(100vh - 202px);
+    overflow-y: auto;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.bottomBtn {
+    width: 100%;
+    height: 55px;
+    padding: 10px;
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.AddressMain {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    gap: 35px;
+}
+
+.BillingDiv {
+    width: 100%;
+    height: 100%;
+}
+
+.ShippingDIv {
+    width: 100%;
+    height: 100%;
+}
+
+.addressHeading {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.copydiv {
+    color: #4c4cf7;
+}
+
+.AddressMainParent {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remarksMAin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.Primary-infoDivmain {
+    /* border: 1px solid; */
+    width: 100%;
+    background-color: #f9f9fb;
+    display: grid;
+    grid-template-columns: 50% 25%;
+    padding: 25px;
+}
+
+.promary-div2 {
+    /* border: 1px dashed #2c5a566b; */
+    background-color: #ffffff;
+    border-radius: 5px;
+}
+
+.Section2MainDiv {
+    width: 100%;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+}
+
+.side1 {
+    width: 37%;
+    /* border: 1px solid red; */
+}
+
+.side2 {
+    width: 42%;
+    /* border: 1px solid green; */
+}
+
+.sidesplitter {
+   /* gap: 100px; */
+    width: 100%;
+    display: flex;
+    padding: 10px;
+}
+hr {
+    border: none;
+    border-top: 1px solid #ebeaea;
+    margin: 10px 0;
+}
+.hrwidth{
+    width: 76%;
+}
+  .image-preview {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .image-preview img {
+    border-radius: 5px;
+    object-fit: cover;
+  }
+  .image-uploader{
+    /* border: 1px solid; */
+    width: 100%;
+    height: 100%;
+  }

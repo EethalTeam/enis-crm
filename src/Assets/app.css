@@ -1,0 +1,484 @@
+/* @import url(styles/vendor.css); */
+@import url(styles/homepage.css);
+@import url(styles/ImageUploader.css);
+
+/* ===========================
+   🌐 Global Reset
+=========================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  /* Base font size */
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  background-color: #f9fafb;
+  color: #333;
+  overflow-x: hidden;
+}
+
+/* ===========================
+     🎨 Typography
+  =========================== */
+/* h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 0.5rem;
+  } */
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+}
+
+h5 {
+  font-size: 1rem;
+}
+
+h6 {
+  font-size: 0.875rem;
+}
+
+p {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* ===========================
+     🖱️ Scrollbar Customization
+  =========================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* ===========================
+     📦 Container
+  =========================== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* ===========================
+    CustomTable Styles
+  =========================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  cursor: pointer;
+}
+
+table th,
+table td {
+  text-align: left;
+  border: 1px solid #e5e7eb;
+  padding: 2px !important;
+}
+
+table th {
+  color: #fff;
+  font-weight: 600;
+}
+
+.custom-table-row {
+  background: rgb(230, 230, 199);
+}
+
+/* ===========================
+     🔘 Buttons
+  =========================== */
+button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+button.primary {
+  background-color: #4f46e5;
+  color: #fff;
+}
+
+button.primary:hover {
+  background-color: #4338ca;
+}
+
+button.secondary {
+  background-color: #f3f4f6;
+  color: #333;
+}
+
+button.secondary:hover {
+  background-color: #e5e7eb;
+}
+
+/* ===========================
+     📝 Forms & Inputs
+  =========================== */
+input,
+textarea
+{
+  width: 100%;
+  padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+  font-size: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+/* ===========================
+     🖥️ Header & Footer
+  =========================== */
+header {
+  background-color: #4f46e5;
+  color: #fff;
+  padding: 1rem;
+  text-align: center;
+}
+
+footer {
+  background-color: #1e293b;
+  color: #fff;
+  padding: 1rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* ===========================
+     📦 Cards
+  =========================== */
+.card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* ===========================
+     🔄 Loader
+  =========================== */
+.loader {
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #4f46e5;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+/*     
+  table th {
+    padding: 5px !important;
+  } */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===========================
+     📱 Responsive Design
+  =========================== */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 12px;
+  }
+
+  table th,
+  table td {
+    padding: 0.5rem
+  }
+}
+
+/* Add this to your global CSS file */
+.react-hot-toast {
+  min-width: 350px !important;
+  /* Ensure it's at least wide enough */
+  max-width: 500px !important;
+}
+
+.ViewHeadingTitle {
+  width: 100%;
+  height: 40px;
+  /* border: 1px solid red; */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.fldcreateNewFolderIcon {
+  width: 12%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.backccicondiv {
+  width: 30%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.overviewdiv{
+  /* border: 1px solid; */
+  margin-top: 25px;
+  /* height: 100px; */
+}
+.ViewHeadingTitle {
+  font-size: 14px !important;
+  padding: 6px;
+  margin-top: 1px;
+  margin-bottom: 5px;
+  font-weight: 500;
+  letter-spacing: .50px !important;
+  cursor: default;
+  cursor: pointer;
+}
+.gridSectiontag {
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  font-size: 12px;
+  font-weight: 300;
+  color: #777;
+  padding: 0px 6px;
+}
+.tagheading{
+  font-size: 14px;
+  color: #32de5a;
+}
+.tagval{
+  font-size: 12px;
+  color: #777;
+}
+.BackBtnIcon {
+  margin: 5px 5px 5px 0px;
+  font-size: 15px;
+  cursor: pointer;
+  color: var(--DKText) !important;
+}
+.GridItemPadding {
+  padding: 8px; /* Or whatever spacing you need */
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide number input arrows in Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dashboard-container {
+  display: flex;
+  width: 100%;
+  /* gap: 20px; */
+  justify-content: space-around;
+  flex-wrap: wrap;
+  padding: 20px;
+}
+
+.plot-box {
+  width: 25%;
+  height: 250px;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.plot-box1 {
+  width: 35%;
+  height: 250px;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.plotDetails-box {
+  width: 19%;
+  height: 90px;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.plot-box h2 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.plot-count {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 0;
+  cursor: pointer;
+}
+
+.plot-box span {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Optional different colors for each box */
+.plot-box.child .plot-count {
+  color: #16a34a; /* green */
+}
+.plot-box.parent .plot-count {
+  color: #2563eb; /* blue */
+}
+.plot-box.main-parent .plot-count {
+  color: #9333ea; /* purple */
+}
+.right-panel {
+  width: 100%; /* Use 25% in parent layout */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Common title style */
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* Chart box */
+.chart-section {
+  background-color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 250px;
+  /* margin-top: 25px; */
+}
+
+.placeholder-chart {
+  background-color: #f3f4f6;
+  height: 150px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 14px;
+}
+
+/* Recent sales box */
+.sales-section {
+  background-color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 200px;
+  overflow-y: scroll !important;
+}
+
+.sales-list {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.sales-list li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #444;
+}
+.swal2-container {
+  z-index: 4000 !important;
+}
+/* .css-1g04pbp-MuiModal-root {
+    z-index: 1050;
+} */

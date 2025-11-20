@@ -1,0 +1,121 @@
+.image-uploader {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.column-layout {
+    flex-direction: column;
+}
+
+.row-layout {
+    flex-direction: row;
+}
+
+.image-preview {
+    display: flex;
+    gap: 0 !important;
+    align-items: center;
+    margin: 0 !important;
+}
+.added-image-preview{
+    display: flex;
+    gap: 0 !important;
+    align-items: center;
+    margin: 0 !important;
+}
+.image-box {
+    position: relative;
+    width: 225px;
+    height: 150px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f9f9f9;
+}
+
+.image {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+.primary-label {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: green;
+    color: white;
+    font-size: 12px;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: red;
+    border: none;
+    width: 45px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: none;
+}
+
+.dropzone {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    background: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Dragheadingstyle {
+    font-size: 14px;
+}
+
+.click-text {
+    color: #408dfb;
+}
+
+.added-image-box,
+.add-image-box {
+    width: 35px;
+    height: 35px;
+    /* border: 1px dashed #ccc; */
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    /* background: #f9f9f9; */
+    flex: auto;
+}
+.Addedimage:hover{
+    border: 1px solid green !important;
+}
+.AddedImageContainer{
+    display: flex;
+    /* border: 1px solid; */
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+.Addedimage {
+    width: 35px;
+    height: 35px;
+    object-fit: contain !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}

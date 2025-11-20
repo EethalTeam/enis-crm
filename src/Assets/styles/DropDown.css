@@ -1,0 +1,1859 @@
+.DashBoardParentSection {
+    width: 100%;
+    height: 90vh;
+}
+
+.DashBoardSubSection {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.BacklogListParent {
+    width: 100%;
+    height: 96px;
+}
+
+.BacklogListSub {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.BacklogListsDiv {
+    width: 13.8%;
+    height: 96px;
+    padding: 10px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    cursor: pointer;
+}
+
+.LogoDiv {
+    min-height: 30px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.BacklogText {
+    font-size: 16px;
+    letter-spacing: 0.4px;
+    color: #fff;
+}
+
+.BacklogCountDiv {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding-top: 6px;
+    gap: 10px;
+}
+
+.BacklogCountSubDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* border-right: 1px solid #fff; */
+    padding-right: 10px;
+}
+
+.BacklogCountSubDiv2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.CountLabel {
+    font-size: 12px;
+    letter-spacing: 0.4px;
+    color: #fff;
+}
+
+.countStyle {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    color: #fff;
+}
+
+.DetailsTableParent {
+    width: 100%;
+    height: calc(100% - 170px);
+    display: flex;
+    gap: 12px;
+}
+
+.DetailsTableParent2 {
+    width: 100%;
+    height: calc(100% - 40px);
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.DetailsTableParent3 {
+    width: 100%;
+    height: calc(100% - 150px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+
+.DetailsTableSub3 {
+    width: 100%;
+    height: auto;
+    display: flex;
+    gap: 12px;
+}
+
+.STaGeWiSEtableParent {
+    width: 100%;
+    height: auto;
+}
+
+.ContractTableParent {
+    width: 50%;
+    height: 100%;
+}
+
+.ContractHeading {
+    width: 100%;
+    height: 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+}
+
+.RefreshExcelDiv {
+    width: auto;
+    height: 36px;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    gap: 10px;
+}
+
+.ContractText {
+    font-size: 16px;
+    font-weight: 500;
+    color: rgb(62, 62, 62);
+    letter-spacing: 0.4px;
+}
+
+.OverAllHeadSecondDiv {
+    width: 60%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+}
+
+.TableParent {
+    height: calc(100% - 20px);
+    margin-top: 6px;
+    overflow-y: auto;
+}
+
+.TableParent2 {
+    height: calc(100% - 40px);
+    margin-top: 6px;
+    overflow-y: auto;
+}
+
+.TableParentdiv {
+    border-radius: 6px;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+}
+
+.TableRow {
+    height: 30px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.TableRowBlue {
+    height: 36px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    background-color: #35363B;
+}
+
+.TableHeadStyle {
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    padding: 0px 10px;
+    color: #292929;
+}
+
+.TableHeadStyleWhite {
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    padding: 0px 10px;
+    color: #fff;
+}
+
+.TableHeadBorderRadius1 {
+    border-top-left-radius: 6px;
+}
+
+.TableHeadBorderRadius2 {
+    border-top-right-radius: 6px;
+}
+
+.TableDataStyle {
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    color: #4d4d4d;
+    padding: 0px 10px;
+}
+
+.TotalDataHover:hover {
+    background-color: #3273E8;
+    color: #fff;
+    font-weight: 500;
+}
+
+.OpenDataHover:hover {
+    background-color: #dc0000;
+    color: #fff;
+    font-weight: 500;
+}
+
+.CloseDataHover:hover {
+    background-color: #03a500;
+    color: #fff;
+    font-weight: 500;
+}
+
+.ModalTableHeadStyle {
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    padding: 10px 10px;
+    color: #2D63EB;
+    text-wrap: nowrap;
+}
+
+.ModalTableDataStyle {
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    color: #4d4d4d;
+    padding: 0px 10px;
+    text-wrap: nowrap;
+}
+
+.ModalTabelParent {
+    height: calc(100% - 46px);
+    overflow: auto;
+}
+
+.TopBar {
+    width: 100%;
+    height: 46px;
+    border-bottom: 1px solid #d3d3d3;
+    padding: 8px 16px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ContractText {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    color: rgb(53, 53, 58);
+}
+
+.CloseIcon {
+    width: 26px;
+    height: 26px;
+    color: #727272;
+    cursor: pointer;
+}
+
+.BlackHover:hover {
+    background-color: #686868;
+    color: #fff;
+    font-weight: 500;
+}
+
+.CRHover:hover {
+    background-color: #fb8500;
+    color: #fff;
+    font-weight: 500;
+}
+
+.NRHover:hover {
+    background-color: #fad643;
+    color: #fff;
+    font-weight: 500;
+}
+
+.ORHover:hover {
+    background-color: #5f0f40;
+    color: #fff;
+    font-weight: 500;
+}
+
+
+.SevenHover:hover {
+    background-color: #2b2d42;
+    color: #fff;
+    font-weight: 500;
+}
+
+.FourteenHover:hover {
+    background-color: #e29578;
+    color: #fff;
+    font-weight: 500;
+}
+
+.thirtyHover:hover {
+    background-color: #0a9396;
+    color: #fff;
+    font-weight: 500;
+}
+
+.SixtyHover:hover {
+    background-color: #bdb2ff;
+    color: #fff;
+    font-weight: 500;
+}
+
+.NinetyHover:hover {
+    background-color: #774936;
+    color: #fff;
+    font-weight: 500;
+}
+
+.EmpCountTitle {
+    background-color: #3273E8;
+    color: #fff;
+    padding: 4px 10px;
+    font-weight: 500;
+    border-radius: 4px;
+}
+
+.TaskTypeMainDiv {
+    width: 100%;
+    height: 40px !important;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.TaskTypeText {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.2px !important;
+}
+
+.css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+    height: 20px !important;
+    padding: 8px 10px !important;
+    font-size: 14px !important;
+}
+
+.ExcelExportButton {
+    width: auto;
+    height: 34px;
+    background-color: #f7f7f7;
+    color: #4b4b4b;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 0px 10px;
+}
+
+.ExcelExportButton:hover {
+    background-color: #e1e1e1;
+}
+
+.WeeklyTaskSummaryParent {
+    width: 100%;
+    height: 90vh;
+    overflow: hidden;
+}
+
+.WeeklyFilterParent {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.WeeklyDropdownparent {
+    width: auto;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+
+.WeeklyDropdownSub {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.SelectFileLabelTxt {
+    width: auto;
+    font-size: 14px;
+    color: #4b4b4b;
+}
+
+.SelectDateFileLabelTxt {
+    width: auto;
+    font-size: 14px;
+    color: #4b4b4b;
+}
+
+.WeekSelectInputField {
+    width: 160px;
+    height: 34px;
+    border-radius: 4px;
+    border: none !important;
+    outline: none !important;
+    background-color: #f1f1f1;
+    font-size: 14px;
+    color: #181818;
+    padding: 0px 12px;
+    appearance: none !important;
+    cursor: pointer;
+}
+
+.TaskTypeSelectInputField {
+    width: 130px;
+    height: 34px;
+    border-radius: 4px;
+    border: none !important;
+    outline: none !important;
+    background-color: #f1f1f1;
+    font-size: 14px;
+    color: #181818;
+    padding: 0px 12px;
+    appearance: none !important;
+    cursor: pointer;
+}
+
+
+.WeeklyTaskTabelParent {
+    width: 100%;
+    height: calc(100% - 50px);
+    margin-top: 10px;
+}
+
+.TabelHeadingSecParent {
+    width: 100%;
+    height: 36px;
+    display: flex;
+}
+
+.WeeklyTaskSeacrhInput {
+    width: 220px;
+    height: 36px;
+    border-radius: 4px;
+    background-color: transparent !important;
+    outline: none !important;
+    border: 1px solid lightgray;
+    display: flex;
+    position: relative !important;
+    justify-content: end;
+}
+
+.WeeklyTaskSerFil {
+    font-size: 14px !important;
+    color: #4b4b4b !important;
+    padding-right: 30px !important;
+}
+
+.WeeklyTaskRefreshParent {
+    width: auto;
+    height: 34px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+    gap: 6px;
+    cursor: pointer !important;
+    padding: 0px 10px;
+}
+
+.WeeklyTaskRefreshParent:hover {
+    background-color: #e1e1e1;
+    cursor: pointer !important;
+}
+
+.WeeklyRefreshIcon {
+    font-size: 20px;
+    color: #5e5e5e;
+    cursor: pointer;
+}
+
+.TaskCreImAttachmentIcon {
+    font-size: 18px;
+    color: #5e5e5e;
+    cursor: pointer;
+}
+
+.WeeklyRefreshText {
+    font-size: 14px;
+    color: #414141;
+    margin-top: 2px;
+}
+
+.WeeklyTableDataParent {
+    width: 100%;
+    height: calc(100% - 46px);
+    margin-top: 10px;
+    overflow-y: auto;
+}
+
+.TabelTagStyle {
+    width: 100%;
+}
+
+.theadStyle {
+    width: 100%;
+    height: 36px !important;
+    background-color: #292929;
+    color: #fff !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    position: sticky;
+    top: 0;
+    border: 1px solid #ddd !important;
+}
+
+.TabelTHstyle {
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    padding: 10px !important;
+    border-bottom: none !important;
+}
+
+.ModalTabelTHstyle {
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    padding: 10px !important;
+    border-bottom: none !important;
+    text-wrap: nowrap;
+}
+
+.TbodyStyle {
+    width: 100% !important;
+    height: calc(100% - 36px) !important;
+    overflow-y: scroll !important;
+}
+
+.TbodyTableRowStyle {
+    width: 100%;
+    height: 36px !important;
+    color: #4b4b4b !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    border: 1px solid #ddd !important;
+    border-top: none !important;
+    outline: none !important;
+}
+
+.TbodyTableRowRedStyle {
+    width: 100%;
+    height: 36px !important;
+    color: #fff !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    border: 1px solid #ddd !important;
+    border-top: none !important;
+    outline: none !important;
+    background-color: #e70000;
+}
+
+.TableTDstyle {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap;
+    max-width: 200px;
+    padding: 10px !important;
+    border-bottom: none !important;
+}
+
+.TableTDNoDatastyle {
+    background-color: #f6f6f6;
+    border: 1px solid #ddd !important;
+    border-top: none !important;
+    padding: 40px !important;
+    text-align: center;
+    font-size: 16px;
+}
+
+.TablePaginationParent {
+    width: 100%;
+    height: 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 8px;
+    border: 1px solid #ddd !important;
+    border-top: none !important;
+}
+
+.rowsPerPageSelector {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 4px;
+}
+
+.RowPageText {
+    padding: 0px !important;
+    margin: 0px !important;
+    font-size: 14px !important;
+    color: #4b4b4b !important;
+}
+
+.PaginationArrowBtn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    border-radius: 50%;
+    outline: none;
+    color: #4b4b4b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.FaAngleRightStyle {
+    font-size: 16px;
+    color: #858585;
+}
+
+.paginationContainer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+
+.paginationButton {
+    border: none !important;
+    outline: none;
+    background-color: transparent;
+    font-size: 16px;
+    color: #4b4b4b;
+}
+
+.PaginationPagesDiv {
+    display: flex;
+    gap: 4px;
+}
+
+.activePaginationPage {
+    background-color: #E81E62 !important;
+    color: #fff;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.PaginationSelectInput {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    outline: none !important;
+    min-width: 40px;
+    width: auto;
+    height: 26px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 2px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #4b4b4b;
+}
+
+.RasideTaskDatePicker {
+    background-color: #f1f1f1;
+    cursor: pointer !important;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.TaskCountParentSec {
+    width: auto;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    gap: 2px;
+    background-color: #E81E62;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0px 18px;
+}
+
+.RefAndSearchSec {
+    width: 70%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.CountSectionParentDiv {
+    width: 30%;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.WeeklyTaskDashboardParent {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.WTdashboardDropdownparent {
+    width: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.WTdashboardDropdownSub1 {
+    width: 80%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+
+.WTdashboardDropdownSub2 {
+    width: 20%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.WTdashboardTableParent1 {
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.StagewiseTableParentDiv {
+    width: 50%;
+    height: 100%;
+}
+
+.StagewiseTableParent {
+    width: 100%;
+    height: 100%;
+}
+
+.StagewisParent2 {
+    height: calc(100% - 36px);
+    margin-top: 2px;
+    overflow-y: auto;
+}
+
+.WTstageHeading {
+    width: 100%;
+    height: 36px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+}
+
+.WTdashboardTableParent2 {
+    width: 100%;
+    height: 80%;
+}
+
+.WTstageHeadingCount {
+    background-color: #E81E62;
+    padding: 0px 8px;
+    color: #fff;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.ControlPanelParent {
+    width: 100%;
+    height: 90vh;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.RightSettingParent {
+    width: 100%;
+    height: auto;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border-radius: 6px;
+    padding: 14px 16px 20px 16px;
+    margin-top: 10px;
+}
+
+.RSheadingText {
+    font-size: 16px;
+    color: #4b4b4b;
+    font-weight: 500;
+    letter-spacing: 0.2px !important;
+}
+
+.RSfieldsParentDiv {
+    width: 100%;
+    height: 36px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.SelectEmpInput {
+    width: 100%;
+    padding: 4px 50px 4px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #4b4b4b;
+    outline: none !important;
+    cursor: pointer;
+}
+
+.SelectEmpDropDown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: white;
+    z-index: 1;
+    margin-top: 5px;
+}
+
+.SelectEmpDropDownList {
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #4b4b4b;
+}
+
+.SelectEmpDropDownList:hover {
+    background-color: #f1f1f1;
+}
+
+.RightSettingSaveBtn {
+    font-size: 14px !important;
+    text-transform: capitalize !important;
+    height: 32px !important;
+    letter-spacing: 0.6px !important;
+    background-color: #3273E8 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 4px !important;
+    min-width: 90px !important;
+    margin-left: 6px !important;
+    font-weight: 400 !important;
+}
+
+.NewStaffAssigneeSaveBtn {
+    font-size: 14px !important;
+    text-transform: capitalize !important;
+    height: 32px !important;
+    letter-spacing: 0.6px !important;
+    background-color: #3273E8 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 4px !important;
+    min-width: 90px !important;
+    margin-left: 0px !important;
+    font-weight: 400 !important;
+}
+
+.RSslectClearIcon {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: red;
+    font-size: 16px;
+}
+
+.RSslectArrowIcon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #4b4b4b;
+    font-size: 16px;
+}
+
+.css-ahj2mt-MuiTypography-root {
+    margin: 0;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-weight: 400;
+    font-size: 14px !important;
+    line-height: 1.5;
+    letter-spacing: 0.00938em;
+}
+
+.NewStaffEntryInput {
+    width: 100%;
+    padding: 4px 30px 4px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #4b4b4b;
+    outline: none !important;
+}
+
+.NEAslectClearIcon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: red;
+    font-size: 16px;
+}
+
+.ClientPortalParentDiv {
+    width: 100%;
+    height: 90vh;
+    overflow: hidden;
+}
+
+.ClientPortalTabelParent {
+    width: 100%;
+    height: 100%;
+    margin-top: 10px;
+}
+
+/* ************* Leave Permission form ************* */
+
+.LeavePermissionParent {
+    width: 100%;
+    height: 90vh;
+    overflow: hidden;
+}
+
+.leaveRequestParent {
+    width: 100%;
+    padding: 10px 16px 16px 16px;
+}
+
+.leaveRequestSub {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    align-items: start;
+    gap: 2%;
+}
+
+
+.LPfieldsParentDivStyle {
+    width: 32%;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    padding: 8px 0px;
+}
+
+.LPfieldLabelText {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    color: #4b4b4b;
+    margin: 0px 0px 2px 2px;
+}
+
+.SelectCommonDropdownInput {
+    width: 100%;
+    padding: 0px 50px 0px 10px;
+    height: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #4b4b4b;
+    outline: none !important;
+    cursor: pointer;
+}
+
+.SelectCommonDropdownArrowIcon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #4b4b4b;
+    font-size: 16px;
+}
+
+.ChecklistDropdownArrowIcon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #FFF;
+    font-size: 16px;
+}
+
+
+.SelectCommonDDclearIcon {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: red;
+    font-size: 16px;
+}
+
+.SelectCommonDropDownSty {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: white;
+    z-index: 1;
+    margin-top: 5px;
+}
+
+.SelectCommonDropDownList {
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #4b4b4b;
+}
+
+.SelectCommonDropDownList:hover {
+    background-color: #f1f1f1 !important;
+}
+
+.SelectCommonDropDownList.focused {
+    background-color: #e0e0e0;
+}
+
+.LeaveRequestDateFields {
+    width: 100%;
+    height: 36px;
+    padding: 0px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #4b4b4b;
+    outline: none !important;
+    cursor: pointer;
+}
+
+.LeaveReqButtonSec {
+    width: 30%;
+    height: 34px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+
+.EntryLeaveReqButtonSec {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.LRsaveButton {
+    font-size: 14px !important;
+    width: 90px !important;
+    text-transform: capitalize !important;
+    height: 34px !important;
+    letter-spacing: 0.6px !important;
+    background-color: green !important;
+    font-weight: 400 !important;
+}
+
+.LRrejectButton {
+    font-size: 14px !important;
+    width: 90px !important;
+    text-transform: capitalize !important;
+    height: 34px !important;
+    letter-spacing: 0.6px !important;
+    background-color: red !important;
+    font-weight: 400 !important;
+}
+
+.LRaddButton {
+    font-size: 14px !important;
+    width: auto !important;
+    text-transform: capitalize !important;
+    height: 34px !important;
+    letter-spacing: 0.6px !important;
+    background-color: #3273E8 !important;
+    font-weight: 400 !important;
+}
+
+.LeaveRequestTableParent {
+    width: 100%;
+    height: calc(100% - 14px);
+    margin-top: 14px;
+}
+
+.LRresetDiv {
+    width: auto;
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-right: 4px;
+}
+
+.LRresetIcon {
+    font-size: 20px;
+    color: #5e5e5e;
+}
+
+.LRresetText {
+    font-size: 12px;
+    font-weight: 400;
+    color: #5e5e5e;
+}
+
+.LREntryModalParent {
+    position: fixed;
+    z-index: 99;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+}
+
+.LREntryModalSub {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 850px;
+    height: auto;
+    background-color: #fff;
+    border: none;
+    box-shadow: 24;
+    border-radius: 10px;
+    outline: none;
+    border: none;
+    /* overflow-y: auto; */
+}
+
+.LRTopBar {
+    width: 100%;
+    height: 40px;
+    border-bottom: 1px solid #d3d3d3;
+    padding: 0px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.LRtitleText {
+    font-size: 16px;
+    font-weight: 400;
+    color: rgb(62, 62, 62);
+    letter-spacing: 0.4px;
+}
+
+.LRIoCloseDivStyle {
+    width: auto;
+    height: auto;
+    padding: 2px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.LRIoCloseDivStyle:hover {
+    background-color: #ffeeee;
+}
+
+.LRioCloseSty {
+    color: #ff2b2b;
+    font-size: 20px;
+}
+
+.ClientPortalModalParent {
+    position: fixed;
+    z-index: 99;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+}
+
+.ClientPortalModalSub {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 70%;
+    background-color: #fff;
+    border: none;
+    box-shadow: 24;
+    border-radius: 10px;
+    outline: none;
+    border: none;
+    overflow-y: auto;
+}
+
+.CPTableParentDiv {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.CPstageHeading {
+    width: 100%;
+    height: 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.CPStagewisParent2 {
+    height: calc(100% - 46px);
+    margin-top: 10px;
+    overflow-y: auto;
+}
+
+.LRinputWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.LRclearIcon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: red;
+    cursor: pointer;
+    user-select: none;
+}
+
+.StaffAssigneeDropdownInput {
+    width: 100%;
+    padding: 0px 10px 0px 36px;
+    height: 32px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #3b3b3b;
+    outline: none !important;
+    cursor: pointer;
+}
+
+.ChecklistDropdownInput {
+    width: 100%;
+    padding: 0px 30px 0px 10px;
+    height: 34px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #fff;
+    outline: none !important;
+    cursor: pointer;
+}
+
+.StaffAssigneeDropDownSty {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: white;
+    z-index: 1;
+    margin-top: 5px;
+}
+
+.StaffAssigneeIcon {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.TableTDstyleForDropdown {
+    white-space: nowrap;
+    max-width: 200px;
+    border-bottom: none !important;
+}
+
+.checklistInputSty {
+    background-color: #FBFBFB;
+    color: #4b4b4b;
+    width: 100%;
+    font-size: 14px;
+    border: 1px solid #c8c8c8;
+    height: 36px;
+    border-radius: 4px;
+    padding: 0px 10px;
+    letter-spacing: 0.6px !important;
+}
+
+.checklistInputSty::placeholder {
+    color: #666666;
+    font-size: 14px;
+}
+
+.checklistInputSty:focus {
+    border-color: black;
+    /* outline: none;  */
+}
+
+.ChecklistCancelButton {
+    font-size: 14px !important;
+    text-transform: capitalize !important;
+    height: 34px !important;
+    letter-spacing: 0.6px !important;
+    background-color: red !important;
+    color: #fff !important;
+}
+
+.ChecklistSaveButton {
+    font-size: 14px !important;
+    text-transform: capitalize !important;
+    height: 34px !important;
+    letter-spacing: 0.6px !important;
+    background-color: green !important;
+    color: #fff !important;
+    font-weight: 400 !important;
+}
+
+.HoldButton {
+    font-size: 14px !important;
+    text-transform: capitalize !important;
+    height: 35px !important;
+    letter-spacing: 0.6px !important;
+    border: 2px solid #2965C0 !important;
+    background-color: transparent !important;
+    color: #2965C0 !important;
+    font-weight: 400 !important;
+    box-shadow: none !important;
+}
+
+.HoldButton:hover {
+    border: 2px solid #8fbcff !important;
+    background-color: #2965C0 !important;
+    color: #fff !important;
+}
+
+.HoldButton1 {
+    font-size: 14px !important;
+    text-transform: capitalize !important;
+    height: 35px !important;
+    width: auto !important;
+    padding: 0px 30px !important;
+    text-wrap: nowrap !important;
+    letter-spacing: 0.6px !important;
+    border: 2px solid #2965C0 !important;
+    background-color: transparent !important;
+    color: #2965C0 !important;
+    font-weight: 400 !important;
+    box-shadow: none !important;
+
+}
+
+.HoldButton1:hover {
+    border: 2px solid #8fbcff !important;
+    background-color: #2965C0 !important;
+    color: #fff !important;
+}
+
+.theadStyleForChecklist {
+    width: 100%;
+    height: 36px !important;
+    background-color: #292929;
+    color: #fff !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    top: 0;
+    border: 1px solid #ddd !important;
+}
+
+.tackActivityParent {
+    width: 100%;
+    height: 90vh;
+    overflow: hidden;
+}
+
+.taskActivityCardsParent {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 24px;
+    margin-top: 20px;
+    padding: 0px 2px;
+}
+
+.TaskActivityCard {
+    width: 220px;
+    height: 100%;
+    box-shadow: 0 4px 6px -1px #0000001a, 0 2px 4px -1px #0000000f;
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+}
+
+.TaskCardIconParent {
+    width: 30%;
+}
+
+.TaskCardIconSub {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #03a500;
+    margin-top: -20px;
+    margin-left: 10px;
+}
+
+.CardDataParent {
+    width: 70%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: end;
+    justify-content: center;
+    padding-right: 16px;
+}
+
+.CardDataParTitle {
+    font-size: 14px;
+    color: #9a9a9a;
+    text-align: right;
+}
+
+.CardDataParCount {
+    font-size: 22px;
+    font-weight: 600;
+    text-align: right;
+    color: #344767;
+}
+
+.GoStopwatchSTY {
+    font-size: 30px;
+    color: #fff;
+}
+
+.GoStopwatchSTY2 {
+    font-size: 28px;
+    color: #fff;
+}
+
+.ModalDetailTableParent {
+    position: fixed;
+    z-index: 99;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+}
+
+.ModalDetailTableSub {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    background-color: #fff;
+    border: none;
+    box-shadow: 24;
+    border-radius: 10px;
+    outline: none;
+    border: none;
+    overflow-y: auto;
+}
+
+.TaskCreationDropdownInput {
+    width: 100%;
+    padding: 0px 50px 0px 10px;
+    height: 34px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #4b4b4b;
+    outline: none !important;
+    cursor: pointer;
+    background-color: rgb(245, 245, 245);
+}
+
+.PauseCircleIconRed {
+    width: 28px;
+    height: 28px;
+    fill: red;
+    cursor: pointer;
+}
+
+.PauseCircleIconWhite {
+    width: 28px;
+    height: 28px;
+    fill: #fff;
+    cursor: pointer;
+}
+
+.PlayCircleIconRed {
+    width: 28px;
+    height: 28px;
+    fill: green;
+    cursor: pointer;
+}
+
+.PlayCircleIconWhite {
+    width: 28px;
+    height: 28px;
+    fill: #fff;
+    cursor: pointer;
+}
+
+.PlayPauseButtonSty {
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+
+.SprintFlagSty {
+    font-size: 16px;
+}
+
+.SprintFlagWhite {
+    fill: #fff !important;
+    font-size: 16px;
+}
+
+.SprintCloseBtnBlue {
+    background-color: #3273E8;
+    width: 100px;
+    height: 32px;
+    border-radius: 4px;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    border: none;
+    cursor: pointer;
+    color: #ffff;
+    text-align: center;
+    outline: 'none';
+}
+
+.TaskCreateButtonStyle {
+    font-size: 13px !important;
+    text-transform: capitalize !important;
+    width: 90px !important;
+    height: 32px !important;
+    letter-spacing: 0.6px !important;
+    background-color: #3273E8 !important;
+    font-weight: 400 !important;
+}
+
+.CricicalAlertNoBtn {
+    font-size: 16px !important;
+    text-transform: capitalize !important;
+    height: 38px !important;
+    letter-spacing: 0.6px !important;
+    background-color: #e70000 !important;
+    box-shadow: none !important;
+    min-width: 100px !important;
+    font-weight: 400 !important;
+}
+
+.CricicalAlertYesBtn {
+    font-size: 16px !important;
+    text-transform: capitalize !important;
+    height: 38px !important;
+    letter-spacing: 0.6px !important;
+    background-color: #56BB5A !important;
+    box-shadow: none !important;
+    min-width: 100px !important;
+    font-weight: 400 !important;
+}
+
+.ModalHeadingFirstSty {
+    color: #4b4b4b;
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.6px;
+}
+
+.MainTaskTxtSty {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 12px;
+    background-color: #eaf1ff;
+    color: #606060;
+    padding: 0px 10px;
+    border-radius: 4px;
+}
+
+.MainTaskTxtSty2 {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    height: 18px;
+    background-color: #3273E8;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.taskCreationModalStyle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    width: 55%;
+    height: auto;
+    max-height: 90%;
+    border-radius: 8px;
+    z-index: 99999;
+    border: none;
+    outline: none;
+    overflow-y: auto;
+}
+
+.taskCreModalHeader {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+    border-bottom: 2px solid #e8eaed;
+    height: 8%;
+    align-items: center;
+}
+
+.TaskCreContainer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    flex-direction: column;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.taskCreContainerStyles {
+    width: 75%;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 10px;
+}
+
+.leftBoxStyles {
+    width: 30%;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 0px;
+}
+
+.TaskCreFormLabel {
+    font-weight: 400;
+    color: #4f4d4d;
+    font-size: 14px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: start;
+    gap: 2px;
+}
+
+.FaStarOfLifeSty {
+    font-size: 6px;
+    color: red;
+    margin-top: 4px;
+    margin-left: 2px;
+}
+
+.DropRightBoxStyles {
+    width: 70%;
+}
+
+.TaskCreationFooter {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    padding: 10px 0px;
+    gap: 14px;
+}
+
+.taskCreatItemSty {
+    cursor: pointer;
+    display: flex;
+    box-sizing: border-box;
+}
+
+.TaskCreationFileList {
+    display: flex;
+    flex-direction: column;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    gap: 10px;
+}
+
+.TaskCreationFileItem {
+    display: flex;
+    align-items: center;
+    border: 1px solid #E3E3E3;
+    padding: 10px 14px;
+    position: relative;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.TaskCreationFileName {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.TaskCreationCloseIcon {
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    color: red;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.TaskNoInputSty {
+    border: none;
+    outline: none;
+    background-color: #f5f5f5;
+    height: 33px;
+    padding: 6px 8px;
+    font-size: 13px;
+    border-radius: 6px;
+    color: #4f4d4d
+}
+
+.TaskCrePrioAssignDiv {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.PriorityMenuItemSty {
+    text-align: center !important;
+    font-size: 14px !important;
+    color: #4b4b4b !important;
+    letter-spacing: 0.6px !important;
+    padding: 0px 6px;
+}
+
+.PriorityTaskCreMainDiv {
+    width: 100px;
+    height: 36px;
+    margin: 0px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid #e3e3e3 !important;
+}
+
+.FlagIconAndNameTxtSty {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    cursor: pointer;
+    justify-content: center;
+}
+
+.FlagIconAndNameTxtSty2 {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    cursor: pointer;
+    justify-content: center;
+}

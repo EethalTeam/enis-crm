@@ -1,35 +1,78 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
-import { LogIn, Mail, Lock, Sparkles } from 'lucide-react';
+import { LogIn, Mail, Lock, Sparkles, Loader2 } from 'lucide-react';
+
+// Shadcn UI Components
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/AuthContext';
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from '@/components/ui/use-toast';
+
+// Context
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isLoading } = useAuth();
   const { toast } = useToast();
 
-  const handleSubmit = (e) => {
+  // --- Effect: Check for "Remember Me" credentials on mount ---
+  useEffect(() => {
+    const savedUsername = localStorage.getItem('EmployeeName_saved');
+    const savedPassword = localStorage.getItem('password_saved');
+    const isRemembered = localStorage.getItem('rememberMe') === 'true';
+
+    if (isRemembered && savedUsername && savedPassword) {
+      try {
+        // Use atob() to decode base64
+        setEmail(atob(savedUsername));
+        setPassword(atob(savedPassword));
+        setRememberMe(true);
+      } catch (error) {
+        console.error("Decoding error:", error);
+        localStorage.removeItem('EmployeeName_saved');
+        localStorage.removeItem('password_saved');
+      }
+    }
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email && password) {
-      login(email, password);
-      toast({
-        title: "Login Successful",
-        description: "Welcome to your upgraded CRM!",
-      });
-      navigate('/');
-    } else {
+    
+    if (!email || !password) {
       toast({
         title: "Error",
         description: "Please enter email and password",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // 1. Call the API
+      const successMessage = await login(email, password, rememberMe);
+      
+      // 2. Show Success Message
+      toast({
+        title: "Login Successful",
+        description: successMessage || "Welcome back!",
+      });
+      
+      // 3. Navigate (Only happens if login doesn't throw error)
+      navigate('/dashboard');
+
+    } catch (error) {
+      // 4. Handle Errors
+      toast({
+        title: "Login Failed",
+        description: error.message || "An error occurred",
         variant: "destructive",
       });
     }
@@ -39,7 +82,7 @@ export default function Login() {
     <>
       <Helmet>
         <title>Login - ENIS CRM</title>
-        <meta name="description" content="Login to access your ENIS CRM dashboard and manage your business operations." />
+        <meta name="description" content="Login to access your ENIS CRM dashboard." />
       </Helmet>
       <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#1b0a2c] via-[#2a133b] to-[#3a1b4a] p-4 overflow-hidden">
         <motion.div
@@ -48,6 +91,7 @@ export default function Login() {
           transition={{ duration: 0.7, type: "spring" }}
           className="w-full max-w-md relative"
         >
+          {/* Background Glow Blobs */}
           <div className="absolute -top-16 -left-16 w-72 h-72 bg-fuchsia-500 rounded-full mix-blend-soft-light filter blur-2xl opacity-40 animate-blob"></div>
           <div className="absolute -bottom-16 -right-16 w-72 h-72 bg-pink-500 rounded-full mix-blend-soft-light filter blur-2xl opacity-40 animate-blob animation-delay-4000"></div>
           
@@ -62,16 +106,17 @@ export default function Login() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">Email</Label>
+                <Label htmlFor="email" className="text-white">User Name</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-5 w-5 text-fuchsia-400" />
                   <Input
                     id="email"
-                    type="email"
-                    placeholder="admin@example.com"
+                    type="text"
+                    placeholder="Enter username"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white placeholder:text-purple-200"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -87,14 +132,45 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white placeholder:text-purple-200"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
 
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onCheckedChange={setRememberMe}
+                  className="border-fuchsia-700 data-[state=checked]:bg-fuchsia-600 data-[state=checked]:text-white"
+                  disabled={isLoading}
+                />
+                <Label
+                  htmlFor="rememberMe"
+                  className="text-sm font-medium leading-none text-white peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Remember Me
+                </Label>
+              </div>
+
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button type="submit" className="w-full bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold" size="lg">
-                  <LogIn className="mr-2 h-5 w-5"/>
-                  Secure Sign In
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold" 
+                  size="lg"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Signing In...
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="mr-2 h-5 w-5"/>
+                      Secure Sign In
+                    </>
+                  )}
                 </Button>
               </motion.div>
             </form>

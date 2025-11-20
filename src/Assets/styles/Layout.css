@@ -1,0 +1,55 @@
+/* Layout.css */
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  /* Header */
+  .header {
+    height:65px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    padding: 0 16px 0 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    justify-content:space-between;
+  }
+  
+  /* Body */
+  .body-container {
+    display: flex;
+    flex: 1;
+    margin-top: 65px; /* To prevent content from being hidden behind the header */
+    overflow: hidden;
+  }
+  
+
+  
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    /* overflow-y: auto; */
+    background-color: #ffffff;
+    /* padding: 16px; */
+    width: calc(100% - 200px);
+    height: 100%;
+  }
+  .locationDiv{
+    width: 100%;
+    height: 10%;
+  }
+  .childrenDiv{
+    height: 100%;
+    width: 100%;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    padding: 10px;
+  }

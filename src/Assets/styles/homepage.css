@@ -1,0 +1,397 @@
+.HomemainDiv {
+    width: 100%;
+    height:  calc(100vh - 120px);
+    /* height: 100vh; */
+    overflow: auto;
+    padding: 2px;
+    display: flex;
+}
+
+.HomeheaderDiv {
+    height: 20%;
+    width: 100%;
+    background-image: url(../Images/headerimage.svg);
+
+}
+
+.HomeBodyDiv {
+    height: auto;
+    width: 100%;
+    display: flex;
+}
+
+.namediv {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    height: 65px;
+    padding: 15px;
+    gap: 15px;
+}
+
+.welmsg {
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.logbuild {
+    height: 18px;
+    width: 18px;
+}
+
+.icon-div {
+    border: 1px solid #ebeaf2;
+    border-radius: 8px;
+    height: 48px;
+    width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+}
+
+.tabSectmc {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    height: 75px;
+    padding: 15px;
+}
+
+.usernamesection {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.tabmenuHeader {
+    width: 100%;
+    height: 50px;
+    border-bottom: 1px solid rgb(180 177 177 / 18%);
+    align-items: center;
+    display: flex;
+    gap: 20px;
+    color: #21263c;
+}
+
+.tabItem {
+    padding: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    color: #21263c;
+}
+
+.tabItem.active {
+    border-bottom: 3px solid blue;
+    font-weight: bold;
+}
+
+.MaintabContent {
+    height: calc(100% - 20%);
+    /* max-width: 1154px;
+    min-width: 1033px; */
+    margin: 35px;
+    width: 100%;
+}
+
+.dashboard-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    height: 170px;
+    margin-top: 35px;
+    margin-bottom: 35px;
+}
+
+.Purchase-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    height: 270px;
+    margin-top: 35px;
+    margin-bottom: 35px;
+}
+
+.ProductDetails-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    height: 256px;
+    margin-top: 35px;
+    margin-bottom: 35px;
+}
+
+.sales-container,
+.inventory-container {
+    background: #fff;
+    border-radius: 10px;
+    /* padding: 15px; */
+    border: 1px solid rgb(228, 225, 225);
+}
+
+.sales-container {
+    width: 68%;
+}
+
+.inventory-container {
+    width: 30%;
+}
+
+.Product-container,
+.Selling-container {
+    background: #fff;
+    border-radius: 10px;
+    /* padding: 15px; */
+    border: 1px solid rgb(228, 225, 225);
+}
+
+.Product-container {
+    width: 50%;
+}
+
+.Selling-container {
+    width: 50%;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 400;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e2e2;
+    background-color: #f9f9fb;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 10px;
+}
+
+.Product-title {
+    font-size: 16px;
+    text-align: center;
+}
+
+.sales-grid {
+    display: flex;
+    justify-content: space-between;
+}
+
+.Product-grid {
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+    flex-direction: column;
+}
+
+.Product-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+}
+
+.sales-card {
+    flex: 1;
+    text-align: center;
+    border-right: 1px solid #e2e2e2;
+}
+
+.sales-card:last-child {
+    border-right: none;
+}
+
+.SalesOrder-card {
+    flex: 1;
+    text-align: center;
+    border-right: 1px solid #e2e2e2;
+}
+
+.sales-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #f7f9fb;
+    margin: 0 !important;
+}
+
+.sales-table th {
+    padding: 15px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #6c718a;
+}
+
+.sales-value {
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.Product-value {
+    font-size: 14px;
+}
+
+.sales-label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.sales-status {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.inventory-content {
+    padding: 10px;
+}
+
+.Purchase-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e2e2;
+}
+
+.Purchase-item:last-child {
+    border-bottom: none;
+}
+
+.inventory-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e2e2;
+}
+
+.inventory-item:last-child {
+    border-bottom: none;
+}
+
+.inventory-label {
+    font-size: 14px;
+    color: black;
+}
+
+.inventory-value {
+    font-size: 25px;
+    font-weight: bold;
+    color: #1E90FF;
+    cursor: pointer;
+}
+
+.Product-Activity {
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+    flex-direction: column;
+}
+
+.ProductDivMAin {
+    width: 100%;
+    display: flex;
+}
+
+.circleDiv {
+    border-radius: 50%;
+    font-size: 10px;
+    height: 115px;
+    width: 115px;
+    border: 14px solid #ebeaf2;
+    padding: 37px 5px;
+    margin: 8px auto;
+}
+
+.Summary-content {
+    display: flex;
+    align-items: center;
+    padding: 90px;
+    font-size: 13px;
+    justify-content: center;
+}
+
+.sales-chart-container {
+    width: 100%;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid rgb(228, 225, 225);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+
+.filter-dropdown {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 15%;
+}
+
+.chart-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.total-sales {
+    width: 30%;
+    /* border-left: 1px solid #ddd; */
+    /* padding-left: 20px; */
+    height: 100%;
+}
+.paddingRes{
+    padding-right: 20px;
+}
+.total-sales-parent {
+    width: 30%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid #ddd;
+
+}
+
+.sales-box {
+    border: 1px solid #3b82f6;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.sales-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.sales-label {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.sales-box h2 {
+    color: #333;
+    margin-top: 10px;
+}
+
+.DivForpadding {
+    padding: 10px;
+    height: 50px;
+    background-color: #f9f9fb;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
