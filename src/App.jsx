@@ -17,15 +17,23 @@ import Analytics from '@/pages/Analytics';
 import Settings from '@/pages/Settings';
 import Users from '@/pages/Users';
 import Plots from '@/pages/Plots';
+import PlotList from '@/pages/PlotList'
+import PlotView from '@/pages/PlotView'
 import Visitors from '@/pages/Visitors';
+import Unit from '@/pages/Unit'
+import Site from '@/pages/Site'
+import Dialer from '@/pages/TeleCMIDialer'
 import MasterForms from '@/pages/MasterForms';
 import AdminPanel from '@/pages/AdminPanel';
 import MainLayout from '@/components/layout/MainLayout';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
 function PrivateRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" />;
+   const token = localStorage.getItem('token');
+      const employeeName = localStorage.getItem('EmployeeName');
+      
+  return (token && employeeName) ? children : <Navigate to="/login" />;
+
 }
 
 function App() {
@@ -40,6 +48,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
             <Route path="/dashboard"  element={<Dashboard />} />
+             <Route path="/"  element={<Dashboard />} />
             <Route path="leads" element={<Leads />} />
             <Route path="contacts" element={<Contacts />} />
             <Route path="companies" element={<Companies />} />
@@ -51,8 +60,12 @@ function App() {
             <Route path="analytics" element={<Analytics />} />
             <Route path="users" element={<Users />} />
             <Route path="settings" element={<Settings />} />
-            <Route path="plots" element={<Plots />} />
+            <Route path="/plots/list" element={<PlotList />} />
+            <Route path="/plots/view" element={<PlotView />} />
             <Route path="visitors" element={<Visitors />} />
+            <Route path="/masters/unit" element={<Unit />} />
+            <Route path="/masters/site" element={<Site />} />
+            <Route path="/dialer" element={<Dialer />} />
             <Route path="master-forms" element={<MasterForms />} />
             <Route path="admin-panel" element={<AdminPanel />} />
           </Route>

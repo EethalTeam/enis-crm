@@ -51,13 +51,15 @@ export default function Header({ toggleSidebar }) {
 
           <div className="flex items-center gap-3 pl-3 border-l border-purple-700/50">
             <motion.div whileHover={{ scale: 1.1 }}>
-              <Avatar>
-                <AvatarImage src={user?.avatar} />
-                <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
-              </Avatar>
+<Avatar>
+  <AvatarImage
+    src={user?.avatar}
+  />
+  <AvatarFallback>🧑‍💼</AvatarFallback>
+</Avatar>
             </motion.div>
             <div className="hidden md:block">
-              <p className="text-sm font-medium text-white">{user?.name}</p>
+              <p className="text-sm font-medium text-white">{user?.EmployeeName}</p>
               <p className="text-xs text-purple-400">{user?.role}</p>
             </div>
             <Button variant="ghost" size="icon" onClick={handleLogout}>

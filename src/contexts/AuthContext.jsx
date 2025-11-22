@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
           token: token,
           EmployeeName: employeeName,
           EmployeeID: localStorage.getItem('EmployeeID'),
-          role: localStorage.getItem('role'), // Note: this is base64 encoded
+          role: atob(localStorage.getItem('role')), 
           departmentId: localStorage.getItem('departmentId'),
           unitId: localStorage.getItem('unitId'),
         });

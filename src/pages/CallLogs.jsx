@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X } from 'lucide-react';
+import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, CheckCircle } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
 
 // --- Inline UI Components for Portability ---
@@ -23,20 +23,22 @@ const Badge = ({ className, children }) => (
   </div>
 );
 
-const Button = ({ className, variant = "default", size = "default", onClick, children }) => {
+const Button = ({ className, variant = "default", size = "default", onClick, disabled, children }) => {
   const baseStyles = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
   const variants = {
-    default: "bg-primary text-primary-foreground hover:bg-primary/90",
-    ghost: "hover:bg-accent hover:text-accent-foreground",
+    default: "bg-blue-600 text-white hover:bg-blue-700",
+    ghost: "hover:bg-slate-800 hover:text-slate-100",
+    outline: "border border-slate-700 hover:bg-slate-800 text-slate-100"
   };
   const sizes = {
     default: "h-10 px-4 py-2",
-    sm: "h-9 rounded-md px-3",
+    sm: "h-8 rounded-md px-3 text-xs",
   };
   return (
     <button 
       className={`${baseStyles} ${variants[variant] || variants.default} ${sizes[size] || sizes.default} ${className}`}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>
@@ -54,7 +56,6 @@ const ToastProvider = ({ children }) => {
     const id = Math.random().toString(36).substring(2, 9);
     setToasts((prev) => [...prev, { id, title, description, variant }]);
 
-    // Auto-dismiss after 3 seconds
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 3000);
@@ -78,6 +79,8 @@ const ToastProvider = ({ children }) => {
               className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
                 t.variant === 'destructive' 
                   ? 'bg-red-900/90 border-red-800 text-white' 
+                  : t.variant === 'success'
+                  ? 'bg-green-900/90 border-green-800 text-white'
                   : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
               }`}
             >
@@ -107,7 +110,6 @@ const statusColors = {
   'busy': 'bg-orange-500 text-white hover:bg-orange-600 border-transparent',
 };
 
-// Helper to format seconds into MM:SS
 const formatDuration = (seconds) => {
   if (!seconds) return "0:00";
   const mins = Math.floor(seconds / 60);
@@ -115,7 +117,6 @@ const formatDuration = (seconds) => {
   return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 };
 
-// Helper to format date
 const formatTime = (isoString) => {
   if (!isoString) return "--:--";
   return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -125,46 +126,34 @@ function CallLogsContent() {
   const { toast } = useToast();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  // eslint-disable-next-line no-unused-vars
-  const [error, setError] = useState(null);
+  const [qualifyingId, setQualifyingId] = useState(null); // Track specific button loading
   
-  // Ref to store the current audio instance so we can stop it later
   const audioRef = useRef(null);
-  // State to track which log is currently playing (to toggle icon)
   const [playingId, setPlayingId] = useState(null);
 
   // Fetch Logs
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        // Using POST method as requested
         let url = config.Api + "CallLogs/getAllCallLogs";
         const response = await fetch(url, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `Bearer ${token}` 
-          },
-          body: JSON.stringify({
-            page: 1,
-            limit: 50 // Fetch first 50 logs
-          }), 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ page: 1, limit: 50 }), 
         });
 
         if (!response.ok) throw new Error('Failed to fetch logs');
 
         const data = await response.json();
-        // Assuming your API returns { success: true, data: [...] } or just [...]
         const logData = data.data || data.calls || []; 
         setLogs(logData);
       } catch (err) {
         console.error(err);
-        setError(err.message);
-        // Mock data for preview if API fails
+        // Mock data includes _id which is needed for qualifying
         setLogs([
-            { cmiuuid: '1', from: 'John Doe', to: '+1234567890', status: 'answered', direction: 'inbound', answeredsec: 323, callDate: new Date().toISOString(), custom: 'Interested', recordingUrl: 'https://www.soundhelix.com/examples/mp3/Soundhelix-Song-1.mp3' },
+            { _id: 'mock1', cmiuuid: '1', from: 'John Doe', to: '+1234567890', status: 'answered', direction: 'inbound', answeredsec: 323, callDate: new Date().toISOString(), custom: 'Interested', recordingUrl: 'https://www.soundhelix.com/examples/mp3/Soundhelix-Song-1.mp3' },
+            { _id: 'mock2', cmiuuid: '2', from: 'Jane Smith', to: '+1987654321', status: 'missed', direction: 'inbound', answeredsec: 0, callDate: new Date().toISOString(), custom: '', recordingUrl: null },
         ]);
-        // Use timeout to ensure toast provider is ready
         setTimeout(() => {
             toast({
                 title: "Demo Mode",
@@ -179,16 +168,55 @@ function CallLogsContent() {
 
     fetchLogs();
 
-    // Cleanup audio on unmount
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
       }
     };
-  }, []); // Removed toast from dependency array to avoid loops
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // --- NEW PLAY FUNCTION ---
+  // --- QUALIFY HANDLER ---
+  const handleQualify = async (callId) => {
+    if (!callId) return;
+    setQualifyingId(callId);
+
+    try {
+      // Assuming the route is /CallLogs/Qualify/:logId as per standard REST patterns
+      // If your backend expects ID in body, change this to body: JSON.stringify({ logId: callId })
+      const url = `${config.Api}CallLogs/Qualify`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:JSON.stringify({logId:callId})
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        toast({
+          title: "Lead Qualified",
+          description: "Call log successfully converted to a lead.",
+          variant: "success"
+        });
+        // Optional: You might want to mark this log as processed locally to disable button
+      } else {
+        throw new Error(result.message || "Failed to qualify lead");
+      }
+    } catch (error) {
+      console.error("Qualify error:", error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setQualifyingId(null);
+    }
+  };
+
   const handlePlayRecording = (recordingUrl, id) => {
     if (!recordingUrl) {
       toast({
@@ -199,7 +227,6 @@ function CallLogsContent() {
       return;
     }
 
-    // If the clicked audio is already playing, pause it
     if (playingId === id) {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -208,13 +235,11 @@ function CallLogsContent() {
       return;
     }
 
-    // Stop currently playing audio if any
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
 
-    // Create and play new audio
     const audio = new Audio(recordingUrl);
     audioRef.current = audio;
     
@@ -227,7 +252,6 @@ function CallLogsContent() {
       setPlayingId(null);
     });
 
-    // Reset state when audio finishes
     audio.onended = () => {
       setPlayingId(null);
     };
@@ -252,8 +276,8 @@ function CallLogsContent() {
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Time</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Duration</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Status</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Disposition</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Recording</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -305,13 +329,8 @@ function CallLogsContent() {
                       </Badge>
                     </td>
 
-                    <td className="py-3 px-4 text-sm text-slate-300">
-                      {call.custom && call.custom !== "null" ? call.custom : "-"}
-                    </td>
-
                     <td className="py-3 px-4">
-                      {/* Use call.recordingUrl which comes from backend */}
-                      {(call.recordingUrl || call.filename) && (
+                      {(call.recordingUrl || call.filename) ? (
                         <Button 
                           variant="ghost" 
                           size="sm" 
@@ -320,8 +339,33 @@ function CallLogsContent() {
                         >
                           {playingId === call.cmiuuid ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                         </Button>
+                      ) : (
+                        <span className="text-xs text-slate-600">N/A</span>
                       )}
                     </td>
+
+                    {/* --- NEW QUALIFY BUTTON COLUMN --- */}
+                    <td className="py-3 px-4">
+                      {call.status === 'answered' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleQualify(call._id)}
+                          disabled={qualifyingId === call._id}
+                          className="border-blue-800 bg-blue-900/20 text-blue-300 hover:bg-blue-800 hover:text-white min-w-[90px]"
+                        >
+                          {qualifyingId === call._id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <UserPlus className="w-3.5 h-3.5 mr-2" />
+                              Qualify
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </td>
+
                   </motion.tr>
                 ))}
               </tbody>
@@ -333,7 +377,6 @@ function CallLogsContent() {
   );
 }
 
-// Wrap the component with the ToastProvider
 export default function CallLogs() {
   return (
     <ToastProvider>
