@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, CheckCircle } from 'lucide-react';
+import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, CheckCircle, Filter } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
 
 // --- Inline UI Components for Portability ---
@@ -28,7 +28,8 @@ const Button = ({ className, variant = "default", size = "default", onClick, dis
   const variants = {
     default: "bg-blue-600 text-white hover:bg-blue-700",
     ghost: "hover:bg-slate-800 hover:text-slate-100",
-    outline: "border border-slate-700 hover:bg-slate-800 text-slate-100"
+    outline: "border border-slate-700 hover:bg-slate-800 text-slate-100",
+    secondary: "bg-slate-800 text-slate-100 hover:bg-slate-700"
   };
   const sizes = {
     default: "h-10 px-4 py-2",
@@ -126,7 +127,10 @@ function CallLogsContent() {
   const { toast } = useToast();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [qualifyingId, setQualifyingId] = useState(null); // Track specific button loading
+  const [qualifyingId, setQualifyingId] = useState(null); 
+  
+  // --- NEW: Tab State ---
+  const [activeTab, setActiveTab] = useState('all');
   
   const audioRef = useRef(null);
   const [playingId, setPlayingId] = useState(null);
@@ -149,10 +153,12 @@ function CallLogsContent() {
         setLogs(logData);
       } catch (err) {
         console.error(err);
-        // Mock data includes _id which is needed for qualifying
+        // Mock data
         setLogs([
             { _id: 'mock1', cmiuuid: '1', from: 'John Doe', to: '+1234567890', status: 'answered', direction: 'inbound', answeredsec: 323, callDate: new Date().toISOString(), custom: 'Interested', recordingUrl: 'https://www.soundhelix.com/examples/mp3/Soundhelix-Song-1.mp3' },
             { _id: 'mock2', cmiuuid: '2', from: 'Jane Smith', to: '+1987654321', status: 'missed', direction: 'inbound', answeredsec: 0, callDate: new Date().toISOString(), custom: '', recordingUrl: null },
+            { _id: 'mock3', cmiuuid: '3', from: 'Sales Team', to: '+1555555555', status: 'answered', direction: 'outbound', answeredsec: 120, callDate: new Date().toISOString(), custom: '', recordingUrl: null },
+            { _id: 'mock4', cmiuuid: '4', from: 'Unknown', to: '+1999999999', status: 'missed', direction: 'inbound', answeredsec: 0, callDate: new Date().toISOString(), custom: '', recordingUrl: null },
         ]);
         setTimeout(() => {
             toast({
@@ -177,14 +183,29 @@ function CallLogsContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // --- FILTER LOGIC BASED ON TABS ---
+  const getFilteredLogs = () => {
+    switch (activeTab) {
+      case 'incoming':
+        return logs.filter(log => log.direction === 'inbound' || log.direction === 'incoming');
+      case 'outgoing':
+        return logs.filter(log => log.direction === 'outbound' || log.direction === 'outgoing');
+      case 'rnr':
+        // RNR typically means missed calls or ring-no-answer
+        return logs.filter(log => log.status === 'missed' || log.status === 'busy');
+      default:
+        return logs;
+    }
+  };
+
+  const filteredLogs = getFilteredLogs();
+
   // --- QUALIFY HANDLER ---
   const handleQualify = async (callId) => {
     if (!callId) return;
     setQualifyingId(callId);
 
     try {
-      // Assuming the route is /CallLogs/Qualify/:logId as per standard REST patterns
-      // If your backend expects ID in body, change this to body: JSON.stringify({ logId: callId })
       const url = `${config.Api}CallLogs/Qualify`;
       
       const response = await fetch(url, {
@@ -201,7 +222,6 @@ function CallLogsContent() {
           description: "Call log successfully converted to a lead.",
           variant: "success"
         });
-        // Optional: You might want to mark this log as processed locally to disable button
       } else {
         throw new Error(result.message || "Failed to qualify lead");
       }
@@ -257,11 +277,39 @@ function CallLogsContent() {
     };
   };
 
+  // --- TAB COMPONENT ---
+  const TabButton = ({ id, label, count }) => (
+    <button
+      onClick={() => setActiveTab(id)}
+      className={`relative px-4 py-2 text-sm font-medium transition-all rounded-md ${
+        activeTab === id 
+          ? 'bg-blue-600 text-white shadow-md' 
+          : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
+      }`}
+    >
+      {label}
+      {activeTab === id && (
+        <motion.div
+          layoutId="activeTab"
+          className="absolute inset-0 rounded-md bg-blue-600 -z-10"
+        />
+      )}
+    </button>
+  );
+
   return (
     <div className="space-y-6 p-4 bg-slate-950 min-h-screen text-slate-100">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-white">Call Logs</h1>
         {loading && <Loader2 className="animate-spin text-white" />}
+      </div>
+
+      {/* --- NEW: TABS SECTION --- */}
+      <div className="flex items-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
+        <TabButton id="all" label="All Calls" />
+        <TabButton id="incoming" label="Incoming" />
+        <TabButton id="outgoing" label="Outgoing" />
+        <TabButton id="rnr" label="RNR" />
       </div>
 
       <Card className="bg-slate-900 border-slate-800">
@@ -281,15 +329,18 @@ function CallLogsContent() {
                 </tr>
               </thead>
               <tbody>
-                {!loading && logs.length === 0 && (
+                {!loading && filteredLogs.length === 0 && (
                   <tr>
-                    <td colSpan="8" className="text-center py-8 text-slate-400">
-                      No call logs found.
+                    <td colSpan="8" className="text-center py-12 text-slate-500">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <Filter className="w-8 h-8 opacity-50" />
+                        <p>No {activeTab === 'all' ? '' : activeTab} logs found.</p>
+                      </div>
                     </td>
                   </tr>
                 )}
                 
-                {logs.map((call, index) => (
+                {filteredLogs.map((call, index) => (
                   <motion.tr
                     key={call._id || call.cmiuuid || index}
                     initial={{ opacity: 0, y: 10 }}
@@ -344,7 +395,6 @@ function CallLogsContent() {
                       )}
                     </td>
 
-                    {/* --- NEW QUALIFY BUTTON COLUMN --- */}
                     <td className="py-3 px-4">
                       {call.status === 'answered' && (
                         <Button

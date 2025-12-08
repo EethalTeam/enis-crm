@@ -186,7 +186,6 @@ function SitesContent() {
   const [cityList, setCityList] = useState([]);
 
   const [state, dispatch] = useReducer(commonReducer, initialState);
-  console.log(state,"state")
   const [isEdit, setIsEdit] = useState(false);
   const [viewData, setViewData] = useState({});
 

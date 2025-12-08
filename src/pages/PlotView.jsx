@@ -148,13 +148,11 @@ const reducer = (state, action) => {
 function PlotViewContent() {
   const { toast } = useToast();
   const [state, dispatch] = useReducer(reducer, initialState);
-  console.log(state,"state")
   // Data States
   const [plotView, setPlotView] = useState([]);
   const [filteredPlots, setFilteredPlots] = useState([]);
   const [siteData, setSiteData] = useState([]); // Site Dropdown
   const [unitData, setUnitData] = useState([]); // Units Dropdown
-  console.log(unitData,"unitData")
   const [visitorData, setVisitorData] = useState([]); // Visitor Dropdown
   const [loading, setLoading] = useState(false);
   

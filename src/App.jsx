@@ -16,7 +16,7 @@ import Workflows from '@/pages/Workflows';
 import Analytics from '@/pages/Analytics';
 import Settings from '@/pages/Settings';
 import Users from '@/pages/Users';
-import Plots from '@/pages/Plots';
+import Reports from '@/pages/Reports';
 import PlotList from '@/pages/PlotList'
 import PlotView from '@/pages/PlotView'
 import Visitors from '@/pages/Visitors';
@@ -59,6 +59,7 @@ function App() {
             <Route path="workflows" element={<Workflows />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="users" element={<Users />} />
+            <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
             <Route path="/plots/list" element={<PlotList />} />
             <Route path="/plots/view" element={<PlotView />} />

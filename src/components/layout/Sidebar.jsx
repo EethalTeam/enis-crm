@@ -43,7 +43,7 @@ const navItems = [
   
   // { icon: GitBranch, label: 'IVR Flow', path: '/ivr-flow' },
   // { icon: MessageSquare, label: 'Omni-Channel', path: '/omni-channel' },
-  { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
+  // { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
   // { icon: Workflow, label: 'Workflows', path: '/workflows' },
   { icon: ClipboardList, label: 'Master Forms', 
     children: [
@@ -56,8 +56,9 @@ const navItems = [
       { label: 'Role', path: '/masters/role' }
     ]
   },
-  { icon: BarChart3, label: 'Analytics', path: '/analytics' },
-  { icon: Users, label: 'Users', path: '/users' },
+  // { icon: BarChart3, label: 'Analytics', path: '/analytics' },
+  // { icon: Users, label: 'Users', path: '/users' },
+  { icon: ClipboardList, label: 'Reports', path: '/reports' },
   { icon: Settings, label: 'Settings', path: '/settings' },
   { icon: Shield, label: 'Admin Panel', 
     children: [

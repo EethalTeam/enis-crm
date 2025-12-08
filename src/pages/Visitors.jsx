@@ -29,6 +29,8 @@ import Loading from '@/components/CustomComponents/Loading';
 const initialState = {
   _id: '',
   visitorCode:'',
+  siteId: '', // Added Site ID
+  sitename: '', // Added Site Name
   visitorName:'',
   visitorEmail:'',
   visitorMobile:'',
@@ -67,7 +69,6 @@ export default function VisitorMain(props) {
   const [showentry, setShowEntry] = useState(false);
   const [loading, setLoading] = useState(false);
   const [state, dispatch] = useReducer(Reducer, initialState);
-  
   const [Visitor, setVisitor] = useState([]);
   const [PlotDetails, setPlotDetails] = useState([]);
   const [FollowUpDetails, setFollowUpDetails] = useState([]);
@@ -89,12 +90,59 @@ export default function VisitorMain(props) {
     { StatusIDPK: 2, StatusName: "Completed" }
   ]);
   
+  // --- API Functions (Exact logic preserved) ---
+  const [siteList, setSiteList] = useState([]); // Stores Sites
+  const [unitList, setUnitList] = useState([]); // Stores Sites
+  const [plotList, setPlotList] = useState([]); // Stores Sites
+  const [statusList, setStatusList] = useState([]); // Stores Sites
+  
   // --- Logic & Effects (Kept exact) ---
 
   useEffect(() => {
     getVisitor();
+    getSites();
+    getStatusList();
   }, []);
 
+// --- 3. FETCH UNITS AUTOMATICALLY WHEN SITE CHANGES ---
+useEffect(() => {
+  const getUnits = async () => {
+    // Stop if no site is selected
+    if (!state.siteId) {
+        setUnitList([]); // Clear units if site is removed
+        return; 
+    }
+
+    try {
+      // Optional: You can show a small inline loader here if needed
+      const response = await fetch(config.Api + "Unit/getAllUnits", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ siteId: state.siteId }), // Pass the selected ID
+      });
+      const result = await response.json();
+      if (Array.isArray(result.data)) setUnitList(result.data);
+    } catch (err) { console.error(err); }
+  };
+
+  getUnits();
+}, [state.siteId]);
+
+useEffect(()=>{
+    const getPlotList = async () => {
+    try {
+      let url = config.Api + "Visitor/getAllPlots/";
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({siteId:state.siteId,unitId: state.unitId}),
+      });
+      const result = await response.json();
+      setPlotList(result.data);
+    } catch (error) { console.error(error); }
+  };
+  getPlotList()
+},[state.siteId,state.unitId])
   const debounce = (func, delay) => {
     let timer;
     return function (...args) {
@@ -177,7 +225,6 @@ export default function VisitorMain(props) {
     dispatch({ type: 'text', name: "statusName", value:''});
   };
 
-  // --- API Functions (Exact logic preserved) ---
   const getVisitor = async () => {
     try {
       setLoading(true);
@@ -196,6 +243,21 @@ export default function VisitorMain(props) {
       console.error('Error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+ const getSites = async () => {
+    try {
+      let url = config.Api + "Site/getAllSites"; 
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const result = await response.json();
+      setSiteList(result.data);
+      SetData(result.data)
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -237,33 +299,6 @@ export default function VisitorMain(props) {
     }
   };
 
-  // --- Dropdown API Calls ---
-  const getPlotList = async () => {
-    try {
-      let url = config.Api + "Visitor/getAllPlots/";
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({unitId: state.unitId}),
-      });
-      const result = await response.json();
-      SetData(result.data);
-    } catch (error) { console.error(error); }
-  };
-
-  const getUnitList = async () => {
-    try {
-      let url = config.Api + "Plot/getAllUnits/";
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      });
-      const result = await response.json();
-      SetData(result.data);
-    } catch (error) { console.error(error); }
-  };
-
   const getCityList = async () => {
     try {
       let url = config.Api + "City/getAllCitys";
@@ -299,7 +334,7 @@ export default function VisitorMain(props) {
         body: JSON.stringify({unitId: state.unitId}),
       });
       const result = await response.json();
-      SetData(result.data);
+      setStatusList(result.data);
     } catch (error) { console.error(error); }
   };
 
@@ -439,11 +474,21 @@ export default function VisitorMain(props) {
             dispatch({ type: 'text', name: 'StateID', value: e.StateIDPK });
             dispatch({ type: 'text', name: "StateName", value: e.StateName });
         }
+        if (name === 'siteId') {
+          dispatch({ type: 'text', name: "siteId", value: e._id });
+          dispatch({ type: 'text', name: "sitename", value: e.sitename });
+          // Reset Unit when Site changes
+          dispatch({ type: 'text', name: "unitId", value: '' });
+          dispatch({ type: 'text', name: "UnitName", value: '' });
+       }
         if (name === 'unitId') {
             dispatch({ type: 'text', name: 'unitId', value: e._id });
             dispatch({ type: 'text', name: "UnitName", value: e.UnitName });
         }
-        if (name === 'plotId') dispatch({ type: 'text', name: 'plotId', value: e });
+        if (name === 'plotId') {
+          dispatch({ type: 'text', name: 'plotId', value: e._id })
+        dispatch({ type: 'text', name: 'plotNumber', value: e.plotNumber })
+        };
         
         if (name === 'employeeId') {
             dispatch({ type: 'text', name: "employeeId", value: e._id });
@@ -469,6 +514,10 @@ export default function VisitorMain(props) {
   };
 
   const ValidatePlot = () => {
+     if (!state.siteId) {
+      toast({ title: 'Error', description: 'Please select a Site', variant: 'destructive' });
+      return;
+    }
     if (!state.unitId) { toast({ title: "Error", description: "Select Unit", variant: "destructive" }); return; }
     if (!state.statusName) { toast({ title: "Error", description: "Select Status", variant: "destructive" }); return; }
     showAlert(OrderTab);
@@ -581,8 +630,8 @@ export default function VisitorMain(props) {
   };
 
   const PlotSubmit = async () => {
-     const saveData = { visitorId: state._id, statusId: state.statusId, plotIds:state.plotId, unitId:state.unitId };
-     const updateData ={ visitorId: state._id, statusId: state.statusId, plotId:state.plotId, unitId:state.unitId };
+     const saveData = {siteId: state.siteId, visitorId: state._id, statusId: state.statusId, plotIds:state.plotId, unitId:state.unitId };
+     const updateData ={siteId: state.siteId, visitorId: state._id, statusId: state.statusId, plotId:state.plotId, unitId:state.unitId };
 
      if (PlotEdit) {
         await updatePlots(updateData);
@@ -608,7 +657,10 @@ export default function VisitorMain(props) {
     dispatch({ type: 'text', name: "visitorAddress", value: data.visitorAddress || '' });
     dispatch({ type: 'text', name: "feedback", value: data.feedback || '' });
     dispatch({ type: 'text', name: "description", value: data.description || '' });
-    
+        if(data.unitId?.siteId) {
+        dispatch({ type: 'text', name: "siteId", value: data.unitId.siteId._id || data.unitId.siteId });
+        dispatch({ type: 'text', name: "sitename", value: data.unitId.siteId.sitename || '' });
+    }
     if(data.cityId) {
         dispatch({ type: 'text', name: "cityId", value: data.cityId._id });
         dispatch({ type: 'text', name: "CityName", value: data.cityId.CityName });
@@ -655,34 +707,50 @@ export default function VisitorMain(props) {
      setPlotEdit(true);
   };
 
-  // --- HELPER FOR STYLED SELECT ---
-  const GlassSelect = ({ label, value, onChange, options, placeholder, disabled, displayKey, valueKey }) => (
-    <div className="space-y-2">
-      <Label className="text-white font-semibold">{label} <span className="text-red-500">*</span></Label>
-      <div className="relative">
-        <select
-            value={value} // This should be the ID or Name depending on logic
-            disabled={disabled}
-            onChange={(e) => {
-                const selectedObj = options.find(item => String(item[valueKey]) === e.target.value || String(item[displayKey]) === e.target.value);
-                onChange(selectedObj); // Pass full object back to handler
-            }}
-            className="w-full bg-purple-900/50 border border-fuchsia-700 text-white rounded-md p-2 h-10 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 appearance-none"
-        >
-            <option value="" className="bg-slate-900 text-gray-400">{placeholder || "Select..."}</option>
-            {options.map((item, idx) => (
-                <option key={idx} value={item[valueKey] || item[displayKey]} className="bg-slate-900 text-white">
-                    {item[displayKey]}
-                </option>
-            ))}
-        </select>
-        {/* Custom Arrow */}
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-fuchsia-300">
-            <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-        </div>
+// --- HELPER FOR STYLED SELECT ---
+const GlassSelect = ({ 
+  label, 
+  value, 
+  onChange, 
+  onFocus,
+  options, 
+  placeholder, 
+  disabled, 
+  displayKey, 
+  valueKey 
+}) => 
+ {
+  return (
+  <div className="space-y-2">
+    <Label className="text-white font-semibold">{label} <span className="text-red-500">*</span></Label>
+    <div className="relative">
+      <select
+        value={value}
+        disabled={disabled}
+        onFocus={onFocus} 
+        onChange={(e) => {
+          const selectedObj = options.find(item => String(item[valueKey]) === e.target.value || String(item[displayKey]) === e.target.value);
+          onChange(selectedObj); 
+        }}
+        className="w-full bg-purple-900/50 border border-fuchsia-700 text-white rounded-md p-2 h-10 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 appearance-none"
+      >
+        <option value="" className="bg-slate-900 text-gray-400">{placeholder || "Select..."}</option>
+        {(options||[]).map((item, idx) => (
+          <option key={idx} value={item[valueKey] || item[displayKey]} className="bg-slate-900 text-white">
+            {item[displayKey]}
+          </option>
+        ))}
+      </select>
+      
+      {/* Custom Arrow */}
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-fuchsia-300">
+        <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+        </svg>
       </div>
     </div>
-  );
+  </div>
+)};
 
   // --- RENDER ---
   return (
@@ -913,13 +981,14 @@ export default function VisitorMain(props) {
                                     </>
                                 ) : (
                                     <>
-                                         <GlassSelect label="Unit" value={state.UnitName} displayKey="UnitName" valueKey="_Id" options={Data} onChange={(e) => storeDispatch(e, 'unitId', 'select')} onFocus={() => getUnitList()} />
+                                         <GlassSelect label="Site" value={state.sitename} displayKey="sitename" valueKey="_Id" options={siteList} onChange={(e) => storeDispatch(e, 'siteId', 'select')} />
+                                         <GlassSelect label="Unit" value={state.UnitName} displayKey="UnitName" valueKey="_Id" options={unitList} onChange={(e) => storeDispatch(e, 'unitId', 'select')} />
                                          {!PlotEdit ? (
-                                            <GlassSelect label="Plot Number" value={state.plotNumber} displayKey="plotNumber" valueKey="_id" options={Data} onChange={(e) => storeDispatch(e, 'plotId', 'select')} onFocus={() => getPlotList()} />
+                                            <GlassSelect label="Plot Number" value={state.plotNumber} displayKey="plotNumber" valueKey="_id" options={plotList} onChange={(e) => storeDispatch(e, 'plotId', 'select')}  />
                                          ) : (
                                              <div className="space-y-2"><Label className="text-white">Plot Number</Label><Input value={state.plotNumber} disabled className="bg-slate-800 border-fuchsia-700 text-gray-400" /></div>
                                          )}
-                                         <GlassSelect label="Status" value={state.statusName} displayKey="statusName" valueKey="_Id" options={Data} onChange={(e) => storeDispatch(e, 'statusId', 'select')} onFocus={() => getStatusList()} />
+                                         <GlassSelect label="Status" value={state.statusName} displayKey="statusName" valueKey="_Id" options={statusList} onChange={(e) => storeDispatch(e, 'statusId', 'select')} />
                                     </>
                                 )}
                             </CardContent>
@@ -947,6 +1016,7 @@ export default function VisitorMain(props) {
                                             </>
                                         ) : (
                                             <>
+                                            <th className="p-3 text-left text-white text-sm">Site</th>
                                             <th className="p-3 text-left text-white text-sm">Unit</th>
                                             <th className="p-3 text-left text-white text-sm">Plot No</th>
                                             <th className="p-3 text-left text-white text-sm">Status</th>
@@ -967,6 +1037,7 @@ export default function VisitorMain(props) {
                                                 </>
                                             ) : (
                                                 <>
+                                                <td className="p-3 text-slate-300 text-sm">{item.plotId?.siteId?.sitename}</td>
                                                  <td className="p-3 text-slate-300 text-sm">{item.plotId?.unitId?.UnitName}</td>
                                                  <td className="p-3 text-slate-300 text-sm">{item.plotId?.plotNumber}</td>
                                                  <td className="p-3"><Badge style={{backgroundColor: item.statusId?.colorCode || 'gray'}}>{item.statusId?.statusName}</Badge></td>
