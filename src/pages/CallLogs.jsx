@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, CheckCircle, Filter } from 'lucide-react';
+import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, CheckCircle, Filter ,User,Phone ,Clock ,Hourglass  } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
 
 // --- Inline UI Components for Portability ---
@@ -36,7 +36,7 @@ const Button = ({ className, variant = "default", size = "default", onClick, dis
     sm: "h-8 rounded-md px-3 text-xs",
   };
   return (
-    <button 
+    <button
       className={`${baseStyles} ${variants[variant] || variants.default} ${sizes[size] || sizes.default} ${className}`}
       onClick={onClick}
       disabled={disabled}
@@ -77,13 +77,12 @@ const ToastProvider = ({ children }) => {
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
-                t.variant === 'destructive' 
-                  ? 'bg-red-900/90 border-red-800 text-white' 
+              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === 'destructive'
+                  ? 'bg-red-900/90 border-red-800 text-white'
                   : t.variant === 'success'
-                  ? 'bg-green-900/90 border-green-800 text-white'
-                  : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
-              }`}
+                    ? 'bg-green-900/90 border-green-800 text-white'
+                    : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
+                }`}
             >
               <div>
                 {t.title && <h4 className="font-semibold text-sm">{t.title}</h4>}
@@ -127,11 +126,11 @@ function CallLogsContent() {
   const { toast } = useToast();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [qualifyingId, setQualifyingId] = useState(null); 
-  
+  const [qualifyingId, setQualifyingId] = useState(null);
+
   // --- NEW: Tab State ---
   const [activeTab, setActiveTab] = useState('all');
-  
+
   const audioRef = useRef(null);
   const [playingId, setPlayingId] = useState(null);
 
@@ -143,29 +142,29 @@ function CallLogsContent() {
         const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ page: 1, limit: 50 }), 
+          body: JSON.stringify({ page: 1, limit: 50 }),
         });
 
         if (!response.ok) throw new Error('Failed to fetch logs');
 
         const data = await response.json();
-        const logData = data.data || data.calls || []; 
+        const logData = data.data || data.calls || [];
         setLogs(logData);
       } catch (err) {
         console.error(err);
         // Mock data
         setLogs([
-            { _id: 'mock1', cmiuuid: '1', from: 'John Doe', to: '+1234567890', status: 'answered', direction: 'inbound', answeredsec: 323, callDate: new Date().toISOString(), custom: 'Interested', recordingUrl: 'https://www.soundhelix.com/examples/mp3/Soundhelix-Song-1.mp3' },
-            { _id: 'mock2', cmiuuid: '2', from: 'Jane Smith', to: '+1987654321', status: 'missed', direction: 'inbound', answeredsec: 0, callDate: new Date().toISOString(), custom: '', recordingUrl: null },
-            { _id: 'mock3', cmiuuid: '3', from: 'Sales Team', to: '+1555555555', status: 'answered', direction: 'outbound', answeredsec: 120, callDate: new Date().toISOString(), custom: '', recordingUrl: null },
-            { _id: 'mock4', cmiuuid: '4', from: 'Unknown', to: '+1999999999', status: 'missed', direction: 'inbound', answeredsec: 0, callDate: new Date().toISOString(), custom: '', recordingUrl: null },
+          { _id: 'mock1', cmiuuid: '1', from: 'John Doe', to: '+1234567890', status: 'answered', direction: 'inbound', answeredsec: 323, callDate: new Date().toISOString(), custom: 'Interested', recordingUrl: 'https://www.soundhelix.com/examples/mp3/Soundhelix-Song-1.mp3' },
+          { _id: 'mock2', cmiuuid: '2', from: 'Jane Smith', to: '+1987654321', status: 'missed', direction: 'inbound', answeredsec: 0, callDate: new Date().toISOString(), custom: '', recordingUrl: null },
+          { _id: 'mock3', cmiuuid: '3', from: 'Sales Team', to: '+1555555555', status: 'answered', direction: 'outbound', answeredsec: 120, callDate: new Date().toISOString(), custom: '', recordingUrl: null },
+          { _id: 'mock4', cmiuuid: '4', from: 'Unknown', to: '+1999999999', status: 'missed', direction: 'inbound', answeredsec: 0, callDate: new Date().toISOString(), custom: '', recordingUrl: null },
         ]);
         setTimeout(() => {
-            toast({
-                title: "Demo Mode",
-                description: "Could not connect to API. Showing mock data.",
-                variant: "destructive"
-            });
+          toast({
+            title: "Demo Mode",
+            description: "Could not connect to API. Showing mock data.",
+            variant: "destructive"
+          });
         }, 500);
       } finally {
         setLoading(false);
@@ -180,7 +179,7 @@ function CallLogsContent() {
         audioRef.current = null;
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // --- FILTER LOGIC BASED ON TABS ---
@@ -207,11 +206,11 @@ function CallLogsContent() {
 
     try {
       const url = `${config.Api}CallLogs/Qualify`;
-      
+
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:JSON.stringify({logId:callId})
+        body: JSON.stringify({ logId: callId })
       });
 
       const result = await response.json();
@@ -262,7 +261,7 @@ function CallLogsContent() {
 
     const audio = new Audio(recordingUrl);
     audioRef.current = audio;
-    
+
     audio.play().then(() => {
       setPlayingId(id);
       toast({ title: "Playing", description: "Audio recording started." });
@@ -281,11 +280,10 @@ function CallLogsContent() {
   const TabButton = ({ id, label, count }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`relative px-4 py-2 text-sm font-medium transition-all rounded-md ${
-        activeTab === id 
-          ? 'bg-blue-600 text-white shadow-md' 
+      className={`relative px-4 py-2 text-sm font-medium transition-all rounded-md ${activeTab === id
+          ? 'bg-blue-600 text-white shadow-md'
           : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
-      }`}
+        }`}
     >
       {label}
       {activeTab === id && (
@@ -305,14 +303,14 @@ function CallLogsContent() {
       </div>
 
       {/* --- NEW: TABS SECTION --- */}
-      <div className="flex items-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
+      <div className="flex md:flex-row flex-col  items-center gap-2 p-1 bg-slate-900/50 rounded-lg md:w-fit w-full border border-slate-800">
         <TabButton id="all" label="All Calls" />
         <TabButton id="incoming" label="Incoming" />
         <TabButton id="outgoing" label="Outgoing" />
         <TabButton id="rnr" label="RNR" />
       </div>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-slate-900 border-slate-800 hidden md:block">
         <CardContent className="p-6">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -339,7 +337,7 @@ function CallLogsContent() {
                     </td>
                   </tr>
                 )}
-                
+
                 {filteredLogs.map((call, index) => (
                   <motion.tr
                     key={call._id || call.cmiuuid || index}
@@ -350,7 +348,7 @@ function CallLogsContent() {
                   >
                     <td className="py-3 px-4">
                       {call.status === 'missed' ? (
-                          <PhoneMissed className="w-5 h-5 text-red-400" />
+                        <PhoneMissed className="w-5 h-5 text-red-400" />
                       ) : call.direction === 'inbound' || call.direction === 'incoming' ? (
                         <PhoneIncoming className="w-5 h-5 text-green-400" />
                       ) : (
@@ -382,10 +380,10 @@ function CallLogsContent() {
 
                     <td className="py-3 px-4">
                       {(call.recordingUrl || call.filename) ? (
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handlePlayRecording(call.recordingUrl, call.cmiuuid)} 
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handlePlayRecording(call.recordingUrl, call.cmiuuid)}
                           className={`hover:bg-fuchsia-900/20 ${playingId === call.cmiuuid ? 'text-green-400' : 'text-fuchsia-300 hover:text-fuchsia-200'}`}
                         >
                           {playingId === call.cmiuuid ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
@@ -421,6 +419,120 @@ function CallLogsContent() {
               </tbody>
             </table>
           </div>
+        </CardContent>
+      </Card>
+      {/* //card for mobile view */}
+      <Card className="bg-slate-900 border-slate-800 md:hidden">
+        <CardContent className="p-6">
+          {/* MOBILE CARD VIEW */}
+          <div className="md:hidden space-y-4">
+            {loading && filteredLogs.length === 0 ? (
+              <div className="text-center py-6 text-slate-500">
+                <Filter className="w-8 h-8 opacity-50 mx-auto" />
+                No {activeTab === 'all' ? '' : activeTab} logs found.
+              </div>
+            ) : (
+              filteredLogs.map((call, index) => (
+                <motion.div
+                  key={call._id || call.cmiuuid || index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="
+  bg-slate-900
+          border border-slate-700
+          rounded-xl
+          p-4
+          shadow-lg
+          hover:bg-slate-800
+          transition-all
+        "
+                >
+                  {/* HEADER: TYPE + STATUS */}
+                  <div className="flex justify-between items-center mb-3">
+                    <div>
+                      {call.status === 'missed' ? (
+                        <PhoneMissed className="w-6 h-6 text-red-400" />
+                      ) : call.direction === 'inbound' || call.direction === 'incoming' ? (
+                        <PhoneIncoming className="w-6 h-6 text-green-400" />
+                      ) : (
+                        <PhoneOutgoing className="w-6 h-6 text-blue-400" />
+                      )}
+                    </div>
+
+                    <Badge className={`${statusColors[call.status] || 'bg-gray-600'} capitalize`}>
+                      {call.status}
+                    </Badge>
+                  </div>
+
+                  {/* CALLER */}
+                  <div className="flex items-center gap-2 mb-2 text-white">
+                    <User className="w-4 h-4 text-purple-300" />
+                    <span>{call.direction === 'inbound' ? call.from : (call.user || 'Agent')}</span>
+                  </div>
+
+                  {/* NUMBER */}
+                  <div className="flex items-center gap-2 mb-2 text-fuchsia-300 text-sm">
+                    <Phone className="w-4 h-4" />
+                    <span>{call.to}</span>
+                  </div>
+
+                  {/* TIME */}
+                  <div className="flex items-center gap-2 mb-2 text-slate-300 text-sm">
+                    <Clock className="w-4 h-4" />
+                    <span>{formatTime(call.callDate || call.createdAt)}</span>
+                  </div>
+
+                  {/* DURATION */}
+                  <div className="flex items-center gap-2 mb-2 text-slate-300 text-sm">
+                    <Hourglass className="w-4 h-4" />
+                    <span>{formatDuration(call.answeredsec || call.duration)}</span>
+                  </div>
+
+                  {/* RECORDING + ACTIONS */}
+                  <div className="flex justify-between items-center border-t border-slate-700 pt-3">
+                    {/* PLAY BUTTON */}
+                    {(call.recordingUrl || call.filename) ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handlePlayRecording(call.recordingUrl, call.cmiuuid)}
+                        className={`
+                hover:bg-fuchsia-900/20
+                ${playingId === call.cmiuuid ? 'text-green-400' : 'text-fuchsia-300 hover:text-fuchsia-200'}
+              `}
+                      >
+                        {playingId === call.cmiuuid ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-slate-600">No Recording</span>
+                    )}
+
+                    {/* QUALIFY */}
+                    {call.status === 'answered' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleQualify(call._id)}
+                        disabled={qualifyingId === call._id}
+                        className="border-blue-800 bg-blue-900/20 text-blue-300 hover:bg-blue-800 hover:text-white min-w-[90px]"
+                      >
+                        {qualifyingId === call._id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <UserPlus className="w-3.5 h-3.5 mr-2" />
+                            Qualify
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </div>
+
         </CardContent>
       </Card>
     </div>

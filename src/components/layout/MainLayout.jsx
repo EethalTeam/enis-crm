@@ -11,7 +11,7 @@ export default function MainLayout() {
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+        <main className="flex-1 overflow-y-auto p-3 md:p-6 scrollbar-hide">
           <Outlet />
         </main>
       </div>

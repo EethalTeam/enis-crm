@@ -182,14 +182,14 @@ export default function Reports() {
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-2">
+          <h1 className="md:text-3xl text-xl font-bold text-white flex items-center gap-2">
             <TrendingUp className="text-fuchsia-600 w-8 h-8" />
             Monthly Reports
           </h1>
           <p className="text-slate-400 text-sm mt-1">AI-powered insights and performance metrics.</p>
         </div>
         
-        <div className="flex gap-3">
+        <div className="flex gap-3 md:flex-row flex-col items-start">
           <Button variant="outline" className="text-slate-300">
             <Calendar className="w-4 h-4 mr-2" />
             {selectedMonth}

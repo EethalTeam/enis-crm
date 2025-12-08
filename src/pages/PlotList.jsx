@@ -1,33 +1,33 @@
 import React, { useState, useEffect, useReducer, useCallback, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, 
-  X, ChevronDown, MapPin, UserPlus, RefreshCw, AlertTriangle 
+import {
+  Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2,
+  X, ChevronDown, MapPin, UserPlus, RefreshCw, AlertTriangle,Home,Square ,Compass 
 } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
 
 // --- LOCAL REDUCER ---
 const initialState = {
-    _id: '',
-    siteId: '', // Added Site ID
-    sitename: '', // Added Site Name
-    plotCode:'',
-    plotNumber:'',
-    dimension:'',
-    areaInSqFt:'',
-    cents:'',
-    road:'',
-    landmark:'',
-    isActive:'',
-    remarks:'',
-    description:'',
-    statusId:'',
-    statusName:'',
-    visitorId:'',
-    visitorName:'',
-    facing:'',
-    unitId:'',
-    UnitName:''
+  _id: '',
+  siteId: '', // Added Site ID
+  sitename: '', // Added Site Name
+  plotCode: '',
+  plotNumber: '',
+  dimension: '',
+  areaInSqFt: '',
+  cents: '',
+  road: '',
+  landmark: '',
+  isActive: '',
+  remarks: '',
+  description: '',
+  statusId: '',
+  statusName: '',
+  visitorId: '',
+  visitorName: '',
+  facing: '',
+  unitId: '',
+  UnitName: ''
 };
 
 const commonReducer = (state, action) => {
@@ -39,7 +39,7 @@ const commonReducer = (state, action) => {
     case 'boolean':
       return { ...state, [action.name]: action.boolean };
     case 'reset':
-        return initialState;
+      return initialState;
     default:
       return state;
   }
@@ -74,13 +74,12 @@ const ToastProvider = ({ children }) => {
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
-                t.variant === 'destructive' 
-                  ? 'bg-red-900/90 border-red-800 text-white' 
+              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === 'destructive'
+                  ? 'bg-red-900/90 border-red-800 text-white'
                   : t.variant === 'success'
-                  ? 'bg-green-900/90 border-green-800 text-white'
-                  : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
-              }`}
+                    ? 'bg-green-900/90 border-green-800 text-white'
+                    : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
+                }`}
             >
               <div>
                 {t.title && <h4 className="font-semibold text-sm">{t.title}</h4>}
@@ -114,7 +113,7 @@ const CardContent = ({ className, children }) => (
 );
 
 const Badge = ({ className, children, color }) => (
-  <div 
+  <div
     className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent ${className}`}
     style={{ backgroundColor: color, color: '#fff' }}
   >
@@ -136,9 +135,9 @@ const Button = ({ className, variant = "default", size = "default", onClick, dis
     icon: "h-9 w-9",
     sm: "h-8 rounded-md px-3 text-xs"
   };
-  
+
   return (
-    <button 
+    <button
       type={type}
       className={`${baseStyles} ${variants[variant] || variants.default} ${sizes[size] || sizes.default} ${className}`}
       onClick={onClick}
@@ -169,7 +168,7 @@ const Dialog = ({ open, onOpenChange, children }) => (
   <AnimatePresence>
     {open && (
       <div className="fixed inset-0 z-50 flex items-center justify-center">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onClick={() => onOpenChange(false)} className="fixed inset-0 bg-black/80 backdrop-blur-sm"
         />
@@ -180,7 +179,7 @@ const Dialog = ({ open, onOpenChange, children }) => (
 );
 
 const DialogContent = ({ className, children, title, onClose }) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }}
     className={`relative z-50 w-full bg-slate-950 border border-slate-800 rounded-lg shadow-lg flex flex-col ${className}`}
     onClick={(e) => e.stopPropagation()}
@@ -195,7 +194,7 @@ const DialogContent = ({ className, children, title, onClose }) => (
 
 const ConfirmDialog = ({ open, title, description, onConfirm, onCancel, loading }) => (
   <Dialog open={open} onOpenChange={onCancel}>
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
       className="relative z-50 w-full max-w-md bg-slate-950 border border-slate-800 rounded-lg shadow-lg p-6"
     >
@@ -222,26 +221,26 @@ const ConfirmDialog = ({ open, title, description, onConfirm, onCancel, loading 
 
 function PlotsContent() {
   const { toast } = useToast();
-  
+
   // State
   const [openView, setOpenView] = useState(false);
   const [Viewdata, setViewData] = useState({});
   const [RowData, setRowData] = useState({});
   const [openVisitor, setOpenVisitor] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false); 
-  
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   // Confirmation State
   const [confirmState, setConfirmState] = useState({ open: false, title: '', description: '', action: null });
 
   const [state, dispatch] = useReducer(commonReducer, initialState);
-  const [Employee, setEmployee] = useState([]); 
+  const [Employee, setEmployee] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [Data, SetData] = useState([]); // Stores Units
   const [siteList, setSiteList] = useState([]); // Stores Sites
-  
+
   const [PlotStatus] = useState([
     { PlotStatusIDPK: 5, PlotStatusName: "Visited", colorCode: '#3b82f6' },
     { PlotStatusIDPK: 5, PlotStatusName: "Interested", colorCode: '#eab308' },
@@ -272,7 +271,7 @@ function PlotsContent() {
 
   const getSites = async () => {
     try {
-      let url = config.Api + "Site/getAllSites"; 
+      let url = config.Api + "Site/getAllSites";
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -296,7 +295,7 @@ function PlotsContent() {
       });
 
       if (!response.ok) throw new Error('Failed to get Plots');
-      
+
       const result = await response.json();
       const data = result.data || [];
       setEmployee(data);
@@ -318,7 +317,7 @@ function PlotsContent() {
       });
       if (!response.ok) throw new Error('Failed to get Units');
       const result = await response.json();
-      SetData(result.data || result); 
+      SetData(result.data || result);
     } catch (error) { console.error('Error:', error); }
   };
 
@@ -339,7 +338,7 @@ function PlotsContent() {
       // For now, let's assume this updates a separate list or handle carefully.
       // NOTE: In original code Data was reused. I will fetch visitors directly in dropdown click or separate state if possible. 
       // For safety, I'll update SetData but be aware of conflict if opening Unit and Visitor dropdowns simultaneously.
-      SetData(result || []); 
+      SetData(result || []);
     } catch (error) { console.error('Error:', error); }
   };
 
@@ -366,7 +365,7 @@ function PlotsContent() {
   };
 
   const deleteRow = async (data) => {
-    let url = config.Api + "Employee/deleteEmployee"; 
+    let url = config.Api + "Employee/deleteEmployee";
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -387,11 +386,11 @@ function PlotsContent() {
     });
     const result = await response.json();
     if (response.status === 400) {
-        toast({ title: 'Error', description: result.message, variant: 'destructive' });
-        return false;
+      toast({ title: 'Error', description: result.message, variant: 'destructive' });
+      return false;
     } else {
-        toast({ title: 'Success', description: result.message, variant: 'success' });
-        return result;
+      toast({ title: 'Success', description: result.message, variant: 'success' });
+      return result;
     }
   };
 
@@ -399,26 +398,26 @@ function PlotsContent() {
 
   const storeDispatch = useCallback((e, name, fieldType) => {
     if (fieldType === "text") {
-        dispatch({ type: 'text', name: name, value: e });
+      dispatch({ type: 'text', name: name, value: e });
     }
     else if (fieldType === "select") {
-       if (name === 'siteId') {
-          dispatch({ type: 'text', name: "siteId", value: e._id });
-          dispatch({ type: 'text', name: "sitename", value: e.sitename });
-          // Reset Unit when Site changes
-          dispatch({ type: 'text', name: "unitId", value: '' });
-          dispatch({ type: 'text', name: "UnitName", value: '' });
-       } else if (name === 'unitId') {
-          dispatch({ type: 'text', name: "unitId", value: e._id });
-          dispatch({ type: 'text', name: "UnitName", value: e.UnitName });
-       } else if (name === 'facing') {
-          dispatch({ type: 'text', name: "facing", value: e.FacingName });
-       } else if (name === 'VisitorID') {
-          dispatch({ type: 'text', name: 'visitorId', value: e._id });
-          dispatch({ type: 'text', name: 'visitorName', value: e.visitorName });
-       } else if (name === 'PlotStatusID') {
-          dispatch({ type: 'text', name: "statusName", value: e.PlotStatusName });
-       }
+      if (name === 'siteId') {
+        dispatch({ type: 'text', name: "siteId", value: e._id });
+        dispatch({ type: 'text', name: "sitename", value: e.sitename });
+        // Reset Unit when Site changes
+        dispatch({ type: 'text', name: "unitId", value: '' });
+        dispatch({ type: 'text', name: "UnitName", value: '' });
+      } else if (name === 'unitId') {
+        dispatch({ type: 'text', name: "unitId", value: e._id });
+        dispatch({ type: 'text', name: "UnitName", value: e.UnitName });
+      } else if (name === 'facing') {
+        dispatch({ type: 'text', name: "facing", value: e.FacingName });
+      } else if (name === 'VisitorID') {
+        dispatch({ type: 'text', name: 'visitorId', value: e._id });
+        dispatch({ type: 'text', name: 'visitorName', value: e.visitorName });
+      } else if (name === 'PlotStatusID') {
+        dispatch({ type: 'text', name: "statusName", value: e.PlotStatusName });
+      }
     }
   }, []);
 
@@ -439,13 +438,13 @@ function PlotsContent() {
   const editTable = (data) => {
     setIsEdit(true);
     dispatch({ type: 'text', name: '_id', value: data._id || '' });
-    
+
     // Set Site if available (Assuming unitId carries siteId populated or plot carries siteId)
     // If backend doesn't populate site inside unit, we need to handle that. 
     // Assuming structure: Plot -> unitId -> siteId
-    if(data.unitId?.siteId) {
-        dispatch({ type: 'text', name: "siteId", value: data.unitId.siteId._id || data.unitId.siteId });
-        dispatch({ type: 'text', name: "sitename", value: data.unitId.siteId.sitename || '' });
+    if (data.unitId?.siteId) {
+      dispatch({ type: 'text', name: "siteId", value: data.unitId.siteId._id || data.unitId.siteId });
+      dispatch({ type: 'text', name: "sitename", value: data.unitId.siteId.sitename || '' });
     }
 
     dispatch({ type: 'text', name: "plotCode", value: data.plotCode || '' });
@@ -457,14 +456,14 @@ function PlotsContent() {
     dispatch({ type: 'text', name: "dimension", value: data.dimension || '' });
     dispatch({ type: 'text', name: "remarks", value: data.remarks || '' });
     dispatch({ type: 'text', name: "description", value: data.description || '' });
-    if(data.statusId) {
-       dispatch({ type: 'text', name: "statusId", value: data.statusId._id || '' });
-       dispatch({ type: 'text', name: "statusName", value: data.statusId.statusName || '' });
+    if (data.statusId) {
+      dispatch({ type: 'text', name: "statusId", value: data.statusId._id || '' });
+      dispatch({ type: 'text', name: "statusName", value: data.statusId.statusName || '' });
     }
     dispatch({ type: 'text', name: "facing", value: data.facing || '' });
-    if(data.unitId) {
-        dispatch({ type: 'text', name: "unitId", value: data.unitId._id || '' });
-        dispatch({ type: 'text', name: "UnitName", value: data.unitId.UnitName || '' });
+    if (data.unitId) {
+      dispatch({ type: 'text', name: "unitId", value: data.unitId._id || '' });
+      dispatch({ type: 'text', name: "UnitName", value: data.unitId.UnitName || '' });
     }
     setDialogOpen(true);
   };
@@ -480,15 +479,15 @@ function PlotsContent() {
   };
 
   const ValidateVisitor = () => {
-      if (!state.statusName) {
-          toast({ title: 'Error', description: 'Please select status', variant: 'destructive' });
-          return;
-      }
-      if (!state.visitorId) {
-          toast({ title: 'Error', description: 'Please select visitor', variant: 'destructive' });
-          return;
-      }
-      triggerConfirm('Visitor');
+    if (!state.statusName) {
+      toast({ title: 'Error', description: 'Please select status', variant: 'destructive' });
+      return;
+    }
+    if (!state.visitorId) {
+      toast({ title: 'Error', description: 'Please select visitor', variant: 'destructive' });
+      return;
+    }
+    triggerConfirm('Visitor');
   }
 
   const triggerConfirm = (type) => {
@@ -518,42 +517,42 @@ function PlotsContent() {
   const performSubmit = async (type) => {
     setLoading(true);
     try {
-        const updateData = {
-            _id: state._id,
-            siteId: state.siteId, // Include Site
-            unitId: state.unitId,
-            plotCode: state.plotCode,
-            UnitName: state.UnitName,
-        };
-        const saveData = {
-            siteId: state.siteId, // Include Site
-            plotNumber: state.plotNumber,
-            dimension: state.dimension,
-            areaInSqFt: state.areaInSqFt,
-            cents: state.cents,
-            road: state.road,
-            landmark: state.landmark,
-            remarks: state.remarks,
-            description: state.description,
-            facing: state.facing,
-            unitId: state.unitId
-        };
+      const updateData = {
+        _id: state._id,
+        siteId: state.siteId, // Include Site
+        unitId: state.unitId,
+        plotCode: state.plotCode,
+        UnitName: state.UnitName,
+      };
+      const saveData = {
+        siteId: state.siteId, // Include Site
+        plotNumber: state.plotNumber,
+        dimension: state.dimension,
+        areaInSqFt: state.areaInSqFt,
+        cents: state.cents,
+        road: state.road,
+        landmark: state.landmark,
+        remarks: state.remarks,
+        description: state.description,
+        facing: state.facing,
+        unitId: state.unitId
+      };
 
-        if (type === 'Update') {
-            await updatePlot(updateData);
-            toast({ title: 'Success', description: 'Plot updated successfully', variant: 'success' });
-        } else {
-            await createPlot(saveData);
-            toast({ title: 'Success', description: 'Plot created successfully', variant: 'success' });
-        }
-        clear();
-        setDialogOpen(false);
-        getPlot();
+      if (type === 'Update') {
+        await updatePlot(updateData);
+        toast({ title: 'Success', description: 'Plot updated successfully', variant: 'success' });
+      } else {
+        await createPlot(saveData);
+        toast({ title: 'Success', description: 'Plot created successfully', variant: 'success' });
+      }
+      clear();
+      setDialogOpen(false);
+      getPlot();
     } catch (error) {
-        toast({ title: 'Error', description: error.message || 'Operation failed', variant: 'destructive' });
+      toast({ title: 'Error', description: error.message || 'Operation failed', variant: 'destructive' });
     } finally {
-        setLoading(false);
-        setConfirmState({ ...confirmState, open: false });
+      setLoading(false);
+      setConfirmState({ ...confirmState, open: false });
     }
   };
 
@@ -561,17 +560,17 @@ function PlotsContent() {
     setLoading(true);
     try {
       const updateData = { plotId: RowData._id };
-      if(state.statusName === 'Sold To') updateData.soldToVisitorId=state.visitorId;
-      else if(state.statusName === 'Reserved By') updateData.reservedBy = state.visitorId;
-      else if(state.statusName === 'Hold By') updateData.holdBy = state.visitorId;
-      else if(state.statusName === 'Booked By') updateData.bookedBy = state.visitorId;
-      else if(state.statusName === 'Interested') updateData.interestedBy = state.visitorId;
-      else if(state.statusName === 'Visited') updateData.visitedBy = state.visitorId;
+      if (state.statusName === 'Sold To') updateData.soldToVisitorId = state.visitorId;
+      else if (state.statusName === 'Reserved By') updateData.reservedBy = state.visitorId;
+      else if (state.statusName === 'Hold By') updateData.holdBy = state.visitorId;
+      else if (state.statusName === 'Booked By') updateData.bookedBy = state.visitorId;
+      else if (state.statusName === 'Interested') updateData.interestedBy = state.visitorId;
+      else if (state.statusName === 'Visited') updateData.visitedBy = state.visitorId;
 
       const res = await updatePlotStatus(updateData);
-      if(res) { 
-          clear(); 
-          setOpenVisitor(false); 
+      if (res) {
+        clear();
+        setOpenVisitor(false);
       }
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to add visitor', variant: 'destructive' });
@@ -582,10 +581,10 @@ function PlotsContent() {
   };
 
   const handleView = (row) => {
-    setViewData({ 
-        "Plot Code": row.plotCode, 
-        "Site": row.unitId?.siteId?.sitename || '-',
-        "Unit": row.unitId?.UnitName || '-' 
+    setViewData({
+      "Plot Code": row.plotCode,
+      "Site": row.unitId?.siteId?.sitename || '-',
+      "Unit": row.unitId?.UnitName || '-'
     });
     setOpenView(true);
   };
@@ -598,22 +597,22 @@ function PlotsContent() {
 
   // Helper to filter units based on selected Site
   const getFilteredUnits = () => {
-      if (!state.siteId) return [];
-      // Filter units where unit.siteId matches state.siteId
-      // Ensure backend populates siteId in Unit/getAllUnits or returns siteId string
-      return Data.filter(u => {
-          const uSiteId = u.siteId?._id || u.siteId; // Handle populated object or ID string
-          return uSiteId === state.siteId;
-      });
+    if (!state.siteId) return [];
+    // Filter units where unit.siteId matches state.siteId
+    // Ensure backend populates siteId in Unit/getAllUnits or returns siteId string
+    return Data.filter(u => {
+      const uSiteId = u.siteId?._id || u.siteId; // Handle populated object or ID string
+      return uSiteId === state.siteId;
+    });
   };
 
   return (
     <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
-      
+
       {/* --- HEADER --- */}
-      <div className="flex items-center justify-between">
+      <div className="flex md:flex-row flex-col  items-start md:justify-between gap-2">
         <h1 className="text-3xl font-bold text-white">Plots</h1>
-        <div className="flex gap-3">
+        <div className="flex  md:flex-row flex-col  gap-3">
           <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
             <Upload className="w-4 h-4 mr-2" /> Import
           </Button>
@@ -627,7 +626,7 @@ function PlotsContent() {
       </div>
 
       {/* --- TABLE CARD --- */}
-      <Card>
+      <Card className='hidden md:block'>
         <CardContent className="p-6">
           {/* FILTER BAR */}
           <div className="flex gap-4 mb-6">
@@ -641,7 +640,7 @@ function PlotsContent() {
               />
             </div>
             <Button variant="outline" onClick={() => getPlot()} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20" title="Refresh">
-               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
           </div>
 
@@ -661,9 +660,9 @@ function PlotsContent() {
               </thead>
               <tbody>
                 {loading && filteredData.length === 0 ? (
-                  <tr><td colSpan="7" className="text-center py-8 text-fuchsia-400"><Loader2 className="animate-spin inline mr-2"/> Loading...</td></tr>
+                  <tr><td colSpan="7" className="text-center py-8 text-fuchsia-400"><Loader2 className="animate-spin inline mr-2" /> Loading...</td></tr>
                 ) : filteredData.length === 0 ? (
-                   <tr><td colSpan="7" className="text-center py-8 text-slate-400">No plots found.</td></tr>
+                  <tr><td colSpan="7" className="text-center py-8 text-slate-400">No plots found.</td></tr>
                 ) : (
                   filteredData.map((row, index) => (
                     <motion.tr
@@ -676,7 +675,7 @@ function PlotsContent() {
                       <td className="py-3 px-4 text-sm text-slate-300">{row.plotNumber}</td>
                       <td className="py-3 px-4">
                         <Badge color={row.statusId?.colorCode || '#64748b'}>
-                           {row.statusId?.statusName || 'Unknown'}
+                          {row.statusId?.statusName || 'Unknown'}
                         </Badge>
                       </td>
                       <td className="py-3 px-4 text-sm text-slate-300">{row.areaInSqFt}</td>
@@ -695,178 +694,301 @@ function PlotsContent() {
         </CardContent>
       </Card>
 
+      {/* //card for Mobile view */}
+      <Card className=' md:hidden'>
+        <CardContent className="p-6">
+          {/* FILTER BAR */}
+          <div className="flex gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" />
+              <Input
+                placeholder="Search plots..."
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white placeholder:text-purple-200 focus-visible:ring-fuchsia-500"
+              />
+            </div>
+            <Button variant="outline" onClick={() => getPlot()} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20" title="Refresh">
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
+
+          {/* DATA TABLE */}
+          {/* CARD LIST FOR MOBILE */}
+          <div className="space-y-4">
+            {loading && filteredData.length === 0 ? (
+              <div className="text-center py-6 text-fuchsia-400">
+                <Loader2 className="animate-spin inline mr-2" /> Loading...
+              </div>
+            ) : filteredData.length === 0 ? (
+              <div className="text-center py-6 text-slate-400">
+                No plots found.
+              </div>
+            ) : (
+              filteredData.map((row, index) => (
+                <motion.div
+                  key={row._id || index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.04 }}
+                  className="
+          bg-purple-900/40
+          border border-fuchsia-700/40
+          rounded-xl
+          p-4
+          shadow-lg
+          hover:bg-purple-800/60
+          transition-all
+        "
+                >
+                  {/* SITE + STATUS ROW */}
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-xs font-bold text-white">
+                      {row?.siteId?.sitename || '-'}
+                    </h3>
+
+                    <Badge color={row.statusId?.colorCode || '#64748b'}>
+                      {row.statusId?.statusName || 'Unknown'}
+                    </Badge>
+                  </div>
+
+                  {/* UNIT */}
+                  <div className="flex items-center gap-2 text-purple-300 text-sm mb-1">
+                    <Home className="w-4 h-4" />
+                    <span>{row.unitId?.UnitName || '-'}</span>
+                  </div>
+
+                  {/* PLOT NO */}
+                  <div className="flex items-center gap-2 text-fuchsia-300 text-sm mb-1">
+                    <MapPin className="w-4 h-4" />
+                    <span>{row.plotNumber}</span>
+                  </div>
+
+                  {/* AREA */}
+                  <div className="flex items-center gap-2 text-slate-300 text-sm mb-1">
+                    <Square className="w-4 h-4" />
+                    <span>{row.areaInSqFt} Sq.ft</span>
+                  </div>
+
+                  {/* FACING */}
+                  <div className="flex items-center gap-2 text-slate-300 text-sm mb-3">
+                    <Compass className="w-4 h-4" />
+                    <span>{row.facing}</span>
+                  </div>
+
+                  {/* ACTION BUTTONS */}
+                  <div className="flex justify-end border-t border-purple-700/40 pt-2 gap-2">
+                    <Button
+                      variant="icon"
+                      size="icon"
+                      onClick={() => handleView(row)}
+                      title="View"
+                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+
+                    <Button
+                      variant="icon"
+                      size="icon"
+                      onClick={() => editTable(row)}
+                      title="Edit"
+                      className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/20"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+
+                    <Button
+                      variant="icon"
+                      size="icon"
+                      onClick={() => handleAddVisitor(row)}
+                      title="Add Visitor"
+                      className="text-green-400 hover:text-green-300 hover:bg-green-900/20"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </div>
+
+        </CardContent>
+      </Card>
+
+
       {/* --- ADD / EDIT PLOT DIALOG --- */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-[800px] max-h-[90vh]" title={isEdit ? "Edit Plot" : "Add New Plot"} onClose={() => setDialogOpen(false)}>
-           <div className="overflow-y-auto p-6 custom-scrollbar">
-              <form onSubmit={(e) => { e.preventDefault(); Validate(); }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 
-                 {/* SITE SELECTION (MANDATORY) */}
-                 <div>
-                    <Label>Site <span className="text-red-500">*</span></Label>
-                    <div className="relative">
-                       <select 
-                          className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
-                          value={state.siteId}
-                          onChange={(e) => {
-                             const selected = siteList.find(s => s._id === e.target.value);
-                             if(selected) storeDispatch(selected, 'siteId', 'select');
-                          }}
-                       >
-                          <option value="">Select Site</option>
-                          {siteList.map(s => <option key={s._id} value={s._id}>{s.sitename}</option>)}
-                       </select>
-                       <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
-                    </div>
-                 </div>
+          <div className="overflow-y-auto p-6 custom-scrollbar">
+            <form onSubmit={(e) => { e.preventDefault(); Validate(); }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                 {/* UNIT SELECTION (FILTERED BY SITE) */}
-                 <div>
-                    <Label>Unit</Label>
-                    <div className="relative">
-                       <select 
-                          className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none disabled:opacity-50"
-                          value={state.unitId}
-                          disabled={!state.siteId} // Disable if no Site selected
-                          onChange={(e) => {
-                             const selected = Data.find(d => d._id === e.target.value);
-                             if(selected) storeDispatch(selected, 'unitId', 'select');
-                             else storeDispatch({_id: '', UnitName: ''}, 'unitId', 'select'); // Clear if reset
-                          }}
-                       >
-                          <option value="">Select Unit (Optional)</option>
-                          {getFilteredUnits().map(u => <option key={u._id} value={u._id}>{u.UnitName}</option>)}
-                       </select>
-                       <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
-                    </div>
-                 </div>
+              {/* SITE SELECTION (MANDATORY) */}
+              <div>
+                <Label>Site <span className="text-red-500">*</span></Label>
+                <div className="relative">
+                  <select
+                    className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
+                    value={state.siteId}
+                    onChange={(e) => {
+                      const selected = siteList.find(s => s._id === e.target.value);
+                      if (selected) storeDispatch(selected, 'siteId', 'select');
+                    }}
+                  >
+                    <option value="">Select Site</option>
+                    {siteList.map(s => <option key={s._id} value={s._id}>{s.sitename}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
+                </div>
+              </div>
 
-                 <div>
-                    <Label>Plot Number <span className="text-red-500">*</span></Label>
-                    <Input value={state.plotNumber} onChange={(e) => storeDispatch(e.target.value, "plotNumber", "text")} />
-                 </div>
+              {/* UNIT SELECTION (FILTERED BY SITE) */}
+              <div>
+                <Label>Unit</Label>
+                <div className="relative">
+                  <select
+                    className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none disabled:opacity-50"
+                    value={state.unitId}
+                    disabled={!state.siteId} // Disable if no Site selected
+                    onChange={(e) => {
+                      const selected = Data.find(d => d._id === e.target.value);
+                      if (selected) storeDispatch(selected, 'unitId', 'select');
+                      else storeDispatch({ _id: '', UnitName: '' }, 'unitId', 'select'); // Clear if reset
+                    }}
+                  >
+                    <option value="">Select Unit (Optional)</option>
+                    {getFilteredUnits().map(u => <option key={u._id} value={u._id}>{u.UnitName}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
+                </div>
+              </div>
 
-                 <div>
-                    <Label>Dimension</Label>
-                    <Input value={state.dimension} onChange={(e) => storeDispatch(e.target.value, "dimension", "text")} />
-                 </div>
+              <div>
+                <Label>Plot Number <span className="text-red-500">*</span></Label>
+                <Input value={state.plotNumber} onChange={(e) => storeDispatch(e.target.value, "plotNumber", "text")} />
+              </div>
 
-                 <div>
-                    <Label>Area (Sq.ft)</Label>
-                    <Input type="number" value={state.areaInSqFt} onChange={(e) => storeDispatch(e.target.value, "areaInSqFt", "text")} />
-                 </div>
+              <div>
+                <Label>Dimension</Label>
+                <Input value={state.dimension} onChange={(e) => storeDispatch(e.target.value, "dimension", "text")} />
+              </div>
 
-                 <div>
-                    <Label>Cents</Label>
-                    <Input type="number" value={state.cents} onChange={(e) => storeDispatch(e.target.value, "cents", "text")} />
-                 </div>
+              <div>
+                <Label>Area (Sq.ft)</Label>
+                <Input type="number" value={state.areaInSqFt} onChange={(e) => storeDispatch(e.target.value, "areaInSqFt", "text")} />
+              </div>
 
-                 <div>
-                    <Label>Facing <span className="text-red-500">*</span></Label>
-                    <div className="relative">
-                       <select 
-                          className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
-                          value={state.facing}
-                          onChange={(e) => storeDispatch({ FacingName: e.target.value }, 'facing', 'select')}
-                       >
-                          <option value="">Select Facing</option>
-                          {Facing.map(f => <option key={f.FacingIDPK} value={f.FacingName}>{f.FacingName}</option>)}
-                       </select>
-                       <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
-                    </div>
-                 </div>
+              <div>
+                <Label>Cents</Label>
+                <Input type="number" value={state.cents} onChange={(e) => storeDispatch(e.target.value, "cents", "text")} />
+              </div>
 
-                 <div>
-                    <Label>Road</Label>
-                    <Input value={state.road} onChange={(e) => storeDispatch(e.target.value, "road", "text")} />
-                 </div>
+              <div>
+                <Label>Facing <span className="text-red-500">*</span></Label>
+                <div className="relative">
+                  <select
+                    className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
+                    value={state.facing}
+                    onChange={(e) => storeDispatch({ FacingName: e.target.value }, 'facing', 'select')}
+                  >
+                    <option value="">Select Facing</option>
+                    {Facing.map(f => <option key={f.FacingIDPK} value={f.FacingName}>{f.FacingName}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
+                </div>
+              </div>
 
-                 <div>
-                    <Label>Landmark</Label>
-                    <Input value={state.landmark} onChange={(e) => storeDispatch(e.target.value, "landmark", "text")} />
-                 </div>
+              <div>
+                <Label>Road</Label>
+                <Input value={state.road} onChange={(e) => storeDispatch(e.target.value, "road", "text")} />
+              </div>
 
-                 <div className="md:col-span-2">
-                    <Label>Description</Label>
-                    <Input value={state.description} onChange={(e) => storeDispatch(e.target.value, "description", "text")} />
-                 </div>
-                 
-                 <div className="md:col-span-2">
-                    <Label>Remarks</Label>
-                    <Input value={state.remarks} onChange={(e) => storeDispatch(e.target.value, "remarks", "text")} />
-                 </div>
+              <div>
+                <Label>Landmark</Label>
+                <Input value={state.landmark} onChange={(e) => storeDispatch(e.target.value, "landmark", "text")} />
+              </div>
 
-                 <div className="md:col-span-2 flex justify-end gap-3 mt-4">
-                    <Button variant="ghost" onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button type="submit" disabled={loading}>{loading ? 'Saving...' : (isEdit ? 'Update' : 'Save')}</Button>
-                 </div>
-              </form>
-           </div>
+              <div className="md:col-span-2">
+                <Label>Description</Label>
+                <Input value={state.description} onChange={(e) => storeDispatch(e.target.value, "description", "text")} />
+              </div>
+
+              <div className="md:col-span-2">
+                <Label>Remarks</Label>
+                <Input value={state.remarks} onChange={(e) => storeDispatch(e.target.value, "remarks", "text")} />
+              </div>
+
+              <div className="md:col-span-2 flex justify-end gap-3 mt-4">
+                <Button variant="ghost" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={loading}>{loading ? 'Saving...' : (isEdit ? 'Update' : 'Save')}</Button>
+              </div>
+            </form>
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* --- ADD VISITOR DIALOG --- */}
       <Dialog open={openVisitor} onOpenChange={setOpenVisitor}>
         <DialogContent className="sm:max-w-[600px]" title="Add Visitor" onClose={() => { clear(); setOpenVisitor(false); }}>
-           <div className="p-6 space-y-4">
-               <div>
-                  <Label>Status <span className="text-red-500">*</span></Label>
-                  <div className="relative">
-                     <select 
-                        className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
-                        value={state.statusName}
-                        onChange={(e) => storeDispatch({ PlotStatusName: e.target.value }, 'PlotStatusID', 'select')}
-                     >
-                        <option value="">Select Status</option>
-                        {PlotStatus.map(s => <option key={s.PlotStatusIDPK} value={s.PlotStatusName}>{s.PlotStatusName}</option>)}
-                     </select>
-                     <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
-                  </div>
-               </div>
+          <div className="p-6 space-y-4">
+            <div>
+              <Label>Status <span className="text-red-500">*</span></Label>
+              <div className="relative">
+                <select
+                  className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
+                  value={state.statusName}
+                  onChange={(e) => storeDispatch({ PlotStatusName: e.target.value }, 'PlotStatusID', 'select')}
+                >
+                  <option value="">Select Status</option>
+                  {PlotStatus.map(s => <option key={s.PlotStatusIDPK} value={s.PlotStatusName}>{s.PlotStatusName}</option>)}
+                </select>
+                <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
+              </div>
+            </div>
 
-               <div>
-                  <Label>Visitor <span className="text-red-500">*</span></Label>
-                  <div className="relative">
-                     <select 
-                        className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
-                        value={state.visitorId}
-                        onClick={() => getVisitor()} 
-                        onChange={(e) => {
-                           const vis = Data.find(v => v._id === e.target.value);
-                           if(vis) storeDispatch({ _id: vis._id, visitorName: vis.visitorName || vis['Visitor Name'] }, 'VisitorID', 'select');
-                        }}
-                     >
-                        <option value="">Select Visitor</option>
-                        {Data.map((v, i) => <option key={v._id || i} value={v._id}>{v.visitorName || v['Visitor Name']}</option>)}
-                     </select>
-                     <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
-                  </div>
-               </div>
+            <div>
+              <Label>Visitor <span className="text-red-500">*</span></Label>
+              <div className="relative">
+                <select
+                  className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
+                  value={state.visitorId}
+                  onClick={() => getVisitor()}
+                  onChange={(e) => {
+                    const vis = Data.find(v => v._id === e.target.value);
+                    if (vis) storeDispatch({ _id: vis._id, visitorName: vis.visitorName || vis['Visitor Name'] }, 'VisitorID', 'select');
+                  }}
+                >
+                  <option value="">Select Visitor</option>
+                  {Data.map((v, i) => <option key={v._id || i} value={v._id}>{v.visitorName || v['Visitor Name']}</option>)}
+                </select>
+                <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
+              </div>
+            </div>
 
-               <div className="flex justify-end gap-3 mt-4">
-                  <Button variant="ghost" onClick={() => setOpenVisitor(false)}>Cancel</Button>
-                  <Button onClick={ValidateVisitor} disabled={loading}>{loading ? 'Adding...' : 'Add Visitor'}</Button>
-               </div>
-           </div>
+            <div className="flex justify-end gap-3 mt-4">
+              <Button variant="ghost" onClick={() => setOpenVisitor(false)}>Cancel</Button>
+              <Button onClick={ValidateVisitor} disabled={loading}>{loading ? 'Adding...' : 'Add Visitor'}</Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* --- VIEW DATA MODAL --- */}
       <Dialog open={openView} onOpenChange={setOpenView}>
         <DialogContent className="sm:max-w-[400px]" title="Plot Details" onClose={() => setOpenView(false)}>
-            <div className="p-6 space-y-4">
-               {Object.entries(Viewdata).map(([key, val]) => (
-                  <div key={key} className="flex justify-between border-b border-slate-800 pb-2">
-                      <span className="text-slate-400 font-medium">{key}</span>
-                      <span className="text-white font-bold">{val}</span>
-                  </div>
-               ))}
-            </div>
+          <div className="p-6 space-y-4">
+            {Object.entries(Viewdata).map(([key, val]) => (
+              <div key={key} className="flex justify-between border-b border-slate-800 pb-2">
+                <span className="text-slate-400 font-medium">{key}</span>
+                <span className="text-white font-bold">{val}</span>
+              </div>
+            ))}
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* --- CONFIRMATION DIALOG --- */}
-      <ConfirmDialog 
+      <ConfirmDialog
         open={confirmState.open}
         title={confirmState.title}
         description={confirmState.description}
@@ -881,9 +1003,9 @@ function PlotsContent() {
 
 // Wrap with Toast Provider
 export default function Plots() {
-    return (
-        <ToastProvider>
-            <PlotsContent />
-        </ToastProvider>
-    );
+  return (
+    <ToastProvider>
+      <PlotsContent />
+    </ToastProvider>
+  );
 }

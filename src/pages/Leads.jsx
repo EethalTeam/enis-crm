@@ -1,11 +1,12 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus } from 'lucide-react';
+import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus,Phone } from 'lucide-react';
 
 // --- CONFIGURATION & IMPORTS ---
 // NOTE: In your local environment, uncomment the config import line below.
 import { Helmet } from 'react-helmet';
 import { config } from '@/components/CustomComponents/config.js';
+
 // import { useToast } from '@/components/ui/use-toast';
 
 const statusColors = {
@@ -938,9 +939,9 @@ function LeadsContent() {
 
   return (
     <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
-      <div className="flex items-center justify-between">
+      <div className="flex md:flex-row flex-col items-start md:justify-between gap-3">
         <h1 className="text-3xl font-bold text-white">Leads</h1>
-        <div className="flex gap-3">
+        <div className="flex md:flex-row flex-col gap-3">
           <Button variant="outline" onClick={handleImport} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
             <Upload className="w-4 h-4 mr-2" />
             Import
@@ -956,7 +957,7 @@ function LeadsContent() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
+      <div className="flex flex-wrap items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
         <TabButton id="new" label="New Leads" icon={Plus} />
         <TabButton id="followups" label="Follow-ups" icon={PhoneCall} />
         <TabButton id="visits" label="Visits" icon={MapPin} />
@@ -964,8 +965,8 @@ function LeadsContent() {
         <TabButton id="all" label="All Leads" icon={Users} />
       </div>
 
-      <Card>
-        <CardContent className="p-6">
+      <Card className='md:block hidden'>
+        <CardContent className="p-6 " >
           <div className="flex gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" />
@@ -1052,6 +1053,133 @@ function LeadsContent() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Card View For Mobile */}
+      
+      <Card className='md:hidden block'>
+        <CardContent className="p-6 " >
+          <div className="flex gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" />
+              <Input
+                placeholder="Search leads by name, email or company..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white placeholder:text-purple-200 focus-visible:ring-fuchsia-500"
+              />
+            </div>
+            <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
+              <Filter className="w-4 h-4 mr-2" />
+              Filter
+            </Button>
+          </div>
+
+         <div className="space-y-4">
+  {loading && leads.length === 0 ? (
+    <div className="text-center py-6 text-fuchsia-400">
+      <Loader2 className="animate-spin inline-block mr-2" /> Loading...
+    </div>
+  ) : filteredLeads.length === 0 ? (
+    <div className="text-center py-6 text-slate-400">
+      No {activeTab === 'all' ? '' : activeTab} leads found.
+    </div>
+  ) : (
+    filteredLeads.map((lead, index) => (
+      <motion.div
+  key={lead.id}
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: index * 0.05 }}
+  className="
+     bg-slate-900
+    border border-fuchsia-700/40
+    rounded-xl
+    p-4
+    shadow-lg
+    hover:bg-purple-800/60
+    transition-all
+  "
+>
+  {/* NAME + STATUS */}
+  <div className="flex justify-between items-center  mb-2 gap-2">
+    <h3 className=" font-bold text-white">{lead.name}</h3>
+
+    <Badge className={statusColors[lead.status] || 'bg-slate-600'}>
+      {lead.status}
+    </Badge>
+  </div>
+
+  {/* SITE */}
+  <div className="flex items-center gap-2 mb-1 text-purple-300 text-sm">
+    <MapPin className="w-4 h-4" />
+    <span>{lead.site}</span>
+  </div>
+
+  {/* PHONE */}
+  <div className="flex items-center gap-2 mb-1 text-fuchsia-300 text-sm">
+    <Phone className="w-4 h-4" />
+    <span>{lead.phone}</span>
+  </div>
+
+  {/* ASSIGNED */}
+  <div
+    className={`flex items-center gap-2 mb-2 text-sm ${
+      lead.assignedTo === 'Unassigned'
+        ? 'text-red-300'
+        : 'text-slate-300'
+    }`}
+  >
+    <User className="w-4 h-4" />
+    <span>{lead.assignedTo}</span>
+  </div>
+
+  {/* ACTION BUTTONS */}
+  <div className="flex justify-end gap-2 border-t border-purple-700/40 pt-2">
+    <Button
+      variant="icon"
+      size="icon"
+      onClick={() => handleAssign(lead)}
+      className="text-green-400 hover:text-green-300 hover:bg-green-900/20"
+    >
+      <UserPlus className="w-4 h-4" />
+    </Button>
+
+    <Button
+      variant="icon"
+      size="icon"
+      onClick={() => handleView(lead)}
+      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+    >
+      <Eye className="w-4 h-4" />
+    </Button>
+
+    <Button
+      variant="icon"
+      size="icon"
+      onClick={() => handleEdit(lead)}
+      className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/20"
+    >
+      <Pencil className="w-4 h-4" />
+    </Button>
+
+    <Button
+      variant="icon"
+      size="icon"
+      onClick={() => handleDelete(lead.id)}
+      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+    >
+      <Trash2 className="w-4 h-4" />
+    </Button>
+  </div>
+</motion.div>
+
+    ))
+  )}
+</div>
+
+        </CardContent>
+      </Card>
+
 
       <LeadDialog 
         open={dialogOpen} 

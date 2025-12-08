@@ -84,7 +84,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   return (
     <motion.aside
       initial={false}
-      animate={{ width: isOpen ? 256 : 80 }}
+      animate={{ width: isOpen ? (window.innerWidth < 768 ? 220 : 280) : 80 }}
       transition={{ duration: 0.3 }}
       className="bg-black/20 backdrop-filter backdrop-blur-lg border-r border-purple-700/50 flex flex-col"
     >
@@ -99,7 +99,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <h2 className="font-bold text-xl text-white text-glow">ENIS CRM</h2>
+              <h2 className="font-bold text-xl text-white text-glow hidden md:block">ENIS CRM</h2>
             </motion.div>
           )}
         </div>
