@@ -53,7 +53,7 @@ const navItems = [
       { label: 'City', path: '/masters/city' },
       { label: 'Employees', path: '/masters/employees' },
       { label: 'Plot Status', path: '/masters/plotStatus' },
-      { label: 'Role', path: '/masters/role' }
+      { label: 'Role', path: '/masters/rolepages' }
     ]
   },
   // { icon: BarChart3, label: 'Analytics', path: '/analytics' },

@@ -478,6 +478,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                 </div>
                 <div>
                   <Label htmlFor="phone">Phone *</Label>
+                  
                   <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required disabled={isViewMode} />
                 </div>
                 <div>
@@ -1022,7 +1023,8 @@ function LeadsContent() {
                     >
                       <td className="py-3 px-4 text-sm font-medium text-white">{lead.name}</td>
                       <td className="py-3 px-4 text-sm text-slate-300">{lead.site}</td>
-                      <td className="py-3 px-4 text-sm text-slate-300">{lead.phone}</td>
+                      <td className="py-3 px-4 text-sm text-slate-300 flex gap-2">
+                        <button ><Phone size={14}/></button>{lead.phone}</td>
                       <td className="py-3 px-4 text-sm text-slate-300">{lead.source}</td>
                       <td className="py-3 px-4">
                         <Badge className={statusColors[lead.status] || 'bg-slate-600'}>{lead.status}</Badge>

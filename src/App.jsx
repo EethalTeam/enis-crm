@@ -26,6 +26,8 @@ import Dialer from '@/pages/TeleCMIDialer'
 import MasterForms from '@/pages/MasterForms';
 import AdminPanel from '@/pages/AdminPanel';
 import MainLayout from '@/components/layout/MainLayout';
+import Employees  from '@/pages/Employees';
+import Rolepages from '@/pages/Rolepages';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
 function PrivateRoute({ children }) {
@@ -69,6 +71,9 @@ function App() {
             <Route path="/dialer" element={<Dialer />} />
             <Route path="master-forms" element={<MasterForms />} />
             <Route path="admin-panel" element={<AdminPanel />} />
+            <Route path="/masters/employees" element={<Employees />} />
+            <Route path="/masters/rolepages" element={<Rolepages />} />
+            
           </Route>
         </Routes>
       </Router>
