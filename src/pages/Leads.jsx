@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus,Phone } from 'lucide-react';
+import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus, Phone } from 'lucide-react';
 
 // --- CONFIGURATION & IMPORTS ---
 // NOTE: In your local environment, uncomment the config import line below.
@@ -69,7 +69,7 @@ const Button = ({ className, variant = "default", size = "default", onClick, dis
     sm: "h-8 rounded-md px-3 text-xs"
   };
   return (
-    <button 
+    <button
       type={type}
       className={`${baseStyles} ${variants[variant] || variants.default} ${sizes[size] || sizes.default} ${className}`}
       onClick={onClick}
@@ -101,7 +101,7 @@ const Dialog = ({ open, onOpenChange, children }) => {
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -116,7 +116,7 @@ const Dialog = ({ open, onOpenChange, children }) => {
 };
 
 const DialogContent = ({ className, children }) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, scale: 0.95, y: 10 }}
     animate={{ opacity: 1, scale: 1, y: 0 }}
     exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -175,13 +175,12 @@ const ToastProvider = ({ children }) => {
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
-                t.variant === 'destructive' 
-                  ? 'bg-red-900/90 border-red-800 text-white' 
+              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === 'destructive'
+                  ? 'bg-red-900/90 border-red-800 text-white'
                   : t.variant === 'success'
-                  ? 'bg-green-900/90 border-green-800 text-white'
-                  : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
-              }`}
+                    ? 'bg-green-900/90 border-green-800 text-white'
+                    : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
+                }`}
             >
               <div>
                 {t.title && <h4 className="font-semibold text-sm">{t.title}</h4>}
@@ -209,9 +208,9 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
 
   useEffect(() => {
     if (open && lead) {
-       // Pre-select if already assigned and matches list
-       const currentAgent = AVAILABLE_AGENTS.find(a => a.name === lead.assignedTo);
-       setSelectedAgent(currentAgent ? currentAgent.name : '');
+      // Pre-select if already assigned and matches list
+      const currentAgent = AVAILABLE_AGENTS.find(a => a.name === lead.assignedTo);
+      setSelectedAgent(currentAgent ? currentAgent.name : '');
     }
   }, [open, lead]);
 
@@ -226,14 +225,14 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
       // Logic to call API
       // Using /Lead/updateLead as generic update endpoint, assuming backend handles 'assignedAgent' in payload
       // Or you might have a specific /Lead/assignLead endpoint
-      const url = config.Api + "Lead/updateLead"; 
-      
+      const url = config.Api + "Lead/updateLead";
+
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-           leadId: lead.id,
-           updateData: { assignedAgent: { name: selectedAgent } } // Adjust structure based on your backend schema
+        body: JSON.stringify({
+          leadId: lead.id,
+          updateData: { assignedAgent: { name: selectedAgent } } // Adjust structure based on your backend schema
         })
       });
 
@@ -273,7 +272,7 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
             Assigning lead <span className="text-white font-medium">{lead?.name}</span>
           </p>
           <Label>Select Agent</Label>
-          <select 
+          <select
             className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600"
             value={selectedAgent}
             onChange={(e) => setSelectedAgent(e.target.value)}
@@ -285,16 +284,48 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
           </select>
         </div>
         <DialogFooter>
-           <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-           <Button onClick={handleSubmit} disabled={isSubmitting}>
-             {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-             Confirm Assignment
-           </Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            Confirm Assignment
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 };
+
+
+//--Call Dialog
+const CallDialog = ({ open, onOpenChange, number }) => {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[350px]">
+        <DialogHeader>
+          <div className="flex justify-between items-center w-full">
+            <DialogTitle>Call Lead</DialogTitle>
+            <button onClick={() => onOpenChange(false)} className="text-slate-400 hover:text-white">
+              <X size={20} />
+            </button>
+          </div>
+        </DialogHeader>
+
+        <div className="p-6 text-center">
+          <p className="text-slate-400 mb-4">Phone Number</p>
+          <h2 className="text-2xl font-bold text-white mb-6">{number}</h2>
+
+          <Button
+            className="bg-green-600 hover:bg-green-700 w-full"
+            // onClick={() => window.location.href = `tel:${number}`}
+          >
+            <Phone className="mr-2 w-4 h-4" /> Call Now
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 
 // --- LEAD DIALOG COMPONENT ---
 
@@ -311,7 +342,7 @@ const initialFormState = {
   street: '', city: '', state: '', country: '', zipCode: '',
   leadStatus: 'New', leadSource: 'Website', leadScore: 0,
   amount: 0, currency: '₹',
-  tags: '' 
+  tags: ''
 };
 
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create' }) => {
@@ -331,25 +362,25 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
           phone: initialData.contactInfo?.phone || '',
           jobTitle: initialData.contactInfo?.jobTitle || '',
           linkedinProfile: initialData.contactInfo?.linkedinProfile || '',
-          
+
           companyName: initialData.companyDetails?.name || '',
           website: initialData.companyDetails?.website || '',
           industry: initialData.companyDetails?.industry || '',
           size: initialData.companyDetails?.size || '',
-          
+
           street: initialData.companyDetails?.address?.street || '',
           city: initialData.companyDetails?.address?.city || '',
           state: initialData.companyDetails?.address?.state || '',
           country: initialData.companyDetails?.address?.country || '',
           zipCode: initialData.companyDetails?.address?.zipCode || '',
-          
+
           leadStatus: initialData.leadStatus || 'New',
           leadSource: initialData.leadSource || 'Website',
           leadScore: initialData.leadScore || 0,
-          
+
           amount: initialData.potentialValue?.amount || 0,
           currency: initialData.potentialValue?.currency || '₹',
-          
+
           tags: initialData.tags ? (Array.isArray(initialData.tags) ? initialData.tags.join(', ') : initialData.tags) : ''
         });
       } else {
@@ -372,7 +403,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
     try {
       const isEdit = mode === 'edit';
       const endpoint = isEdit ? 'Lead/updateLead' : 'Lead/createLead';
-      
+
       const payload = {
         contactInfo: {
           firstName: formData.firstName,
@@ -421,7 +452,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         toast({
           title: isEdit ? "Lead Updated" : "Lead Created",
           description: result.message,
-          variant: "success" 
+          variant: "success"
         });
         onSuccess();
       } else {
@@ -443,7 +474,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0">
-        
+
         <DialogHeader>
           <div className="flex justify-between items-center w-full">
             <DialogTitle>
@@ -456,10 +487,10 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
             </button>
           </div>
         </DialogHeader>
-        
+
         <div className="overflow-y-auto p-6 custom-scrollbar flex-1">
           <form id="lead-form" onSubmit={handleSubmit} className="space-y-6">
-            
+
             {/* CONTACT INFO */}
             <div>
               <SectionHeader icon={User} title="Contact Information" />
@@ -478,7 +509,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                 </div>
                 <div>
                   <Label htmlFor="phone">Phone *</Label>
-                  
+
                   <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required disabled={isViewMode} />
                 </div>
                 <div>
@@ -511,9 +542,9 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                 <div>
                   <Label htmlFor="size">Company Size</Label>
                   <div className="relative">
-                    <select 
-                      name="size" 
-                      value={formData.size} 
+                    <select
+                      name="size"
+                      value={formData.size}
                       onChange={handleChange}
                       disabled={isViewMode}
                       className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 disabled:opacity-50"
@@ -563,9 +594,9 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>Status</Label>
-                  <select 
+                  <select
                     name="leadStatus"
-                    value={formData.leadStatus} 
+                    value={formData.leadStatus}
                     onChange={handleChange}
                     disabled={isViewMode}
                     className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 disabled:opacity-50"
@@ -584,9 +615,9 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
 
                 <div>
                   <Label>Source</Label>
-                  <select 
+                  <select
                     name="leadSource"
-                    value={formData.leadSource} 
+                    value={formData.leadSource}
                     onChange={handleChange}
                     disabled={isViewMode}
                     className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 disabled:opacity-50"
@@ -601,47 +632,47 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                 </div>
 
                 <div>
-                   <Label htmlFor="amount">Potential Value</Label>
-                   <div className="flex gap-2">
-                      <Input 
-                        id="amount" 
-                        name="amount" 
-                        type="number" 
-                        value={formData.amount} 
-                        onChange={handleChange} 
-                        disabled={isViewMode} 
-                      />
-                      <Input 
-                         name="currency" 
-                         value={formData.currency} 
-                         onChange={handleChange} 
-                         className="w-24 text-center" 
-                         disabled={isViewMode} 
-                      />
-                   </div>
+                  <Label htmlFor="amount">Potential Value</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="amount"
+                      name="amount"
+                      type="number"
+                      value={formData.amount}
+                      onChange={handleChange}
+                      disabled={isViewMode}
+                    />
+                    <Input
+                      name="currency"
+                      value={formData.currency}
+                      onChange={handleChange}
+                      className="w-24 text-center"
+                      disabled={isViewMode}
+                    />
+                  </div>
                 </div>
 
                 <div>
                   <Label htmlFor="leadScore">Lead Score (0-100)</Label>
-                  <Input 
-                    id="leadScore" 
-                    name="leadScore" 
-                    type="number" 
-                    value={formData.leadScore} 
-                    onChange={handleChange} 
-                    disabled={isViewMode} 
+                  <Input
+                    id="leadScore"
+                    name="leadScore"
+                    type="number"
+                    value={formData.leadScore}
+                    onChange={handleChange}
+                    disabled={isViewMode}
                   />
                 </div>
 
                 <div className="md:col-span-2">
                   <Label htmlFor="tags">Tags (comma separated)</Label>
-                  <Input 
-                    id="tags" 
-                    name="tags" 
-                    value={formData.tags} 
-                    onChange={handleChange} 
-                    placeholder="vip, urgent, q4-target" 
-                    disabled={isViewMode} 
+                  <Input
+                    id="tags"
+                    name="tags"
+                    value={formData.tags}
+                    onChange={handleChange}
+                    placeholder="vip, urgent, q4-target"
+                    disabled={isViewMode}
                   />
                 </div>
               </div>
@@ -654,10 +685,10 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             {isViewMode ? 'Close' : 'Cancel'}
           </Button>
-          
+
           {!isViewMode && (
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               onClick={handleSubmit}
               disabled={isSubmitting}
             >
@@ -678,13 +709,16 @@ function LeadsContent() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  
+  // --- ADD for Dailog box open  ---
+  const [callDialogOpen, setCallDialogOpen] = useState(false);
+  const [callNumber, setCallNumber] = useState('');
+
   // --- NEW: Tab State ---
   const [activeTab, setActiveTab] = useState('new');
 
   const [selectedLead, setSelectedLead] = useState(null);
-  const [dialogMode, setDialogMode] = useState('create'); 
-  
+  const [dialogMode, setDialogMode] = useState('create');
+
   // --- NEW: Assign State ---
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
   const [leadToAssign, setLeadToAssign] = useState(null);
@@ -698,8 +732,8 @@ function LeadsContent() {
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          page: 1, 
+        body: JSON.stringify({
+          page: 1,
           limit: 50,
           search: search
         })
@@ -716,73 +750,73 @@ function LeadsContent() {
           source: lead.leadSource,
           status: lead.leadStatus,
           assignedTo: lead.assignedAgent?.name || 'Unassigned',
-          lastContact: new Date(lead.updatedAt).toLocaleDateString('en-US', { 
-            month: 'short', day: 'numeric', year: 'numeric' 
+          lastContact: new Date(lead.updatedAt).toLocaleDateString('en-US', {
+            month: 'short', day: 'numeric', year: 'numeric'
           }),
-          original: lead 
+          original: lead
         }));
         // setLeads(mappedLeads);
-        
+
         // --- MOCK DATA LOGIC ---
         if (leads.length === 0) {
           const mockLeads = [
             // 1. New Today (Unassigned)
-            { 
-              _id: '101', 
-              contactInfo: { firstName: 'Priya', lastName: 'Menon', email: 'priya.menon@gmail.com', phone: '+91 98765 12345' }, 
-              leadStatus: 'New', 
-              site:'GANAS ENCLAVE',
+            {
+              _id: '101',
+              contactInfo: { firstName: 'Priya', lastName: 'Menon', email: 'priya.menon@gmail.com', phone: '+91 98765 12345' },
+              leadStatus: 'New',
+              site: 'GANAS ENCLAVE',
               leadSource: 'Incoming Call - Answered',
               assignedTo: null, // Unassigned case
               updatedAt: new Date().toISOString() // Today
             },
             // 2. Follow Up (Assigned)
-            { 
-              _id: '104', 
-              contactInfo: { firstName: 'Suresh', lastName: 'Reddy', email: 'suresh.r@gmail.com', phone: '+91 91234 56789' }, 
-              leadStatus: 'Follow Up',  
-              site:'BHUMI RESIDENCIES',
-              leadSource: 'Justdial', 
+            {
+              _id: '104',
+              contactInfo: { firstName: 'Suresh', lastName: 'Reddy', email: 'suresh.r@gmail.com', phone: '+91 91234 56789' },
+              leadStatus: 'Follow Up',
+              site: 'BHUMI RESIDENCIES',
+              leadSource: 'Justdial',
               assignedTo: 'Ramesh',
-              updatedAt: new Date(Date.now() - 259200000).toISOString() 
+              updatedAt: new Date(Date.now() - 259200000).toISOString()
             },
             // 3. Visit Scheduled
-            { 
-              _id: '112', 
-              contactInfo: { firstName: 'Anita', lastName: 'Roy', email: 'anita.r@yahoo.com', phone: '+91 77665 54433' }, 
-              leadStatus: 'Site Visit',  
-              site:'SPRING FIELDS',
-              leadSource: 'Referral', 
+            {
+              _id: '112',
+              contactInfo: { firstName: 'Anita', lastName: 'Roy', email: 'anita.r@yahoo.com', phone: '+91 77665 54433' },
+              leadStatus: 'Site Visit',
+              site: 'SPRING FIELDS',
+              leadSource: 'Referral',
               assignedTo: 'Suresh',
-              updatedAt: new Date(Date.now() - 404800000).toISOString() 
+              updatedAt: new Date(Date.now() - 404800000).toISOString()
             },
             // 4. Unassigned Old Lead
-            { 
-              _id: '109', 
-              contactInfo: { firstName: 'John', lastName: 'Doe', email: 'john@example.com', phone: '+1 123 456 7890' }, 
-              leadStatus: 'New',  
-              site:'SPRING FIELDS',
+            {
+              _id: '109',
+              contactInfo: { firstName: 'John', lastName: 'Doe', email: 'john@example.com', phone: '+1 123 456 7890' },
+              leadStatus: 'New',
+              site: 'SPRING FIELDS',
               leadSource: 'Website Contact Form',
               assignedTo: 'Unassigned',
               updatedAt: new Date(Date.now() - 604800000).toISOString() // 1 week ago
             },
-             // 5. Actual Lead (Contacted)
-            { 
-              _id: '102', 
-              contactInfo: { firstName: 'Rajesh', lastName: 'Kumar', email: 'rajesh.k@yahoo.com', phone: '+91 87654 98765' }, 
-              leadStatus: 'Contacted',  
-              site:'SPRING FIELDS',
-              leadSource: 'Facebook - Luxury Villa Campaign', 
+            // 5. Actual Lead (Contacted)
+            {
+              _id: '102',
+              contactInfo: { firstName: 'Rajesh', lastName: 'Kumar', email: 'rajesh.k@yahoo.com', phone: '+91 87654 98765' },
+              leadStatus: 'Contacted',
+              site: 'SPRING FIELDS',
+              leadSource: 'Facebook - Luxury Villa Campaign',
               assignedTo: 'Sundhar',
               updatedAt: new Date(Date.now() - 86400000).toISOString() // 1 day ago
             },
-             // 6. New Today (Assigned)
-            { 
-              _id: '111', 
-              contactInfo: { firstName: 'Amit', lastName: 'Singh', email: 'amit.s@outlook.com', phone: '+91 99887 77665' }, 
-              leadStatus: 'New',  
-              site:'GANAS ENCLAVE',
-              leadSource: '99acres', 
+            // 6. New Today (Assigned)
+            {
+              _id: '111',
+              contactInfo: { firstName: 'Amit', lastName: 'Singh', email: 'amit.s@outlook.com', phone: '+91 99887 77665' },
+              leadStatus: 'New',
+              site: 'GANAS ENCLAVE',
+              leadSource: '99acres',
               assignedTo: 'Ramesh',
               updatedAt: new Date().toISOString() // Today
             },
@@ -806,9 +840,9 @@ function LeadsContent() {
     } catch (error) {
       console.error("Error fetching leads:", error);
       // Demo Mode Fallback
-       if (leads.length === 0) {
-          // ... (Existing fallback logic)
-       }
+      if (leads.length === 0) {
+        // ... (Existing fallback logic)
+      }
     } finally {
       setLoading(false);
     }
@@ -816,7 +850,7 @@ function LeadsContent() {
 
   useEffect(() => {
     fetchLeads();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -824,7 +858,7 @@ function LeadsContent() {
       if (searchTerm) fetchLeads(searchTerm);
     }, 500);
     return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
   const handleCreate = () => {
@@ -847,8 +881,8 @@ function LeadsContent() {
 
   // --- NEW: ASSIGN HANDLER ---
   const handleAssign = (lead) => {
-     setLeadToAssign(lead);
-     setAssignDialogOpen(true);
+    setLeadToAssign(lead);
+    setAssignDialogOpen(true);
   };
 
   const handleDelete = async (leadId) => {
@@ -861,9 +895,9 @@ function LeadsContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ leadId })
       });
-      
+
       const result = await response.json();
-      
+
       if (result.success) {
         toast({ title: "Deleted", description: "Lead removed successfully.", variant: "success" });
         fetchLeads(searchTerm);
@@ -891,27 +925,27 @@ function LeadsContent() {
 
   // --- FILTER LOGIC ---
   const getFilteredLeads = () => {
-    const today = new Date().toLocaleDateString('en-US'); 
+    const today = new Date().toLocaleDateString('en-US');
 
     return leads.filter(lead => {
       const status = lead.status.toLowerCase();
       const updatedAtDate = new Date(lead.original.updatedAt).toLocaleDateString('en-US');
-      const isCreatedToday = updatedAtDate === today; 
+      const isCreatedToday = updatedAtDate === today;
       const assignedTo = lead.assignedTo;
 
       switch (activeTab) {
         case 'new':
-           return status === 'new' || isCreatedToday;
+          return status === 'new' || isCreatedToday;
         case 'followups':
-           return status.includes('follow');
+          return status.includes('follow');
         case 'visits':
-           return status.includes('visit') || status.includes('scheduled');
+          return status.includes('visit') || status.includes('scheduled');
         case 'unassigned':
-           return assignedTo === 'Unassigned' || !assignedTo;
+          return assignedTo === 'Unassigned' || !assignedTo;
         case 'all':
-           return true;
+          return true;
         default:
-           return true;
+          return true;
       }
     });
   };
@@ -921,11 +955,10 @@ function LeadsContent() {
   const TabButton = ({ id, label, icon: Icon }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-md ${
-        activeTab === id 
-          ? 'bg-fuchsia-600 text-white shadow-md' 
+      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-md ${activeTab === id
+          ? 'bg-fuchsia-600 text-white shadow-md'
           : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
-      }`}
+        }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
       {label}
@@ -1024,18 +1057,19 @@ function LeadsContent() {
                       <td className="py-3 px-4 text-sm font-medium text-white">{lead.name}</td>
                       <td className="py-3 px-4 text-sm text-slate-300">{lead.site}</td>
                       <td className="py-3 px-4 text-sm text-slate-300 flex gap-2">
-                        <button ><Phone size={14}/></button>{lead.phone}</td>
+                        <button onClick={() => { setCallNumber(lead.phone);setCallDialogOpen(true);
+                        }}><Phone size={14} /></button>{lead.phone}</td>
                       <td className="py-3 px-4 text-sm text-slate-300">{lead.source}</td>
                       <td className="py-3 px-4">
                         <Badge className={statusColors[lead.status] || 'bg-slate-600'}>{lead.status}</Badge>
                       </td>
-                      <td className={`py-3 px-4 text-sm ${lead.assignedTo === 'Unassigned' ? 'text-red-300' : 'text-slate-300' }`}>{lead.assignedTo}</td>
-                      
+                      <td className={`py-3 px-4 text-sm ${lead.assignedTo === 'Unassigned' ? 'text-red-300' : 'text-slate-300'}`}>{lead.assignedTo}</td>
+
                       {/* --- Action Buttons --- */}
                       <td className="py-3 px-2 flex items-center">
                         {/* --- NEW: ASSIGN BUTTON --- */}
                         <Button variant="icon" size="icon" title="Assign Agent" onClick={() => handleAssign(lead)} className="text-green-400 hover:text-green-300 hover:bg-green-900/20">
-                           <UserPlus className="w-4 h-4" />
+                          <UserPlus className="w-4 h-4" />
                         </Button>
                         <Button variant="icon" size="icon" title="View" onClick={() => handleView(lead)} className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20">
                           <Eye className="w-4 h-4" />
@@ -1057,7 +1091,7 @@ function LeadsContent() {
       </Card>
 
       {/* Card View For Mobile */}
-      
+
       <Card className='md:hidden block'>
         <CardContent className="p-6 " >
           <div className="flex gap-4 mb-6">
@@ -1076,23 +1110,23 @@ function LeadsContent() {
             </Button>
           </div>
 
-         <div className="space-y-4">
-  {loading && leads.length === 0 ? (
-    <div className="text-center py-6 text-fuchsia-400">
-      <Loader2 className="animate-spin inline-block mr-2" /> Loading...
-    </div>
-  ) : filteredLeads.length === 0 ? (
-    <div className="text-center py-6 text-slate-400">
-      No {activeTab === 'all' ? '' : activeTab} leads found.
-    </div>
-  ) : (
-    filteredLeads.map((lead, index) => (
-      <motion.div
-  key={lead.id}
-  initial={{ opacity: 0, y: 10 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ delay: index * 0.05 }}
-  className="
+          <div className="space-y-4">
+            {loading && leads.length === 0 ? (
+              <div className="text-center py-6 text-fuchsia-400">
+                <Loader2 className="animate-spin inline-block mr-2" /> Loading...
+              </div>
+            ) : filteredLeads.length === 0 ? (
+              <div className="text-center py-6 text-slate-400">
+                No {activeTab === 'all' ? '' : activeTab} leads found.
+              </div>
+            ) : (
+              filteredLeads.map((lead, index) => (
+                <motion.div
+                  key={lead.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="
      bg-slate-900
     border border-fuchsia-700/40
     rounded-xl
@@ -1101,102 +1135,108 @@ function LeadsContent() {
     hover:bg-purple-800/60
     transition-all
   "
->
-  {/* NAME + STATUS */}
-  <div className="flex justify-between items-center  mb-2 gap-2">
-    <h3 className=" font-bold text-white">{lead.name}</h3>
+                >
+                  {/* NAME + STATUS */}
+                  <div className="flex justify-between items-center  mb-2 gap-2">
+                    <h3 className=" font-bold text-white">{lead.name}</h3>
 
-    <Badge className={statusColors[lead.status] || 'bg-slate-600'}>
-      {lead.status}
-    </Badge>
-  </div>
+                    <Badge className={statusColors[lead.status] || 'bg-slate-600'}>
+                      {lead.status}
+                    </Badge>
+                  </div>
 
-  {/* SITE */}
-  <div className="flex items-center gap-2 mb-1 text-purple-300 text-sm">
-    <MapPin className="w-4 h-4" />
-    <span>{lead.site}</span>
-  </div>
+                  {/* SITE */}
+                  <div className="flex items-center gap-2 mb-1 text-purple-300 text-sm">
+                    <MapPin className="w-4 h-4" />
+                    <span>{lead.site}</span>
+                  </div>
 
-  {/* PHONE */}
-  <div className="flex items-center gap-2 mb-1 text-fuchsia-300 text-sm">
-    <Phone className="w-4 h-4" />
-    <span>{lead.phone}</span>
-  </div>
+                  {/* PHONE */}
+                  <div className="flex items-center gap-2 mb-1 text-fuchsia-300 text-sm">
+                    <Phone className="w-4 h-4" />
+                    <span>{lead.phone}</span>
+                  </div>
 
-  {/* ASSIGNED */}
-  <div
-    className={`flex items-center gap-2 mb-2 text-sm ${
-      lead.assignedTo === 'Unassigned'
-        ? 'text-red-300'
-        : 'text-slate-300'
-    }`}
-  >
-    <User className="w-4 h-4" />
-    <span>{lead.assignedTo}</span>
-  </div>
+                  {/* ASSIGNED */}
+                  <div
+                    className={`flex items-center gap-2 mb-2 text-sm ${lead.assignedTo === 'Unassigned'
+                        ? 'text-red-300'
+                        : 'text-slate-300'
+                      }`}
+                  >
+                    <User className="w-4 h-4" />
+                    <span>{lead.assignedTo}</span>
+                  </div>
 
-  {/* ACTION BUTTONS */}
-  <div className="flex justify-end gap-2 border-t border-purple-700/40 pt-2">
-    <Button
-      variant="icon"
-      size="icon"
-      onClick={() => handleAssign(lead)}
-      className="text-green-400 hover:text-green-300 hover:bg-green-900/20"
-    >
-      <UserPlus className="w-4 h-4" />
-    </Button>
+                  {/* ACTION BUTTONS */}
+                  <div className="flex justify-end gap-2 border-t border-purple-700/40 pt-2">
+                    <Button
+                      variant="icon"
+                      size="icon"
+                      onClick={() => handleAssign(lead)}
+                      className="text-green-400 hover:text-green-300 hover:bg-green-900/20"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                    </Button>
 
-    <Button
-      variant="icon"
-      size="icon"
-      onClick={() => handleView(lead)}
-      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
-    >
-      <Eye className="w-4 h-4" />
-    </Button>
+                    <Button
+                      variant="icon"
+                      size="icon"
+                      onClick={() => handleView(lead)}
+                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
 
-    <Button
-      variant="icon"
-      size="icon"
-      onClick={() => handleEdit(lead)}
-      className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/20"
-    >
-      <Pencil className="w-4 h-4" />
-    </Button>
+                    <Button
+                      variant="icon"
+                      size="icon"
+                      onClick={() => handleEdit(lead)}
+                      className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/20"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
 
-    <Button
-      variant="icon"
-      size="icon"
-      onClick={() => handleDelete(lead.id)}
-      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-    >
-      <Trash2 className="w-4 h-4" />
-    </Button>
-  </div>
-</motion.div>
+                    <Button
+                      variant="icon"
+                      size="icon"
+                      onClick={() => handleDelete(lead.id)}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </motion.div>
 
-    ))
-  )}
-</div>
+              ))
+            )}
+          </div>
 
         </CardContent>
       </Card>
 
 
-      <LeadDialog 
-        open={dialogOpen} 
-        onOpenChange={setDialogOpen} 
+      <LeadDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
         onSuccess={handleLeadSaved}
         initialData={selectedLead}
         mode={dialogMode}
       />
-      
+
       {/* --- NEW: ASSIGN DIALOG --- */}
-      <AssignDialog 
-        open={assignDialogOpen} 
+      <AssignDialog
+        open={assignDialogOpen}
         onOpenChange={setAssignDialogOpen}
         lead={leadToAssign}
         onSuccess={() => fetchLeads(searchTerm)}
+      />
+
+      {/* --- NEW: Dailer paid --- */}
+      <CallDialog
+        open={callDialogOpen}
+        onOpenChange={setCallDialogOpen}
+        number={callNumber}
       />
     </div>
   );
