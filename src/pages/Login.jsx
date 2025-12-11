@@ -15,29 +15,89 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
+  // const [rememberMe, setRememberMe] = useState(false);
+  
+  // const navigate = useNavigate();
+  // const { login, isLoading } = useAuth();
+  // const { toast } = useToast();
+
+  // // --- Effect: Check for "Remember Me" credentials on mount ---
+  // useEffect(() => {
+  //   const savedUsername = localStorage.getItem('EmployeeName_saved');
+  //   const savedPassword = localStorage.getItem('password_saved');
+  //   const isRemembered = localStorage.getItem('rememberMe') === 'true';
+
+  //   if (isRemembered && savedUsername && savedPassword) {
+  //     try {
+  //       // Use atob() to decode base64
+  //       setEmail(atob(savedUsername));
+  //       setPassword(atob(savedPassword));
+  //       setRememberMe(true);
+  //     } catch (error) {
+  //       console.error("Decoding error:", error);
+  //       localStorage.removeItem('EmployeeName_saved');
+  //       localStorage.removeItem('password_saved');
+  //     }
+  //   }
+  // }, []);
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+    
+  //   if (!email || !password) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Please enter email and password",
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
+
+  //   try {
+  //     // 1. Call the API
+  //     const successMessage = await login(email, password, rememberMe);
+      
+  //     // 2. Show Success Message
+  //     toast({
+  //       title: "Login Successful",
+  //       description: successMessage || "Welcome back!",
+  //     });
+      
+  //     // 3. Navigate (Only happens if login doesn't throw error)
+  //     navigate('/dashboard');
+
+  //   } catch (error) {
+  //     // 4. Handle Errors
+  //     toast({
+  //       title: "Login Failed",
+  //       description: error.message || "An error occurred",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
+
+   const [EmployeeCode, setEmployeeCode] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  
+
   const navigate = useNavigate();
   const { login, isLoading } = useAuth();
   const { toast } = useToast();
 
-  // --- Effect: Check for "Remember Me" credentials on mount ---
   useEffect(() => {
-    const savedUsername = localStorage.getItem('EmployeeName_saved');
+    const savedCode = localStorage.getItem('EmployeeCode_saved');
     const savedPassword = localStorage.getItem('password_saved');
     const isRemembered = localStorage.getItem('rememberMe') === 'true';
 
-    if (isRemembered && savedUsername && savedPassword) {
+    if (isRemembered && savedCode && savedPassword) {
       try {
-        // Use atob() to decode base64
-        setEmail(atob(savedUsername));
+        setEmployeeCode(atob(savedCode));
         setPassword(atob(savedPassword));
         setRememberMe(true);
       } catch (error) {
-        console.error("Decoding error:", error);
-        localStorage.removeItem('EmployeeName_saved');
+        localStorage.removeItem('EmployeeCode_saved');
         localStorage.removeItem('password_saved');
       }
     }
@@ -45,34 +105,30 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!email || !password) {
+
+    if (!EmployeeCode || !password) {
       toast({
         title: "Error",
-        description: "Please enter email and password",
+        description: "Please enter employee code and password",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      // 1. Call the API
-      const successMessage = await login(email, password, rememberMe);
-      
-      // 2. Show Success Message
+      const successMessage = await login(EmployeeCode, password, rememberMe);
+
       toast({
         title: "Login Successful",
         description: successMessage || "Welcome back!",
       });
-      
-      // 3. Navigate (Only happens if login doesn't throw error)
+
       navigate('/dashboard');
 
     } catch (error) {
-      // 4. Handle Errors
       toast({
         title: "Login Failed",
-        description: error.message || "An error occurred",
+        description: error.message || "Invalid credentials",
         variant: "destructive",
       });
     }
@@ -110,11 +166,11 @@ export default function Login() {
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-5 w-5 text-fuchsia-400" />
                   <Input
-                    id="email"
+                    id="EmployeeCode"
                     type="text"
                     placeholder="Enter username"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={EmployeeCode}
+                    onChange={(e) => setEmployeeCode(e.target.value)}
                     className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white placeholder:text-purple-200"
                     disabled={isLoading}
                   />

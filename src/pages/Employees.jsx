@@ -18,6 +18,8 @@ import {
     AlertTriangle,
 } from "lucide-react";
 import { config } from "@/components/CustomComponents/config.js";
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from "react-router-dom";
 
 // ------------------- REDUCER -------------------
 const initialState = {
@@ -26,10 +28,10 @@ const initialState = {
     EmployeeName: "",
     employeeEmail: "",
     employeePhone: "",
-    employeeRole: "",
+    roleId: "",
     employeeAddress: "",
     password: "",
-    isActive:true
+    isActive: true
 };
 
 const employeeReducer = (state, action) => {
@@ -70,10 +72,10 @@ const ToastProvider = ({ children }) => {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
                             className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === "destructive"
-                                    ? "bg-red-900/90 border-red-800 text-white"
-                                    : t.variant === "success"
-                                        ? "bg-green-900/90 border-green-800 text-white"
-                                        : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
+                                ? "bg-red-900/90 border-red-800 text-white"
+                                : t.variant === "success"
+                                    ? "bg-green-900/90 border-green-800 text-white"
+                                    : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
                                 }`}
                         >
                             <div>
@@ -206,7 +208,7 @@ const DialogContent = ({ className, title, onClose, children }) => (
 // ------------------- EMPLOYEE CONTENT -------------------
 function EmployeeContent() {
     const { toast } = useToast();
-
+    const navigate = useNavigate()
     const [Employee, setEmployee] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
 
@@ -224,11 +226,14 @@ function EmployeeContent() {
     const [state, dispatch] = useReducer(employeeReducer, initialState);
     const [isEdit, setIsEdit] = useState(false);
     const [viewData, setViewData] = useState({});
-
+    const [role, setRole] = useState([])
     // ------------------- FETCH EMPLOYEES -------------------
     useEffect(() => {
         getAllEmployees();
+        getAllRole();
     }, []);
+
+
 
     const getAllEmployees = async () => {
         try {
@@ -256,6 +261,37 @@ function EmployeeContent() {
             setLoading(false);
         }
     };
+
+
+    //get Role
+    const getAllRole = async () => {
+        try {
+            setLoading(true);
+            let url = config.Api + 'RoleBased/getAllRoles';
+
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({}),
+            });
+
+            const result = await res.json();
+            const data = result.data || result;
+
+            setRole(data);
+
+        } catch (err) {
+            toast({
+                title: "Error",
+                description: "Could not fetch employees",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
 
     // ------------------- CRUD APIs -------------------
     const createEmployee = async (data) => {
@@ -321,6 +357,12 @@ function EmployeeContent() {
         Object.entries(row).forEach(([key, val]) => {
             dispatch({ type: "text", name: key, value: val });
         });
+        const roleValue =
+            row.roleId
+                ? (typeof row.roleId === "object" ? row.roleId._id : row.roleId)
+                : "";
+
+        dispatch({ type: "text", name: "roleId", value: roleValue });
 
         setDialogOpen(true);
     };
@@ -332,7 +374,7 @@ function EmployeeContent() {
             "Employee Name": row.EmployeeName,
             "Email": row.employeeEmail,
             "Phone": row.employeePhone,
-            "Role": row.employeeRole,
+            "Role": row.roleId.RoleName,
             "Address": row.employeeAddress,
         });
         setViewOpen(true);
@@ -451,6 +493,16 @@ function EmployeeContent() {
                 >
                     <Plus className="w-4 h-4 mr-2" /> Add Employee
                 </Button>
+
+                {/* <Button
+                    onClick={() => {
+                        clear();
+                        setDialogOpen(true);
+                    }}
+                    className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white"
+                >
+                    <Plus className="w-4 h-4 mr-2" /> Add Employee
+                </Button> */}
             </div>
 
             {/* TABLE */}
@@ -516,7 +568,7 @@ function EmployeeContent() {
                                             <td className="py-3 px-4">{row.EmployeeName}</td>
                                             <td className="py-3 px-4">{row.employeeEmail}</td>
                                             <td className="py-3 px-4">{row.employeePhone}</td>
-                                            <td className="py-3 px-4">{row.employeeRole}</td>
+                                            <td className="py-3 px-4">{row.roleId?.RoleName}</td>
 
                                             <td className="py-3 px-4 flex gap-2">
                                                 <Button
@@ -603,13 +655,20 @@ function EmployeeContent() {
                             </div>
 
                             <div>
-                                <Label>Role</Label>
-                                <Input
-                                    value={state.employeeRole}
-                                    onChange={(e) =>
-                                        storeDispatch(e.target.value, "employeeRole")
-                                    }
-                                />
+                                <Label>Role *</Label>
+                                <select
+                                    className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100"
+                                    value={state.roleId}
+                                    onChange={(e) => storeDispatch(e.target.value, "roleId")}
+                                >
+                                    <option value="">-- Select Role --</option>
+
+                                    {role.map((r) => (
+                                        <option key={r._id} value={r._id}>
+                                            {r.RoleName}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div>
