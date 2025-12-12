@@ -18,7 +18,7 @@ const initialFormState = {
   // Contact Info
   firstName: '', lastName: '', email: '', phone: '', jobTitle: '', linkedinProfile: '',
   // Company Details
-  companyName: '', website: '', industry: '', size: '',
+  // companyName: '', website: '', industry: '', size: '',
   // Address
   street: '', city: '', state: '', country: '', zipCode: '',
   // Deal Info
@@ -96,19 +96,19 @@ export default function LeadDialog({ open, onOpenChange, onSuccess, initialData,
           jobTitle: formData.jobTitle,
           linkedinProfile: formData.linkedinProfile
         },
-        companyDetails: {
-          name: formData.companyName,
-          website: formData.website,
-          industry: formData.industry,
-          size: formData.size,
-          address: {
-            street: formData.street,
-            city: formData.city,
-            state: formData.state,
-            country: formData.country,
-            zipCode: formData.zipCode
-          }
-        },
+        // companyDetails: {
+        //   name: formData.companyName,
+        //   website: formData.website,
+        //   industry: formData.industry,
+        //   size: formData.size,
+        //   address: {
+        //     street: formData.street,
+        //     city: formData.city,
+        //     state: formData.state,
+        //     country: formData.country,
+        //     zipCode: formData.zipCode
+        //   }
+        // },
         leadStatus: formData.leadStatus,
         leadSource: formData.leadSource,
         leadScore: Number(formData.leadScore),
@@ -201,7 +201,7 @@ export default function LeadDialog({ open, onOpenChange, onSuccess, initialData,
             </div>
 
             {/* COMPANY DETAILS */}
-            <div>
+            {/* <div>
               <SectionHeader icon={Briefcase} title="Company Details" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
@@ -234,7 +234,7 @@ export default function LeadDialog({ open, onOpenChange, onSuccess, initialData,
                   </select>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* ADDRESS */}
             <div>

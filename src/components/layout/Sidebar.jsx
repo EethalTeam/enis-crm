@@ -26,26 +26,27 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
   //  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-    { icon: PhoneCall, label: 'Dialer', path: '/dialer' },
+  { icon: PhoneCall, label: 'Dialer', path: '/dialer' },
   { icon: Phone, label: 'Call Logs', path: '/call-logs' },
   { icon: Users, label: 'Leads', path: '/leads' },
   // { icon: UserCircle, label: 'Contacts', path: '/contacts' },
   // { icon: Building2, label: 'Companies', path: '/companies' },
-  { 
-    icon: MapPin, 
-    label: 'Plots', 
+  {
+    icon: MapPin,
+    label: 'Plots',
     children: [
       { label: 'Plot List', path: '/plots/list' },
       { label: 'Plot View', path: '/plots/view' }
     ]
   },
   { icon: PersonStanding, label: 'Visitors', path: '/visitors' },
-  
+
   // { icon: GitBranch, label: 'IVR Flow', path: '/ivr-flow' },
   // { icon: MessageSquare, label: 'Omni-Channel', path: '/omni-channel' },
   // { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
   // { icon: Workflow, label: 'Workflows', path: '/workflows' },
-  { icon: ClipboardList, label: 'Master Forms', 
+  {
+    icon: ClipboardList, label: 'Master Forms',
     children: [
       { label: 'Site', path: '/masters/site' },
       { label: 'Unit', path: '/masters/unit' },
@@ -53,18 +54,21 @@ const navItems = [
       { label: 'City', path: '/masters/city' },
       { label: 'Employees', path: '/masters/employees' },
       { label: 'Plot Status', path: '/masters/plotStatus' },
-      { label: 'Role', path: '/masters/rolepages' }
+
     ]
   },
   // { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   // { icon: Users, label: 'Users', path: '/users' },
   { icon: ClipboardList, label: 'Reports', path: '/reports' },
   { icon: Settings, label: 'Settings', path: '/settings' },
-  { icon: Shield, label: 'Admin Panel', 
+  {
+    icon: Shield, label: 'Admin Panel',
     children: [
       { label: 'Menu Registry', path: '/adminpanel/menu' },
-      { label: 'user Rights', path: '/adminpanel/rights' },
-      { label: 'Transfer', path: '/adminpanel/transfer' },
+      { label: 'Role', path: '/masters/rolepages' }
+
+      // { label: 'user Rights', path: '/adminpanel/rights' },
+      // { label: 'Transfer', path: '/adminpanel/transfer' },
     ]
   },
 ];
@@ -124,7 +128,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   )}
                 >
                   {isActive && <motion.div layoutId="active-nav" className="absolute inset-0 bg-gradient-to-r from-pink-600 to-fuchsia-600 rounded-lg opacity-70" />}
-                  
+
                   <div className="relative z-10 flex items-center gap-3 w-full">
                     <item.icon className="w-5 h-5 flex-shrink-0" />
                     {isOpen && (
@@ -135,8 +139,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                         className="flex items-center justify-between w-full"
                       >
                         <span className="font-medium">{item.label}</span>
-                        <ChevronDown 
-                          className={cn("w-4 h-4 transition-transform duration-200", isOpenMenu ? "rotate-180" : "")} 
+                        <ChevronDown
+                          className={cn("w-4 h-4 transition-transform duration-200", isOpenMenu ? "rotate-180" : "")}
                         />
                       </motion.div>
                     )}

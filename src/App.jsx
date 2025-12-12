@@ -29,6 +29,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import Employees  from '@/pages/Employees';
 import Rolepages from '@/pages/Rolepages';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import MenuRegistry from '@/pages/MenuRegistry';
 
 function PrivateRoute({ children }) {
    const token = localStorage.getItem('token');
@@ -73,6 +74,7 @@ function App() {
             <Route path="admin-panel" element={<AdminPanel />} />
             <Route path="/masters/employees" element={<Employees />} />
             <Route path="/masters/rolepages" element={<Rolepages />} />
+            <Route path="/adminpanel/menu" element={<MenuRegistry />} />
             
           </Route>
         </Routes>

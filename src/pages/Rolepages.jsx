@@ -1,4 +1,4 @@
- import React, {
+import React, {
     useState,
     useEffect,
     useReducer,
@@ -16,6 +16,7 @@ import {
     X,
     RefreshCw,
     AlertTriangle,
+    ShieldCheck
 } from "lucide-react";
 import { config } from "@/components/CustomComponents/config.js";
 
@@ -65,13 +66,12 @@ const ToastProvider = ({ children }) => {
                             initial={{ opacity: 0, x: 100 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
-                            className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
-                                t.variant === "destructive"
-                                    ? "bg-red-900/90 border-red-800 text-white"
-                                    : t.variant === "success"
+                            className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === "destructive"
+                                ? "bg-red-900/90 border-red-800 text-white"
+                                : t.variant === "success"
                                     ? "bg-green-900/90 border-green-800 text-white"
                                     : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
-                            }`}
+                                }`}
                         >
                             <div>
                                 {t.title && (
@@ -223,6 +223,8 @@ function Rolepages() {
     const [state, dispatch] = useReducer(RoleReducer, initialState);
     const [isEdit, setIsEdit] = useState(false);
     const [viewData, setViewData] = useState({});
+    const [permissionOpen, setPermissionOpen] = useState(false);
+    const [selectedRole, setSelectedRole] = useState(null);
 
     // ------------------- FETCH -------------------
     useEffect(() => {
@@ -286,6 +288,46 @@ function Rolepages() {
         });
         return await res.json();
     };
+
+
+    // ------------------- PERMISSION API -------------------
+    const getAllMenus = async () => {
+        try {
+            let url = config.Api + "RoleBased/getAllMenus";
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({})
+            });
+            const result = await res.json();
+            return result.data || [];
+        } catch (err) {
+            console.error("Fetch menus failed", err);
+            return [];
+        }
+    };
+
+    const updateMenusAndAccess = async (roleId, menus) => {
+        try {
+            let url = config.Api + "RoleBased/updateMenusAndAccess";
+            const payload = {
+                _id: roleId,
+                menus: menus
+            };
+
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            return await res.json();
+        } catch (err) {
+            console.error("Update access failed", err);
+            throw err;
+        }
+    };
+
 
     // ------------------- SEARCH -------------------
     const handleSearchChange = (value) => {
@@ -372,44 +414,44 @@ function Rolepages() {
     };
 
     // ------------------- SUBMIT -------------------
-   const handleSubmit = async () => {
-    setLoading(true);
+    const handleSubmit = async () => {
+        setLoading(true);
 
-    try {
-        let payload = { ...state };
+        try {
+            let payload = { ...state };
 
-        if (isEdit) {
-            // update uses _id
-            await updateRole(payload);
-        } else {
-            // NEW ROLE  delete _id before POST
-            delete payload._id;
+            if (isEdit) {
+                // update uses _id
+                await updateRole(payload);
+            } else {
+                // NEW ROLE  delete _id before POST
+                delete payload._id;
 
-            await createRoleBase(payload);
+                await createRoleBase(payload);
+            }
+
+            toast({
+                title: "Success",
+                description: isEdit ? "Role updated successfully" : "Role created successfully",
+                variant: "success",
+            });
+
+            clear();
+            setDialogOpen(false);
+            getAllRole();
+
+        } catch (err) {
+            toast({
+                title: "Error",
+                description: "Operation failed",
+                variant: "destructive",
+            });
+
+        } finally {
+            setLoading(false);
+            setConfirmState((prev) => ({ ...prev, open: false }));
         }
-
-        toast({
-            title: "Success",
-            description: isEdit ? "Role updated successfully" : "Role created successfully",
-            variant: "success",
-        });
-
-        clear();
-        setDialogOpen(false);
-        getAllRole();
-
-    } catch (err) {
-        toast({
-            title: "Error",
-            description: "Operation failed",
-            variant: "destructive",
-        });
-
-    } finally {
-        setLoading(false);
-        setConfirmState((prev) => ({ ...prev, open: false }));
-    }
-};
+    };
 
     // ------------------- DELETE -------------------
     const handleDelete = async (_id) => {
@@ -433,6 +475,107 @@ function Rolepages() {
             setConfirmState((prev) => ({ ...prev, open: false }));
         }
     };
+
+    const PermissionDialog = ({ open, setOpen, role, onSave }) => {
+        const [menus, setMenus] = useState([]);
+        const [permissions, setPermissions] = useState({});
+        const [loading, setLoading] = useState(true);
+
+        useEffect(() => {
+            if (open && role) loadData();
+        }, [open, role]);
+
+        const loadData = async () => {
+            setLoading(true);
+
+            const allMenus = await getAllMenus();
+
+            setMenus(allMenus);
+            console.log(allMenus, "allMenus")
+
+            const mapped = {};
+            (role?.permissions || []).forEach((p) => {
+                mapped[p.menuId] = {
+                    isView: p.isView,
+                    isAdd: p.isAdd,
+                    isEdit: p.isEdit,
+                    isDelete: p.isDelete,
+                };
+            });
+
+            setPermissions(mapped);
+            setLoading(false);
+        };
+
+        const toggle = (menuId, key, value) => {
+            setPermissions(prev => ({
+                ...prev,
+                [menuId]: {
+                    ...prev[menuId],
+                    [key]: value
+                }
+            }));
+        };
+
+        const handleSave = async () => {
+            const formatted = Object.entries(permissions).map(([menuId, perm]) => ({
+                menuId,
+                ...perm
+            }));
+
+            await updateMenusAndAccess(role._id, formatted);
+            onSave();
+            setOpen(false);
+        };
+
+        return (
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent
+                    className="sm:max-w-[650px]"
+                    title={`Permissions — ${role?.RoleName}`}
+                    onClose={() => setOpen(false)}
+                >
+                    {loading ? (
+                        <div className="text-center p-10 text-slate-400">Loading…</div>
+                    ) : (
+                        <div className="space-y-4">
+
+                            {menus.map(menu => (
+                                <div
+                                    key={menu._id}
+                                    className="border border-slate-800 bg-slate-900 p-4 rounded-lg"
+                                >
+                                    <p className="text-white font-semibold mb-3">{menu.label}</p>
+
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {["isView", "isAdd", "isEdit", "isDelete"].map((key) => (
+                                            <label key={key} className="flex items-center gap-2 text-slate-300">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={permissions[menu._id]?.[key] || false}
+                                                    onChange={(e) =>
+                                                        toggle(menu._id, key, e.target.checked)
+                                                    }
+                                                />
+                                                {key.replace("is", "is")}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+
+                        </div>
+                    )}
+
+                    <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-800">
+                        <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+                        <Button onClick={handleSave}>Save Changes</Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        );
+    };
+
 
     // ------------------- RENDER -------------------
     return (
@@ -473,7 +616,7 @@ function Rolepages() {
                         </Button>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {loading && filteredData.length === 0 ? (
                             <div className="text-center py-8">
                                 <Loader2 className="animate-spin inline mr-2" /> Loading...
@@ -487,46 +630,45 @@ function Rolepages() {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.05 }}
-                                    className="border border-slate-700 rounded-lg p-4 bg-slate-900/40 hover:bg-slate-800/40 flex-col justify-center items-start max-w-sm"
+                                    className="border border-slate-800 rounded-lg p-4 
+                                                  bg-slate-900/60 hover:bg-slate-900 
+                                                    backdrop-blur-md shadow-lg hover:shadow-xl
+                                                      transition-all duration-300 
+                                                      flex flex-col gap-3 w-[260px]"
                                 >
-                                    <div className="flex-1">
-                                        <p className="text-lg font-semibold">
-                                            {row.RoleName}
-                                        </p>
-                                        <p className="text-sm text-gray-400">
-                                            {row.RoleCode}
-                                        </p>
-                                        <p className="text-sm text-gray-400">
-                                            {row.description}
-                                        </p>
+                                    {/* ROLE DETAILS */}
+                                    <div className="">
+                                        <p className="text-lg font-semibold text-white">{row.RoleName}</p>
+                                        <p className="text-xs text-gray-400 mt-1">{row.RoleCode}</p>
                                     </div>
 
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="icon"
-                                            size="icon"
-                                            onClick={() => handleViewClick(row)}
-                                        >
+                                    {/* PERMISSION ACCESS BUTTON */}
+                                    <Button
+                                        className="w-full py-1 text-xs font-semibold bg-purple-700/40 
+                                           hover:bg-purple-700/60 hover:text-white transition-all"
+                                        onClick={() => {
+                                            setSelectedRole(row);
+                                            setPermissionOpen(true);
+                                        }}
+                                    >
+                                        Permission Access
+                                    </Button>
+
+                                    {/* ACTION BUTTONS */}
+                                    <div className="flex items-center justify-between  mt-2">
+
+                                        <Button variant="icon" size="icon" onClick={() => handleViewClick(row)}>
                                             <Eye className="w-4 h-4 text-blue-400" />
                                         </Button>
 
-                                        <Button
-                                            variant="icon"
-                                            size="icon"
-                                            onClick={() => handleEditClick(row)}
-                                        >
+                                        <Button variant="icon" size="icon" onClick={() => handleEditClick(row)}>
                                             <Pencil className="w-4 h-4 text-yellow-400" />
                                         </Button>
 
-                                        <Button
-                                            variant="icon"
-                                            size="icon"
-                                            onClick={() =>
-                                                triggerDeleteConfirm(row)
-                                            }
-                                        >
+                                        <Button variant="icon" size="icon" onClick={() => triggerDeleteConfirm(row)}>
                                             <Trash2 className="w-4 h-4 text-red-400" />
                                         </Button>
+
                                     </div>
                                 </motion.div>
                             ))
@@ -674,13 +816,32 @@ function Rolepages() {
                     </div>
                 </motion.div>
             </Dialog>
+            <div>
+                <PermissionDialog
+                    open={permissionOpen}
+                    setOpen={setPermissionOpen}
+                    role={selectedRole}
+                    onSave={() => {
+                        toast({
+                            title: "Permissions Updated",
+                            description: "Role permissions saved successfully",
+                            variant: "success"
+                        });
+                        getAllRole();
+                    }}
+                />
+            </div>
         </div>
+
+
     );
+
 }
 
 // ------------------- EXPORT -------------------
 export default function Rolepage() {
     return (
+
         <ToastProvider>
             <Rolepages />
         </ToastProvider>
