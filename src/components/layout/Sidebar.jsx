@@ -54,6 +54,8 @@ const navItems = [
       { label: 'City', path: '/masters/city' },
       { label: 'Employees', path: '/masters/employees' },
       { label: 'Plot Status', path: '/masters/plotStatus' },
+      { label: 'Document Type', path: '/masters/Document' }
+
 
     ]
   },

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus, Phone } from 'lucide-react';
+import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus, Phone, FileText, Contact } from 'lucide-react';
 
 // --- CONFIGURATION & IMPORTS ---
 // NOTE: In your local environment, uncomment the config import line below.
@@ -176,10 +176,10 @@ const ToastProvider = ({ children }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === 'destructive'
-                  ? 'bg-red-900/90 border-red-800 text-white'
-                  : t.variant === 'success'
-                    ? 'bg-green-900/90 border-green-800 text-white'
-                    : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
+                ? 'bg-red-900/90 border-red-800 text-white'
+                : t.variant === 'success'
+                  ? 'bg-green-900/90 border-green-800 text-white'
+                  : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
                 }`}
             >
               <div>
@@ -203,6 +203,7 @@ const useToast = () => useContext(ToastContext);
 
 const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
   const [selectedAgent, setSelectedAgent] = useState('');
+  // const [notesAgent, setNotesAgent] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -215,7 +216,7 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
   }, [open, lead]);
 
   const handleSubmit = async () => {
-    if (!selectedAgent) {
+    if (!selectedAgent && !notesAgent) {
       toast({ title: "Validation Error", description: "Please select an agent.", variant: "destructive" });
       return;
     }
@@ -282,6 +283,15 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
               <option key={agent.id} value={agent.name}>{agent.name}</option>
             ))}
           </select>
+          {/* <div className='mt-4'>
+            <Label>Notes</Label>
+            <textarea className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600"
+              value={notesAgent}
+              onChange={(e) => setNotesAgent(e.target.value)}
+            >
+            </textarea>
+
+          </div> */}
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
@@ -316,7 +326,7 @@ const CallDialog = ({ open, onOpenChange, number }) => {
 
           <Button
             className="bg-green-600 hover:bg-green-700 w-full"
-            // onClick={() => window.location.href = `tel:${number}`}
+          // onClick={() => window.location.href = `tel:${number}`}
           >
             <Phone className="mr-2 w-4 h-4" /> Call Now
           </Button>
@@ -348,9 +358,51 @@ const initialFormState = {
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create' }) => {
   const [formData, setFormData] = useState(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 🔥 DOCUMENT STATES (INSIDE LeadDialog)
+  // const [documentId, setDocumentId] = useState("");
+  // const [fileData, setFileData] = useState(null);
+  const [documents, setDocuments] = useState([]);
+  const [docRows, setDocRows] = useState([
+    { documentId: "", file: null }
+  ]);
+  // const [pendingDocuments, setPendingDocuments] = useState([]);
+
+  const [activeFormTab, setActiveFormTab] = useState("contact");
+
   const { toast } = useToast();
 
   const isViewMode = mode === 'view';
+
+
+  useEffect(() => {
+    if (open) {
+      getAllDocument();
+    }
+  }, [open]);
+
+  const getAllDocument = async () => {
+    try {
+      const res = await fetch(config.Api + "Document/getAllDocument", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})
+      });
+
+      const result = await res.json();
+
+      console.log("Document API RESULT:", result);
+
+      // ✅ YOUR API RETURNS ARRAY DIRECTLY
+      setDocuments(Array.isArray(result) ? result : []);
+
+    } catch (error) {
+      console.error(error);
+      setDocuments([]);
+    }
+  };
+
+
 
   useEffect(() => {
     if (open) {
@@ -471,6 +523,85 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
     }
   };
 
+  docRows.forEach(row => {
+    console.log("Document:", row.documentId);
+    console.log("File:", row.file);
+  });
+
+
+  //   // SAVE DOCUMENTS AFTER LEAD CREATION
+  // if (pendingDocuments.length > 0) {
+  //   const existing =
+  //     JSON.parse(localStorage.getItem("leadDocuments")) || [];
+
+  //   localStorage.setItem(
+  //     "leadDocuments",
+  //     JSON.stringify([
+  //       ...existing,
+  //       ...pendingDocuments.map(doc => ({
+  //         ...doc,
+  //         uploadedAt: new Date(),
+  //       }))
+  //     ])
+  //   );
+
+  //   toast({
+  //     title: "Documents Uploaded",
+  //     description: `${pendingDocuments.length} document(s) saved`,
+  //     variant: "success",
+  //   });
+
+  //   setPendingDocuments([]);
+  // }
+
+  const handleDocChange = (index, value) => {
+    const updated = [...docRows];
+    updated[index].documentId = value;
+    updated[index].file = null; // reset file on change
+    setDocRows(updated);
+  };
+
+  const handleFileChange = (index, file) => {
+    const updated = [...docRows];
+    updated[index].file = file;
+    setDocRows(updated);
+  };
+
+  const addDocRow = () => {
+    setDocRows([...docRows, { documentId: "", file: null }]);
+  };
+
+  const removeDocRow = (index) => {
+    setDocRows(docRows.filter((_, i) => i !== index));
+  };
+
+
+  const TabButton = ({ id, label, icon: Icon, active, onClick }) => {
+    const isActive = active === id;
+
+    return (
+      <button
+        type="button"
+        onClick={() => onClick(id)}
+        className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all
+        ${isActive
+            ? "bg-fuchsia-600 text-white shadow-md"
+            : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+          }`}
+      >
+        {Icon && <Icon className="w-4 h-4" />}
+        <span className='hidden md:inline'> {label}</span>
+
+        {isActive && (
+          <motion.div
+            layoutId="activeFormTab"
+            className="absolute inset-0 rounded-md bg-fuchsia-600 -z-10"
+          />
+        )}
+      </button>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0">
@@ -492,105 +623,76 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
           <form id="lead-form" onSubmit={handleSubmit} className="space-y-6">
 
             {/* CONTACT INFO */}
-            <div>
-              <SectionHeader icon={User} title="Contact Information" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="firstName">First Name *</Label>
-                  <Input id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} required disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="email">Email *</Label>
-                  <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Phone *</Label>
+            <div className="flex flex-wrap items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
 
-                  <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="jobTitle">Job Title</Label>
-                  <Input id="jobTitle" name="jobTitle" value={formData.jobTitle} onChange={handleChange} disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="linkedinProfile">LinkedIn Profile</Label>
-                  <Input id="linkedinProfile" name="linkedinProfile" value={formData.linkedinProfile} onChange={handleChange} placeholder="https://linkedin.com/in/..." disabled={isViewMode} />
-                </div>
-              </div>
+              <TabButton id="contact" label="Contact Information" icon={Contact} active={activeFormTab} onClick={setActiveFormTab}
+              />
+
+              <TabButton id="deal" label="Deal & Status" icon={DollarSign} active={activeFormTab} onClick={setActiveFormTab}
+              />
+
+              <TabButton id="document" label="Document" icon={FileText} active={activeFormTab} onClick={setActiveFormTab}
+              />
+
             </div>
-
-            {/* COMPANY DETAILS */}
             <div>
-              <SectionHeader icon={Briefcase} title="Company Details" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <Label htmlFor="companyName">Company Name</Label>
-                  <Input id="companyName" name="companyName" value={formData.companyName} onChange={handleChange} disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="website">Website</Label>
-                  <Input id="website" name="website" value={formData.website} onChange={handleChange} disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="industry">Industry</Label>
-                  <Input id="industry" name="industry" value={formData.industry} onChange={handleChange} disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="size">Company Size</Label>
-                  <div className="relative">
-                    <select
-                      name="size"
-                      value={formData.size}
-                      onChange={handleChange}
-                      disabled={isViewMode}
-                      className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 disabled:opacity-50"
-                    >
-                      <option value="">Select Size</option>
-                      <option value="1-10">1-10 employees</option>
-                      <option value="11-50">11-50 employees</option>
-                      <option value="51-200">51-200 employees</option>
-                      <option value="200+">200+ employees</option>
-                      <option value="Enterprise">Enterprise</option>
-                    </select>
+              {/* <SectionHeader icon={User} title="Contact Information" /> */}
+              {activeFormTab === "contact" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName">First Name *</Label>
+                    <Input id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} required disabled={isViewMode} />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} disabled={isViewMode} />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email *</Label>
+                    <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required disabled={isViewMode} />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Phone *</Label>
+
+                    <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required disabled={isViewMode} />
+                  </div>
+                  <div>
+                    <Label htmlFor="jobTitle">Job Title</Label>
+                    <Input id="jobTitle" name="jobTitle" value={formData.jobTitle} onChange={handleChange} disabled={isViewMode} />
+                  </div>
+                  <div>
+                    <Label htmlFor="linkedinProfile">LinkedIn Profile</Label>
+                    <Input id="linkedinProfile" name="linkedinProfile" value={formData.linkedinProfile} onChange={handleChange} placeholder="https://linkedin.com/in/..." disabled={isViewMode} />
+                  </div>
+                  <div>
+                    <Label htmlFor="street">Street Address</Label>
+                    <Input id="street" name="street" value={formData.street} onChange={handleChange} disabled={isViewMode} />
+                  </div>
+                  <div>
+                    <Label htmlFor="city">City</Label>
+                    <Input id="city" name="city" value={formData.city} onChange={handleChange} disabled={isViewMode} />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">State</Label>
+                    <Input id="state" name="state" value={formData.state} onChange={handleChange} disabled={isViewMode} />
+                  </div>
+                  <div>
+                    <Label htmlFor="country">Country</Label>
+                    <Input id="country" name="country" value={formData.country} onChange={handleChange} disabled={isViewMode} />
+                  </div>
+                  <div>
+                    <Label htmlFor="zipCode">Zip Code</Label>
+                    <Input id="zipCode" name="zipCode" value={formData.zipCode} onChange={handleChange} disabled={isViewMode} />
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* ADDRESS */}
-            <div>
-              <SectionHeader icon={MapPin} title="Address" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <Label htmlFor="street">Street Address</Label>
-                  <Input id="street" name="street" value={formData.street} onChange={handleChange} disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="city">City</Label>
-                  <Input id="city" name="city" value={formData.city} onChange={handleChange} disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="state">State</Label>
-                  <Input id="state" name="state" value={formData.state} onChange={handleChange} disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="country">Country</Label>
-                  <Input id="country" name="country" value={formData.country} onChange={handleChange} disabled={isViewMode} />
-                </div>
-                <div>
-                  <Label htmlFor="zipCode">Zip Code</Label>
-                  <Input id="zipCode" name="zipCode" value={formData.zipCode} onChange={handleChange} disabled={isViewMode} />
-                </div>
-              </div>
+              )}
             </div>
-
             {/* DEAL INFO */}
-            <div>
-              <SectionHeader icon={DollarSign} title="Deal & Status" />
+
+
+            {/* <SectionHeader icon={DollarSign} title="Deal & Status" /> */}
+            {activeFormTab === "deal" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>Status</Label>
@@ -676,7 +778,88 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                   />
                 </div>
               </div>
-            </div>
+            )}
+            {activeFormTab === "document" && (
+              <div>
+                <SectionHeader icon={FileText} title="Document Attachment" />
+
+                {docRows.map((row, index) => (
+                  <div
+                    key={index}
+                    className="
+          grid
+          grid-cols-1
+          md:grid-cols-[220px_1fr_auto]
+          gap-4 md:gap-20
+          items-end
+          mb-4
+        "
+                  >
+                    {/* DOCUMENT SELECT */}
+                    <div>
+                      {/* <Label>Document Name</Label> */}
+                      <select
+                        value={row.documentId}
+                        onChange={(e) => handleDocChange(index, e.target.value)}
+                        className="w-full h-10 bg-slate-800 border border-slate-700 rounded-md px-3 text-sm text-gray-300"
+                      >
+                        <option value="">Select</option>
+                        {documents.map((doc) => (
+                          <option key={doc._id} value={doc._id}>
+                            {doc.documentName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* UPLOAD (hidden until document selected) */}
+                    <div>
+                      {row.documentId && (
+                        <>
+                          <Label>Upload File</Label>
+                          <input
+                            type="file"
+                            className="w-full text-sm text-slate-300"
+                            onChange={(e) =>
+                              handleFileChange(index, e.target.files[0])
+                            }
+                          />
+                        </>
+                      )}
+                    </div>
+
+                    {/* + / - BUTTONS */}
+                    <div className="flex gap-2 md:pb-1">
+                      {docRows.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeDocRow(index)}
+                          className="h-8 w-8 rounded-md bg-white text-red-600 font-extrabold"
+                          title="Remove Document"
+                        >
+                          –
+                        </button>
+                      )}
+
+                      {index === docRows.length - 1 && (
+                        <button
+                          type="button"
+                          onClick={addDocRow}
+                          className="h-8 w-8 rounded-md bg-white text-green-600 font-extrabold"
+                          title="Add Document"
+                        >
+                          +
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+
+
+
 
           </form>
         </div>
@@ -697,6 +880,8 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
             </Button>
           )}
         </DialogFooter>
+
+
       </DialogContent>
     </Dialog>
   );
@@ -722,8 +907,23 @@ function LeadsContent() {
   // --- NEW: Assign State ---
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
   const [leadToAssign, setLeadToAssign] = useState(null);
+  // --- NOTES DIALOG ---
+  const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+  const [notesLead, setNotesLead] = useState(null);
+  const [noteText, setNoteText] = useState('');
+
 
   const { toast } = useToast();
+
+  const openNotesDialog = (lead) => {
+    setNotesLead(lead);
+    setNoteText('');
+    setNotesDialogOpen(true);
+  };
+
+
+
+
 
   const fetchLeads = async (search = '') => {
     setLoading(true);
@@ -850,6 +1050,7 @@ function LeadsContent() {
 
   useEffect(() => {
     fetchLeads();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -956,8 +1157,8 @@ function LeadsContent() {
     <button
       onClick={() => setActiveTab(id)}
       className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-md ${activeTab === id
-          ? 'bg-fuchsia-600 text-white shadow-md'
-          : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
+        ? 'bg-fuchsia-600 text-white shadow-md'
+        : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
         }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
@@ -1054,11 +1255,28 @@ function LeadsContent() {
                       transition={{ delay: index * 0.05 }}
                       className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors group"
                     >
-                      <td className="py-3 px-4 text-sm font-medium text-white">{lead.name}</td>
+                      {/* <td className="py-3 px-4 text-sm font-medium text-white">{lead.name}</td> */}
+                      <td className="py-3 px-4 text-sm font-medium text-white">
+                        <div
+                          onClick={() => openNotesDialog(lead)}
+                          className="flex items-center gap-2 cursor-pointer group hover:text-fuchsia-400"
+                        >
+                          {/* PLUS ICON */}
+                          {/* <span className="">
+                            <Plus size={12} />
+                          </span> */}
+
+                          {/* NAME */}
+                          <span className="underline-offset-4 group-hover:underline">
+                            {lead.name}
+                          </span>
+                        </div>
+                      </td>
                       <td className="py-3 px-4 text-sm text-slate-300">{lead.site}</td>
                       <td className="py-3 px-4 text-sm text-slate-300 flex gap-2">
-                        <button onClick={() => { setCallNumber(lead.phone);setCallDialogOpen(true);
-                        }}><Phone size={14} /></button>{lead.phone}</td>
+                        <button onClick={() => {
+                          setCallNumber(lead.phone); setCallDialogOpen(true);
+                        }}><Phone size={18} className=' hover:text-fuchsia-400' /></button>{lead.phone}</td>
                       <td className="py-3 px-4 text-sm text-slate-300">{lead.source}</td>
                       <td className="py-3 px-4">
                         <Badge className={statusColors[lead.status] || 'bg-slate-600'}>{lead.status}</Badge>
@@ -1160,8 +1378,8 @@ function LeadsContent() {
                   {/* ASSIGNED */}
                   <div
                     className={`flex items-center gap-2 mb-2 text-sm ${lead.assignedTo === 'Unassigned'
-                        ? 'text-red-300'
-                        : 'text-slate-300'
+                      ? 'text-red-300'
+                      : 'text-slate-300'
                       }`}
                   >
                     <User className="w-4 h-4" />
@@ -1222,6 +1440,7 @@ function LeadsContent() {
         onSuccess={handleLeadSaved}
         initialData={selectedLead}
         mode={dialogMode}
+      // documents={documents}
       />
 
       {/* --- NEW: ASSIGN DIALOG --- */}
@@ -1238,7 +1457,58 @@ function LeadsContent() {
         onOpenChange={setCallDialogOpen}
         number={callNumber}
       />
+
+
+      <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}>
+        <DialogContent className="sm:max-w-[450px]">
+          <DialogHeader>
+            <div className="flex justify-between items-center w-full">
+              <DialogTitle>Add Note</DialogTitle>
+              <button onClick={() => setNotesDialogOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+          </DialogHeader>
+
+          <div className="p-6">
+            <p className="text-sm text-slate-400 mb-2">
+              Lead: <span className="text-white font-medium">{notesLead?.name}</span>
+            </p>
+
+            <Label>Notes</Label>
+            <textarea
+              className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white focus:ring-2 focus:ring-fuchsia-600 outline-none"
+              placeholder="Enter follow-up notes..."
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setNotesDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                console.log("Lead:", notesLead);
+                console.log("Note:", noteText);
+                toast({
+                  title: "Note Saved",
+                  description: "Your note has been added",
+                  variant: "success"
+                });
+                setNotesDialogOpen(false);
+              }}
+            >
+              Save Note
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </div>
+
+
   );
 }
 

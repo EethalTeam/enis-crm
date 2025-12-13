@@ -28,6 +28,7 @@ import AdminPanel from '@/pages/AdminPanel';
 import MainLayout from '@/components/layout/MainLayout';
 import Employees  from '@/pages/Employees';
 import Rolepages from '@/pages/Rolepages';
+import Document from '@/pages/Document';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import MenuRegistry from '@/pages/MenuRegistry';
 
@@ -75,6 +76,7 @@ function App() {
             <Route path="/masters/employees" element={<Employees />} />
             <Route path="/masters/rolepages" element={<Rolepages />} />
             <Route path="/adminpanel/menu" element={<MenuRegistry />} />
+            <Route path="/masters/Document" element={<Document />} />
             
           </Route>
         </Routes>
