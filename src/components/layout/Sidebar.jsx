@@ -247,7 +247,9 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden ml-4 border-l-2 border-purple-700/30 pl-2 space-y-1"
                     >
-                      {item.subItems.map((subItem) => (
+                      {item.subItems.map((subItem) => {
+                        Icon = iconMap[subItem.icon]
+                        return (
                         <NavLink
                           key={subItem.path}
                           to={subItem.path}
@@ -260,9 +262,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                             )
                           }
                         >
+                           <Icon className="w-5 h-5 flex-shrink-0" />
                           {subItem.label}
                         </NavLink>
-                      ))}
+                      )})}
                     </motion.div>
                   )}
                 </AnimatePresence>
