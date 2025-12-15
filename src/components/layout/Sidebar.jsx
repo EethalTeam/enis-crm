@@ -22,7 +22,7 @@ import {
   ChevronDown,
   LandPlot,
     Landmark,
-  Group,
+   Users2,   
   Layers,
   FileText
 } from 'lucide-react';
@@ -52,7 +52,7 @@ const iconMap = {
   ChevronDown,
   LandPlot,
   Landmark,
-  Group,
+   Users2,   
   Layers,
   FileText
 
@@ -85,7 +85,7 @@ const navItems = [
     icon: ClipboardList, label: 'Master Forms',
     children: [
       { icon: Landmark, label: 'Site', path: '/masters/site' },
-      { icon: Group, label: 'Unit', path: '/masters/unit' },
+      { icon:  Users2, label: 'Unit', path: '/masters/unit' },
       { icon: MapPin, label: 'State', path: '/masters/state' },
       { icon: Building2, label: 'City', path: '/masters/city' },
       { icon: Users, label: 'Employees', path: '/masters/employees' },
@@ -169,6 +169,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     }
     return hasAccess(item.path) ? item : null;
   }).filter(Boolean);
+  console.log(filteredMenuItems,"filteredMenuItems")
   return (
     <motion.aside
       initial={false}
@@ -195,17 +196,17 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-hide">
         {filteredMenuItems.sort((a, b) => {
-          const numA = +a.id.match(/\d+/)[0];
-          const numB = +b.id.match(/\d+/)[0];
-          return numA - numB;
-        })
-          .map((item) => {
-            let Icon = iconMap[item.icon] || CheckSquare
-            if (item.subItems.length > 0) {
-              // Render Parent with Submenu
-              const isActive = isParentActive(item.subItems);
-              const isOpenMenu = openMenu === item.label;
-
+    const numA = +a.id.match(/\d+/)[0]; 
+    const numB = +b.id.match(/\d+/)[0];
+    return numA - numB;
+  })
+  .map((item) => {
+     let Icon = iconMap[item.icon] || CheckSquare
+          if (item.subItems.length > 0) {
+            // Render Parent with Submenu
+            const isActive = isParentActive(item.subItems);
+            const isOpenMenu = openMenu === item.label;
+           
 
               return (
                 <div key={item.label} className="space-y-1">
@@ -238,36 +239,36 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     </div>
                   </div>
 
-                  <AnimatePresence>
-                    {isOpen && isOpenMenu && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden ml-4 border-l-2 border-purple-700/30 pl-2 space-y-1"
-                      >
-                        {item.subItems.map((subItem) => (
-                          <NavLink
-                            key={subItem.path}
-                            to={subItem.path}
-                            className={({ isActive }) =>
-                              cn(
-                                'flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 text-sm',
-                                isActive
-                                  ? 'text-white font-medium bg-white/10'
-                                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-                              )
-                            }
-                          >
-                            {subItem.label}
-                          </NavLink>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            }
+                <AnimatePresence>
+                  {isOpen && isOpenMenu && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden ml-4 border-l-2 border-purple-700/30 pl-2 space-y-1"
+                    >
+                      {item.subItems.map((subItem) => (
+                        <NavLink
+                          key={subItem.path}
+                          to={subItem.path}
+                          className={({ isActive }) =>
+                            cn(
+                              'flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 text-sm',
+                              isActive
+                                ? 'text-white font-medium bg-white/10'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            )
+                          }
+                        >
+                          {subItem.label}
+                        </NavLink>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          }
 
             // Render Standard Menu Item
             return (
