@@ -175,7 +175,6 @@ function MenuRegistryInner() {
 
     const data = result.data;
 
-    console.log("Fetched menus:", data);
 
     // normalize
     const normalized = data.map(m => ({

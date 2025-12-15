@@ -26,7 +26,26 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
 import { apiRequest } from '@/components/CustomComponents/apiRequest'
 import { config } from '@/components/CustomComponents/config.js';
-
+const iconMap = {
+  LayoutDashboard,
+  Users,
+  Building2,
+  Phone,
+  PhoneCall,
+  GitBranch,
+  MessageSquare,
+  CheckSquare,
+  Workflow,
+  BarChart3,
+  Settings,
+  UserCircle,
+  Sparkles,
+  MapPin,
+  PersonStanding,
+  ClipboardList,
+  Shield,
+  ChevronDown 
+};
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
   //  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
@@ -93,7 +112,6 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     const { user } = useAuth();
   const { menuPermissions } = useData();
   const [MENU,SETMENU]=useState([])
-  console.log(MENU,"MENU")
   useEffect(()=>{
     getAllMenus()
   },[])
@@ -117,10 +135,8 @@ const getAllMenus = async () => {
   const hasAccess = (path) => {
     const userRole = user.role;
     if (userRole === 'Super Admin') return true;
-
     const rolePermissions = menuPermissions[userRole];
     // const rolePermissions = ['*'];
-
     if (!rolePermissions) return false;
     if (rolePermissions.includes('*')) return true;
     
@@ -140,7 +156,6 @@ const getAllMenus = async () => {
     }
     return hasAccess(item.path) ? item : null;
   }).filter(Boolean);
-  console.log(filteredMenuItems,"filteredMenuItems")
   return (
     <motion.aside
       initial={false}
@@ -166,11 +181,18 @@ const getAllMenus = async () => {
       </div>
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-hide">
-        {navItems.map((item) => {
-          if (item.children) {
+        {filteredMenuItems.sort((a, b) => {
+    const numA = +a.id.match(/\d+/)[0]; 
+    const numB = +b.id.match(/\d+/)[0];
+    return numA - numB;
+  })
+  .map((item) => {
+     let Icon = iconMap[item.icon] || CheckSquare
+          if (item.subItems.length > 0) {
             // Render Parent with Submenu
-            const isActive = isParentActive(item.children);
+            const isActive = isParentActive(item.subItems);
             const isOpenMenu = openMenu === item.label;
+           
 
             return (
               <div key={item.label} className="space-y-1">
@@ -186,7 +208,7 @@ const getAllMenus = async () => {
                   {isActive && <motion.div layoutId="active-nav" className="absolute inset-0 bg-gradient-to-r from-pink-600 to-fuchsia-600 rounded-lg opacity-70" />}
 
                   <div className="relative z-10 flex items-center gap-3 w-full">
-                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                    <Icon className="w-5 h-5 flex-shrink-0" />
                     {isOpen && (
                       <motion.div
                         initial={{ opacity: 0 }}
@@ -211,7 +233,7 @@ const getAllMenus = async () => {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden ml-4 border-l-2 border-purple-700/30 pl-2 space-y-1"
                     >
-                      {item.children.map((subItem) => (
+                      {item.subItems.map((subItem) => (
                         <NavLink
                           key={subItem.path}
                           to={subItem.path}
@@ -253,7 +275,7 @@ const getAllMenus = async () => {
                 <>
                   {isActive && <motion.div layoutId="active-nav" className="absolute inset-0 bg-gradient-to-r from-pink-600 to-fuchsia-600 rounded-lg opacity-70" />}
                   <div className="relative z-10 flex items-center gap-3">
-                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                    <Icon className="w-5 h-5 flex-shrink-0" />
                     {isOpen && (
                       <motion.span
                         initial={{ opacity: 0 }}

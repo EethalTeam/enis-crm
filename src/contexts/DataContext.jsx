@@ -164,14 +164,13 @@ export const DataProvider = ({ children }) => {
 //   const [attendanceStatus, setAttendanceStatus] = useState(() => getInitialData('hrms_attendance_status', { status: 'out', break: false }) || { status: 'out', break: false });
   const [roles,setRoles]=useState([])
   const [menuPermissions,setMenuPermissions]=useState({})
-  console.log(menuPermissions,"menuPermissions")
   useEffect(()=>{
     getRole()
   },[])
 useEffect(()=>{
 let rolepath=roles.reduce((acc,curr)=>{
   if(!acc[curr.RoleName]){
-return {...acc,[curr.RoleName]:curr.permissions.map(val=>val.menuDetails.path)}
+return {...acc,[curr.RoleName]:curr.permissions.map(val=> (val.isAdd || val.isEdit || val.isView || val.isDelete) ? val.menuDetails.path : '').filter(val=>val !== '' && val!==undefined)}
   }else{
 return acc
   }

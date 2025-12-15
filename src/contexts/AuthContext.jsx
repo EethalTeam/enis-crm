@@ -228,7 +228,6 @@ export const AuthProvider = ({ children }) => {
       };
 
       setUser(userData);
-      console.log(userData, "userData")
 
       toast({
         title: "Login Successful",

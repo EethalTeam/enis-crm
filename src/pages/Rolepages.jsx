@@ -491,7 +491,6 @@ function Rolepages() {
             const allMenus = await getAllMenus();
 
             setMenus(allMenus);
-            console.log(allMenus, "allMenus")
 
             const mapped = {};
             (role?.permissions || []).forEach((p) => {

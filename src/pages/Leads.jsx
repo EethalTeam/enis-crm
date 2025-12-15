@@ -391,7 +391,6 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
 
       const result = await res.json();
 
-      console.log("Document API RESULT:", result);
 
       // ✅ YOUR API RETURNS ARRAY DIRECTLY
       setDocuments(Array.isArray(result) ? result : []);
@@ -524,8 +523,6 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
   };
 
   docRows.forEach(row => {
-    console.log("Document:", row.documentId);
-    console.log("File:", row.file);
   });
 
 
@@ -1490,8 +1487,6 @@ function LeadsContent() {
             </Button>
             <Button
               onClick={() => {
-                console.log("Lead:", notesLead);
-                console.log("Note:", noteText);
                 toast({
                   title: "Note Saved",
                   description: "Your note has been added",
