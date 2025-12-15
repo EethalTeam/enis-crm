@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -22,6 +22,10 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { useData } from '@/contexts/DataContext';
+import { apiRequest } from '@/components/CustomComponents/apiRequest'
+import { config } from '@/components/CustomComponents/config.js';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -86,7 +90,57 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
   const isPathActive = (path) => location.pathname === path;
   const isParentActive = (children) => children.some(child => isPathActive(child.path));
+    const { user } = useAuth();
+  const { menuPermissions } = useData();
+  const [MENU,SETMENU]=useState([])
+  console.log(MENU,"MENU")
+  useEffect(()=>{
+    getAllMenus()
+  },[])
+const getAllMenus = async () => {
+  try {
+    // const response = await apiRequest("Menu/getFormattedMenu", {
+    //   method: 'POST',
+    //   body: JSON.stringify({}),
+    // });
+    let url = config.Api + "Menu/getFormattedMenu"; 
+          const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+          if (!response.ok) throw new Error('Failed to get Menus');
+          const result = await response.json();
+          const data = result.data || result; 
+    SETMENU(data)
+  } catch (error) {
+    console.error("Failed to fetch menus", error);
+    return {};
+  }
+};
+  const hasAccess = (path) => {
+    const userRole = user.role;
+    if (userRole === 'Super Admin') return true;
 
+    const rolePermissions = menuPermissions[userRole];
+    // const rolePermissions = ['*'];
+
+    if (!rolePermissions) return false;
+    if (rolePermissions.includes('*')) return true;
+    
+    return rolePermissions.some(p => path===p);
+  };
+
+  const filteredMenuItems = MENU.map(item => {
+    // const filteredMenuItems = ALL_MENU_ITEMS.map(item => {
+    if (user.role === 'Super Admin') return item;
+    
+    if (item.subItems.length > 0) {
+      const accessibleSubItems = item.subItems.filter(sub => hasAccess(sub.path));
+      if (accessibleSubItems.length > 0) {
+        return { ...item, subItems: accessibleSubItems };
+      }
+      return null;
+    }
+    return hasAccess(item.path) ? item : null;
+  }).filter(Boolean);
+  console.log(filteredMenuItems,"filteredMenuItems")
   return (
     <motion.aside
       initial={false}

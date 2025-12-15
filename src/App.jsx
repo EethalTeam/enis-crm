@@ -30,6 +30,7 @@ import Employees  from '@/pages/Employees';
 import Rolepages from '@/pages/Rolepages';
 import Document from '@/pages/Document';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { DataProvider } from '@/contexts/DataContext';
 import MenuRegistry from '@/pages/MenuRegistry';
 
 function PrivateRoute({ children }) {
@@ -43,6 +44,7 @@ function PrivateRoute({ children }) {
 function App() {
   return (
     <AuthProvider>
+       <DataProvider>
       <Helmet>
         <title>ENIS CRM - Complete Business Management Solution</title>
         <meta name="description" content="ENIS CRM: Industry-neutral platform with IVR, omni-channel communication, automation, and analytics for ultimate business growth." />
@@ -82,6 +84,7 @@ function App() {
         </Routes>
       </Router>
       <Toaster />
+      </DataProvider>
     </AuthProvider>
   );
 }
