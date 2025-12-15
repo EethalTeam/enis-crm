@@ -158,6 +158,7 @@ const getAllMenus = async () => {
     }
     return hasAccess(item.path) ? item : null;
   }).filter(Boolean);
+  console.log(filteredMenuItems,"filteredMenuItems")
   return (
     <motion.aside
       initial={false}
@@ -189,12 +190,12 @@ const getAllMenus = async () => {
     return numA - numB;
   })
   .map((item) => {
-     let Icon = iconMap[item.icon] || CheckSquare
+      let Icon = iconMap[item.icon] || CheckSquare
           if (item.subItems.length > 0) {
             // Render Parent with Submenu
             const isActive = isParentActive(item.subItems);
             const isOpenMenu = openMenu === item.label;
-           
+          
 
             return (
               <div key={item.label} className="space-y-1">
@@ -235,7 +236,11 @@ const getAllMenus = async () => {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden ml-4 border-l-2 border-purple-700/30 pl-2 space-y-1"
                     >
-                      {item.subItems.map((subItem) => (
+                      {item.subItems.map((subItem) => 
+                      {
+                        Icon = iconMap[subItem.icon]
+                        console.log(Icon,"Icon")
+                        return (
                         <NavLink
                           key={subItem.path}
                           to={subItem.path}
@@ -248,9 +253,10 @@ const getAllMenus = async () => {
                             )
                           }
                         >
+                          <Icon className="w-5 h-5 flex-shrink-0" />
                           {subItem.label}
                         </NavLink>
-                      ))}
+                      )})}
                     </motion.div>
                   )}
                 </AnimatePresence>
