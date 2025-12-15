@@ -227,11 +227,31 @@ function EmployeeContent() {
     const [isEdit, setIsEdit] = useState(false);
     const [viewData, setViewData] = useState({});
     const [role, setRole] = useState([])
+     const { getPermissionsByPath } = useAuth();
+  const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
     // ------------------- FETCH EMPLOYEES -------------------
     useEffect(() => {
-        getAllEmployees();
+       
         getAllRole();
     }, []);
+
+     useEffect(() => {
+    getPermissionsByPath(window.location.pathname).then(res => {
+      if (res) {
+        console.log(res, "res")
+        setPermissions(res)
+      } else {
+        navigate('/dashboard')
+      }
+    })
+
+  }, [])
+
+useEffect(()=>{
+    if (Permissions.isView) {
+      getAllEmployees();
+    }
+},[Permissions])
 
 
 

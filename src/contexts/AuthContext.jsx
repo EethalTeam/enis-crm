@@ -256,7 +256,7 @@ export const AuthProvider = ({ children }) => {
 
       if (!roleName) return null;
 
-      const res = await fetch(config.Api + "RoleBased/getPermissionsByPath", {
+      const res = await fetch(config.Api + "RoleBased/getPermissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ RoleName: roleName, path }),
