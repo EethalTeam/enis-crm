@@ -19,7 +19,8 @@ import {
   PersonStanding,
   ClipboardList,
   Shield,
-  ChevronDown
+  ChevronDown,
+  LandPlot
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -44,7 +45,8 @@ const iconMap = {
   PersonStanding,
   ClipboardList,
   Shield,
-  ChevronDown 
+  ChevronDown ,
+  LandPlot
 };
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -58,8 +60,8 @@ const navItems = [
     icon: MapPin,
     label: 'Plots',
     children: [
-      { label: 'Plot List', path: '/plots/list' },
-      { label: 'Plot View', path: '/plots/view' }
+      { icon:LandPlot, label: 'Plot List', path: '/plots/list' },
+      {icon:LandPlot,  label: 'Plot View', path: '/plots/view' }
     ]
   },
   { icon: PersonStanding, label: 'Visitors', path: '/visitors' },
