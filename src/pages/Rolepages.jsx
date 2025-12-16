@@ -556,7 +556,7 @@ function Rolepages() {
                                                         toggle(menu._id, key, e.target.checked)
                                                     }
                                                 />
-                                                {key.replace("is", "is")}
+                                                {key}
                                             </label>
                                         ))}
                                     </div>

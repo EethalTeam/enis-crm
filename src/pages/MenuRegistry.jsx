@@ -3,6 +3,8 @@ import React, { useState, useEffect, useReducer, createContext, useContext } fro
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, Loader2, Edit, Trash2, X, RefreshCw, Menu as MenuIcon } from "lucide-react";
 import { config } from "@/components/CustomComponents/config.js";
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from "react-router-dom";
 
 /*
   MenuRegistry.jsx
@@ -141,11 +143,34 @@ function MenuRegistryInner() {
   const [toDelete, setToDelete] = useState(null);
 
   const [state, dispatch] = useReducer(formReducer, initialState);
+   const { getPermissionsByPath } = useAuth();
+    const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
 
   /* ---------------- Fetch all menus ---------------- */
-  useEffect(() => {
-    fetchMenus();
-  }, []);
+  // useEffect(() => {
+  //   fetchMenus();
+  // }, []);
+
+    useEffect(() => {
+      getPermissionsByPath(window.location.pathname).then(res => {
+        if (res) {
+          console.log(res, "res")
+          setPermissions(res)
+        } else {
+          navigate('/dashboard')
+        }
+      })
+  
+    }, [])
+  
+  useEffect(()=>{
+      if (Permissions.isView) {
+       fetchMenus();
+      }
+  },[Permissions])
+
+
+
 
  const fetchMenus = async () => {
   setLoading(true);
@@ -327,9 +352,13 @@ function MenuRegistryInner() {
           <Button onClick={() => fetchMenus()} variant="outline" className="flex items-center gap-2">
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Refresh
           </Button>
-          <Button onClick={openAdd} className="flex items-center gap-2">
+          {
+            Permissions.isAdd && 
+             <Button onClick={openAdd} className="flex items-center gap-2">
             <Plus className="w-4 h-4" /> Add Menu
           </Button>
+          }
+        
         </div>
       </div>
 
@@ -379,8 +408,17 @@ function MenuRegistryInner() {
                 </div>
 
                 <div className="flex gap-2 mt-4">
+                  {
+                    Permissions.isEdit && 
                   <Button variant="outline" className="flex-1" onClick={() => openEdit(m)}><Edit className="w-4 h-4 mr-2" />Edit</Button>
+
+                  }
+
+                  {
+                    Permissions.isDelete && 
                   <Button variant="destructive" className="flex-1" onClick={() => confirmDelete(m)}><Trash2 className="w-4 h-4 mr-2" />Delete</Button>
+
+                  }
                 </div>
               </motion.div>
             ))}

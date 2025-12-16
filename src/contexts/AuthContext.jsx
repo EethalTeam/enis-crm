@@ -158,6 +158,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { config } from "@/components/CustomComponents/config";
 import { toast } from "@/components/ui/use-toast";
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 export const useAuth = () => {
@@ -169,6 +170,7 @@ export const useAuth = () => {
 };
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  // const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
 
   // ------------------ RESTORE USER ON REFRESH ------------------
@@ -250,26 +252,51 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ---------------- FETCH PERMISSIONS (PHYSIO STYLE) ------------------
-  const getPermissionsByPath = async (path) => {
-    try {
-      const roleName = localStorage.getItem("role");
+  // const getPermissionsByPath = async (path) => {
+  //   try {
+  //     const roleName = localStorage.getItem("role");
 
-      if (!roleName) return null;
+  //     if (!roleName) return null;
 
-      const res = await fetch(config.Api + "RoleBased/getPermissions", {
+  //     const res = await fetch(config.Api + "RoleBased/getPermissions", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ RoleName: roleName, path }),
+  //     });
+
+  //     const result = await res.json();
+  //     return result.success ? result.permissions : null;
+
+  //   } catch (err) {
+  //     console.error("Permission Error:", err);
+  //     return null;
+  //   }
+  // };
+
+  const getPermissionsByPath = async(path) => {
+  const roleName = user.role || localStorage.getItem("role"); // read role from localStorage
+  if (!roleName) return null;
+
+  try {
+        const res = await fetch(config.Api + "RoleBased/getPermissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ RoleName: roleName, path }),
+        body: JSON.stringify({  roleName, path }),
       });
 
-      const result = await res.json();
-      return result.success ? result.permissions : null;
-
-    } catch (err) {
-      console.error("Permission Error:", err);
+    const data = await res.json()
+    if (data.success) {
+      return data.permissions;
+    } else {
+      // navigate('/dashboard')
       return null;
     }
-  };
+  } catch (err) {
+    console.error("Error fetching permissions:", err);
+    return null;
+  }
+}
+
 
   return (
     <AuthContext.Provider value=

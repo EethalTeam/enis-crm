@@ -24,7 +24,11 @@ import {
     Landmark,
    Users2,   
   Layers,
-  FileText
+  FileText,
+  ArrowLeftRight,
+  UserCog,
+  ShieldCheck,
+  MenuSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -54,7 +58,11 @@ const iconMap = {
   Landmark,
    Users2,   
   Layers,
-  FileText
+  FileText,
+    ArrowLeftRight,
+  UserCog,
+  ShieldCheck,
+  MenuSquare
 
 
 
@@ -102,11 +110,10 @@ const navItems = [
   {
     icon: Shield, label: 'Admin Panel',
     children: [
-      { label: 'Menu Registry', path: '/adminpanel/menu' },
-      { label: 'Role', path: '/masters/rolepages' }
-
-      // { label: 'user Rights', path: '/adminpanel/rights' },
-      // { label: 'Transfer', path: '/adminpanel/transfer' },
+      {icon: MenuSquare,  label: 'Menu Registry', path: '/adminpanel/menu' },
+      { icon: ShieldCheck, label: 'Role', path: '/masters/rolepages' },
+      { icon: UserCog, label: 'user Rights', path: '/adminpanel/rights' },
+      { icon: ArrowLeftRight, label: 'Transfer', path: '/adminpanel/transfer' },
     ]
   },
 ];

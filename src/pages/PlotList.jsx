@@ -5,7 +5,8 @@ import {
   X, ChevronDown, MapPin, UserPlus, RefreshCw, AlertTriangle,Home,Square ,Compass 
 } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
-
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from "react-router-dom";
 // --- LOCAL REDUCER ---
 const initialState = {
   _id: '',
@@ -221,6 +222,7 @@ const ConfirmDialog = ({ open, title, description, onConfirm, onCancel, loading 
 
 function PlotsContent() {
   const { toast } = useToast();
+   const navigate = useNavigate()
 
   // State
   const [openView, setOpenView] = useState(false);
@@ -240,6 +242,8 @@ function PlotsContent() {
   const [filteredData, setFilteredData] = useState([]);
   const [Data, SetData] = useState([]); // Stores Units
   const [siteList, setSiteList] = useState([]); // Stores Sites
+   const { getPermissionsByPath } = useAuth();
+    const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
 
   const [PlotStatus] = useState([
     { PlotStatusIDPK: 5, PlotStatusName: "Visited", colorCode: '#3b82f6' },
@@ -264,10 +268,31 @@ function PlotsContent() {
   // --- API FUNCTIONS ---
 
   useEffect(() => {
-    getPlot();
+    // getPlot();
     getSites(); // Fetch Sites on Load
     getUnitList(); // Fetch Units on Load (for filter matching)
   }, []);
+
+
+   useEffect(() => {
+      getPermissionsByPath(window.location.pathname).then(res => {
+        if (res) {
+          console.log(res, "res")
+          setPermissions(res)
+        } else {
+          navigate('/dashboard')
+        }
+      })
+  
+    }, [])
+  
+  useEffect(()=>{
+      if (Permissions.isView) {
+        getPlot();
+      }
+  },[Permissions])
+
+
 
   const getSites = async () => {
     try {
@@ -619,9 +644,13 @@ function PlotsContent() {
           <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
             <Download className="w-4 h-4 mr-2" /> Export
           </Button>
-          <Button onClick={() => { clear(); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
+          {
+            Permissions.isAdd && 
+             <Button onClick={() => { clear(); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
             <Plus className="w-4 h-4 mr-2" /> Add Plot
           </Button>
+          }
+         
         </div>
       </div>
 
@@ -682,7 +711,11 @@ function PlotsContent() {
                       <td className="py-3 px-4 text-sm text-slate-300">{row.facing}</td>
                       <td className="py-3 px-4 flex items-center gap-2">
                         <Button variant="icon" size="icon" onClick={() => handleView(row)} title="View"><Eye className="w-4 h-4 text-blue-400" /></Button>
+                        {
+                          Permissions.isEdit && 
                         <Button variant="icon" size="icon" onClick={() => editTable(row)} title="Edit"><Pencil className="w-4 h-4 text-yellow-400" /></Button>
+
+                        }
                         <Button variant="icon" size="icon" onClick={() => handleAddVisitor(row)} title="Add Visitor"><UserPlus className="w-4 h-4 text-green-400" /></Button>
                       </td>
                     </motion.tr>

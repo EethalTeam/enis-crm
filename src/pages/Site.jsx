@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 
 import { config } from '@/components/CustomComponents/config.js';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from "react-router-dom";
 
 // --- LOCAL REDUCER ---
 const initialState = {
@@ -188,14 +190,33 @@ function SitesContent() {
   const [state, dispatch] = useReducer(commonReducer, initialState);
   const [isEdit, setIsEdit] = useState(false);
   const [viewData, setViewData] = useState({});
+   const { getPermissionsByPath } = useAuth();
+    const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
 
   useEffect(() => {
-    getSites();
+    // getSites();
     // Pre-fetch states on load if needed, or do it on focus
     getStateList(); 
   }, []);
 
   // --- API FUNCTIONS ---
+      useEffect(() => {
+      getPermissionsByPath(window.location.pathname).then(res => {
+        if (res) {
+          console.log(res, "res")
+          setPermissions(res)
+        } else {
+          navigate('/dashboard')
+        }
+      })
+  
+    }, [])
+  
+  useEffect(()=>{
+      if (Permissions.isView) {
+      getSites()
+      }
+  },[Permissions])
 
   const getSites = async () => {
     try {
@@ -426,7 +447,11 @@ function SitesContent() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-white flex items-center gap-2"><Building className="text-fuchsia-600"/> Sites</h1>
         <div className="flex gap-3">
+          {
+            Permissions.isAdd && 
           <Button onClick={() => { clear(); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0"><Plus className="w-4 h-4 mr-2" /> Add Site</Button>
+
+          }
         </div>
       </div>
 
@@ -466,8 +491,16 @@ function SitesContent() {
                       <td className="py-3 px-4 text-sm text-slate-300">{row.state?.StateName || row.state}</td>
                       <td className="py-3 px-4 flex items-center gap-2">
                         <Button variant="icon" size="icon" onClick={() => handleViewClick(row)}><Eye className="w-4 h-4 text-blue-400" /></Button>
+                        {
+                          Permissions.isEdit && 
                         <Button variant="icon" size="icon" onClick={() => handleEditClick(row)}><Pencil className="w-4 h-4 text-yellow-400" /></Button>
+
+                        }
+                        {
+                          Permissions.isDelete && 
                         <Button variant="icon" size="icon" onClick={() => triggerDeleteConfirm(row)}><Trash2 className="w-4 h-4 text-red-400" /></Button>
+
+                        }
                       </td>
                     </motion.tr>
                   ))

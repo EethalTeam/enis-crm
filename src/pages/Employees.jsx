@@ -504,7 +504,10 @@ useEffect(()=>{
             {/* HEADER */}
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold text-white">Employees</h1>
-                <Button
+              
+              {
+                Permissions.isAdd && 
+                 <Button
                     onClick={() => {
                         clear();
                         setDialogOpen(true);
@@ -513,6 +516,7 @@ useEffect(()=>{
                 >
                     <Plus className="w-4 h-4 mr-2" /> Add Employee
                 </Button>
+              } 
 
                 {/* <Button
                     onClick={() => {
@@ -598,7 +602,8 @@ useEffect(()=>{
                                                 >
                                                     <Eye className="w-4 h-4 text-blue-400" />
                                                 </Button>
-
+                                        {
+                                            Permissions.isEdit &&
                                                 <Button
                                                     variant="icon"
                                                     size="icon"
@@ -606,14 +611,19 @@ useEffect(()=>{
                                                 >
                                                     <Pencil className="w-4 h-4 text-yellow-400" />
                                                 </Button>
-
-                                                <Button
+                                        }
+                                            
+                                             
+                                             {
+                                                Permissions.isDelete && <Button
                                                     variant="icon"
                                                     size="icon"
                                                     onClick={() => triggerDeleteConfirm(row)}
                                                 >
                                                     <Trash2 className="w-4 h-4 text-red-400" />
                                                 </Button>
+                                             }
+                                                
                                             </td>
                                         </motion.tr>
                                     ))

@@ -6,6 +6,8 @@ import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X
 // NOTE: In your local environment, uncomment the config import line below.
 import { Helmet } from 'react-helmet';
 import { config } from '@/components/CustomComponents/config.js';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from "react-router-dom";
 
 // import { useToast } from '@/components/ui/use-toast';
 
@@ -911,6 +913,9 @@ function LeadsContent() {
 
 
   const { toast } = useToast();
+   const navigate = useNavigate()
+    const { getPermissionsByPath } = useAuth();
+     const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
 
   const openNotesDialog = (lead) => {
     setNotesLead(lead);
@@ -918,7 +923,23 @@ function LeadsContent() {
     setNotesDialogOpen(true);
   };
 
+   useEffect(() => {
+    getPermissionsByPath(window.location.pathname).then(res => {
+      if (res) {
+        console.log(res, "res")
+        setPermissions(res)
+      } else {
+        navigate('/dashboard')
+      }
+    })
 
+  }, [])
+
+useEffect(()=>{
+    if (Permissions.isView) {
+      fetchLeads();
+    }
+},[Permissions])
 
 
 
@@ -1045,11 +1066,11 @@ function LeadsContent() {
     }
   };
 
-  useEffect(() => {
-    fetchLeads();
+  // useEffect(() => {
+  //   fetchLeads();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -1182,10 +1203,14 @@ function LeadsContent() {
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button onClick={handleCreate} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
+          {
+            Permissions.isAdd && 
+              <Button onClick={handleCreate} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
             <Plus className="w-4 h-4 mr-2" />
             Add Lead
           </Button>
+          }
+        
         </div>
       </div>
 
@@ -1289,12 +1314,21 @@ function LeadsContent() {
                         <Button variant="icon" size="icon" title="View" onClick={() => handleView(lead)} className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20">
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button variant="icon" size="icon" title="Edit" onClick={() => handleEdit(lead)} className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/20">
+                        {
+                          Permissions.isEdit && 
+                           <Button variant="icon" size="icon" title="Edit" onClick={() => handleEdit(lead)} className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/20">
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button variant="icon" size="icon" title="Delete" onClick={() => handleDelete(lead.id)} className="text-red-400 hover:text-red-300 hover:bg-red-900/20">
+                        }
+
+                        {
+                          Permissions.isDelete && 
+                           <Button variant="icon" size="icon" title="Delete" onClick={() => handleDelete(lead.id)} className="text-red-400 hover:text-red-300 hover:bg-red-900/20">
                           <Trash2 className="w-4 h-4" />
                         </Button>
+                        }
+                       
+                       
                       </td>
                     </motion.tr>
                   ))

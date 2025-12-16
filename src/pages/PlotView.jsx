@@ -7,6 +7,8 @@ import {
 
 // --- CONFIGURATION ---
 import { config } from '@/components/CustomComponents/config.js';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from "react-router-dom";
 
 // --- TOAST & NOTIFICATION SYSTEM ---
 const ToastContext = createContext({});
@@ -161,6 +163,8 @@ function PlotViewContent() {
   const [openViewModal, setOpenViewModal] = useState(false);
   const [openVisitorModal, setOpenVisitorModal] = useState(false);
   const [viewData, setViewData] = useState({});
+    const { getPermissionsByPath } = useAuth();
+    const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
   
   // Status Reference
   const [plotStatuses] = useState([
@@ -217,6 +221,25 @@ function PlotViewContent() {
       setUnitData(result || []);
     } catch (error) { console.error(error); }
   };
+
+
+  //   useEffect(() => {
+  //     getPermissionsByPath(window.location.pathname).then(res => {
+  //       if (res) {
+  //         console.log(res, "res")
+  //         setPermissions(res)
+  //       } else {
+  //         navigate('/dashboard')
+  //       }
+  //     })
+  
+  //   }, [])
+  
+  // useEffect(()=>{
+  //     if (Permissions.isView) {
+      
+  //     }
+  // },[Permissions])
 
   const getPlotView = async () => {
     try {
