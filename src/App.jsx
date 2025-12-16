@@ -29,6 +29,8 @@ import MainLayout from '@/components/layout/MainLayout';
 import Employees  from '@/pages/Employees';
 import Rolepages from '@/pages/Rolepages';
 import Document from '@/pages/Document';
+import State from '@/pages/State'
+import City from '@/pages/City'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { DataProvider } from '@/contexts/DataContext';
 import MenuRegistry from '@/pages/MenuRegistry';
@@ -79,6 +81,8 @@ function App() {
             <Route path="/masters/rolepages" element={<Rolepages />} />
             <Route path="/adminpanel/menu" element={<MenuRegistry />} />
             <Route path="/masters/Document" element={<Document />} />
+            <Route path="/masters/state" element={<State />} />
+            <Route path="/masters/city" element={<City />} />
             
           </Route>
         </Routes>
