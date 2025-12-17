@@ -23,13 +23,13 @@ import { useNavigate } from "react-router-dom";
 
 // ------------------- REDUCER -------------------
 const initialState = {
-    CityCode: '',
-    CityName: '',
+    CountryCode: '',
+    CountryName: '',
     StateID: '',
     isActive: true
 };
 
-const CityReducer = (state, action) => {
+const CountryReducer = (state, action) => {
     switch (action.type) {
         case "text":
             return { ...state, [action.name]: action.value };
@@ -201,10 +201,10 @@ const DialogContent = ({ className, title, onClose, children }) => (
 );
 
 // ------------------- EMPLOYEE CONTENT -------------------
-function City() {
+function Country() {
     const { toast } = useToast();
     const navigate = useNavigate()
-    const [city, setCity] = useState([]);
+    const [country, setCountry] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [states, setStates] = useState([])
 
@@ -219,13 +219,13 @@ function City() {
         action: null,
     });
 
-    const [state, dispatch] = useReducer(CityReducer, initialState);
+    const [state, dispatch] = useReducer(CountryReducer, initialState);
     const [isEdit, setIsEdit] = useState(false);
     const [viewData, setViewData] = useState({});
 
     // ------------------- FETCH EMPLOYEES -------------------
     useEffect(() => {
-        getAllCity();
+        getAllCountry();
         getAllState()
 
     }, []);
@@ -233,7 +233,7 @@ function City() {
     const getAllState = async () => {
         try {
             setLoading(true);
-            let url = config.Api + "City/getAllStates";
+            let url = config.Api + "Country/getAllStates";
 
             const res = await fetch(url, {
                 method: "POST",
@@ -249,7 +249,7 @@ function City() {
         } catch (err) {
             toast({
                 title: "Error",
-                description: "Could not fetch City",
+                description: "Could not fetch Country",
                 variant: "destructive",
             });
         } finally {
@@ -260,10 +260,10 @@ function City() {
 
 
 
-    const getAllCity = async () => {
+    const getAllCountry = async () => {
         try {
             setLoading(true);
-            let url = config.Api + "City/getAllCitys";
+            let url = config.Api + "Country/getAllCountry";
 
             const res = await fetch(url, {
                 method: "POST",
@@ -274,12 +274,12 @@ function City() {
             const result = await res.json();
             const data = result.data || result;
 
-            setCity(data);
+            setCountry(data);
             setFilteredData(data);
         } catch (err) {
             toast({
                 title: "Error",
-                description: "Could not fetch City",
+                description: "Could not fetch Country",
                 variant: "destructive",
             });
         } finally {
@@ -289,8 +289,8 @@ function City() {
 
 
     // ------------------- CRUD APIs -------------------
-    const createCity = async (data) => {
-        let url = config.Api + "City/createCity";
+    const createCountry = async (data) => {
+        let url = config.Api + "Country/createCountry";
         const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -299,8 +299,8 @@ function City() {
         return await res.json();
     };
 
-    const updateCity = async (data) => {
-        let url = config.Api + "City/updateCity";
+    const updateCountry = async (data) => {
+        let url = config.Api + "Country/updateCountry";
         const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -309,8 +309,8 @@ function City() {
         return await res.json();
     };
 
-    const deleteCity = async (_id) => {
-        let url = config.Api + "City/deleteCity";
+    const deleteCountry = async (_id) => {
+        let url = config.Api + "Country/deleteCountry";
         const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -323,7 +323,7 @@ function City() {
     const handleSearchChange = (value) => {
         setSearchTerm(value);
 
-        const filtered = city.filter((row) =>
+        const filtered = country.filter((row) =>
             Object.values(row).some(
                 (v) =>
                     v &&
@@ -365,8 +365,8 @@ function City() {
     // ------------------- VIEW -------------------
     const handleViewClick = (row) => {
         setViewData({
-            "City Code": row.CityCode,
-            "City Name": row.CityName,
+            "Country Code": row.CountryCode,
+            "Country Name": row.CountryName,
 
         });
         setViewOpen(true);
@@ -374,18 +374,18 @@ function City() {
 
     // ------------------- VALIDATE -------------------
     const Validate = () => {
-        if (!state.CityCode) {
+        if (!state.CountryCode) {
             toast({
                 title: "Error",
-                description: "Enter City Code",
+                description: "Enter Country Code",
                 variant: "destructive",
             });
             return;
         }
-        if (!state.CityName) {
+        if (!state.CountryName) {
             toast({
                 title: "Error",
-                description: "Enter City Name",
+                description: "Enter Country Name",
                 variant: "destructive",
             });
             return;
@@ -398,7 +398,7 @@ function City() {
     const triggerConfirm = (type) => {
         setConfirmState({
             open: true,
-            title: type === "Update" ? "Update City?" : "Create City?",
+            title: type === "Update" ? "Update Country?" : "Create Country?",
             description: `Are you sure?`,
             action: handleSubmit,
         });
@@ -407,7 +407,7 @@ function City() {
     const triggerDeleteConfirm = (row) => {
         setConfirmState({
             open: true,
-            title: "Delete City?",
+            title: "Delete Country?",
             description: "Are you sure?",
             action: () => handleDelete(row._id),
         });
@@ -418,23 +418,23 @@ function City() {
         setLoading(true);
         try {
             if (isEdit) {
-                await updateCity(state);
+                await updateCountry(state);
                 toast({
                     title: "Success",
-                    description: "City updated successfully",
+                    description: "Country updated successfully",
                     variant: "success",
                 });
             } else {
-                await createCity(state);
+                await createCountry(state);
                 toast({
                     title: "Success",
-                    description: "City created successfully",
+                    description: "Country created successfully",
                     variant: "success",
                 });
             }
             clear();
             setDialogOpen(false);
-            getAllCity();
+            getAllCountry();
         } catch (err) {
             toast({
                 title: "Error",
@@ -451,13 +451,13 @@ function City() {
     const handleDelete = async (_id) => {
         setLoading(true);
         try {
-            await deleteCity(_id);
+            await deleteCountry(_id);
             toast({
                 title: "Deleted",
-                description: "City deleted",
+                description: "Country deleted",
                 variant: "success",
             });
-            getAllCity();
+            getAllCountry();
         } catch (err) {
             toast({
                 title: "Error",
@@ -475,7 +475,7 @@ function City() {
         <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
             {/* HEADER */}
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold text-white">City</h1>
+                <h1 className="text-3xl font-bold text-white">Country</h1>
                 <Button
                     onClick={() => {
                         clear();
@@ -483,7 +483,7 @@ function City() {
                     }}
                     className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white"
                 >
-                    <Plus className="w-4 h-4 mr-2" /> Add City
+                    <Plus className="w-4 h-4 mr-2" /> Add Country
                 </Button>
 
                 {/* <Button
@@ -505,7 +505,7 @@ function City() {
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" />
                             <Input
-                                placeholder="Search City Name..."
+                                placeholder="Search Country Name..."
                                 value={searchTerm}
                                 onChange={(e) => handleSearchChange(e.target.value)}
                                 className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white"
@@ -513,7 +513,7 @@ function City() {
                         </div>
                         <Button
                             variant="outline"
-                            onClick={() => getAllCity()}
+                            onClick={() => getAllCountry()}
                             className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
                         >
                             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -525,8 +525,8 @@ function City() {
                         <table className="w-full">
                             <thead>
                                 <tr className="border-b border-slate-700">
-                                    <th className="py-3 px-4 text-left">City Code</th>
-                                    <th className="py-3 px-4 text-left">City Name</th>
+                                    <th className="py-3 px-4 text-left">Country Code</th>
+                                    <th className="py-3 px-4 text-left">Country Name</th>
                                     <th className="py-3 px-4 text-left">State Name</th>
                                     <th className="py-3 px-4 text-left">Actions</th>
                                 </tr>
@@ -542,7 +542,7 @@ function City() {
                                 ) : filteredData.length === 0 ? (
                                     <tr>
                                         <td colSpan="6" className="text-center py-8">
-                                            No City found.
+                                            No Country found.
                                         </td>
                                     </tr>
                                 ) : (
@@ -554,8 +554,8 @@ function City() {
                                             transition={{ delay: index * 0.05 }}
                                             className="border-b border-slate-800 hover:bg-slate-800/50"
                                         >
-                                            <td className="py-3 px-4">{row.CityCode}</td>
-                                            <td className="py-3 px-4">{row.CityName}</td>
+                                            <td className="py-3 px-4">{row.CountryCode}</td>
+                                            <td className="py-3 px-4">{row.CountryName}</td>
                                             <td className="py-3 px-4">{row.StateName}</td>
 
 
@@ -597,28 +597,28 @@ function City() {
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogContent
                     className="sm:max-w-[600px]"
-                    title={isEdit ? "Edit City" : "Add City"}
+                    title={isEdit ? "Edit Country" : "Add Country"}
                     onClose={() => setDialogOpen(false)}
                 >
                     <div className="space-y-4">
                         {/* FORM */}
                         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                             <div>
-                                <Label>City Code *</Label>
+                                <Label>Country Code *</Label>
                                 <Input
-                                    value={state.CityCode}
+                                    value={state.CountryCode}
                                     onChange={(e) =>
-                                        storeDispatch(e.target.value, "CityCode")
+                                        storeDispatch(e.target.value, "CountryCode")
                                     }
                                 />
                             </div>
 
                             <div>
-                                <Label>City Name *</Label>
+                                <Label>Country Name *</Label>
                                 <Input
-                                    value={state.CityName}
+                                    value={state.CountryName}
                                     onChange={(e) =>
-                                        storeDispatch(e.target.value, "CityName")
+                                        storeDispatch(e.target.value, "CountryName")
                                     }
                                 />
                             </div>
@@ -740,10 +740,10 @@ function City() {
 }
 
 // ------------------- EXPORT -------------------
-export default function CityPage() {
+export default function CountryPage() {
     return (
         <ToastProvider>
-            <City />
+            <Country />
         </ToastProvider>
     );
 }

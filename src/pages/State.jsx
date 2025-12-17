@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 const initialState = {
    StateCode:'',
    StateName:'',
+   CountryID:'',
     isActive: true
 };
 
@@ -220,13 +221,42 @@ function State() {
     const [state, dispatch] = useReducer(StateReducer, initialState);
     const [isEdit, setIsEdit] = useState(false);
     const [viewData, setViewData] = useState({});
+    const [country,setCountry] = useState([])
     
     // ------------------- FETCH EMPLOYEES -------------------
     useEffect(() => {
         getAllStates();
+        getAllCountry()
         
     }, []);
 
+
+       const getAllCountry = async () => {
+            try {
+                setLoading(true);
+                let url = config.Api + "State/getAllCountry";
+    
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({}),
+                });
+    
+                const result = await res.json();
+                const data = result.data || result;
+    
+                setCountry(data);
+              
+            } catch (err) {
+                toast({
+                    title: "Error",
+                    description: "Could not fetch Country",
+                    variant: "destructive",
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
 
 
     const getAllStates = async () => {
@@ -292,7 +322,7 @@ function State() {
     const handleSearchChange = (value) => {
         setSearchTerm(value);
 
-        const filtered = document.filter((row) =>
+        const filtered = states.filter((row) =>
             Object.values(row).some(
                 (v) =>
                     v &&
@@ -321,12 +351,12 @@ function State() {
         Object.entries(row).forEach(([key, val]) => {
             dispatch({ type: "text", name: key, value: val });
         });
-        const roleValue =
-            row.roleId
-                ? (typeof row.roleId === "object" ? row.roleId._id : row.roleId)
-                : "";
+        // const roleValue =
+        //     row.roleId
+        //         ? (typeof row.roleId === "object" ? row.roleId._id : row.roleId)
+        //         : "";
 
-        dispatch({ type: "text", name: "roleId", value: roleValue });
+        // dispatch({ type: "text", name: "roleId", value: roleValue });
 
         setDialogOpen(true);
     };
@@ -496,6 +526,7 @@ function State() {
                                 <tr className="border-b border-slate-700">
                                     <th className="py-3 px-4 text-left">State Code</th>
                                     <th className="py-3 px-4 text-left">State Name</th>
+                                    <th className="py-3 px-4 text-left">Country Name</th>
                                     <th className="py-3 px-4 text-left">Actions</th>
                                 </tr>
                             </thead>
@@ -524,6 +555,7 @@ function State() {
                                         >
                                             <td className="py-3 px-4">{row.StateCode}</td>
                                             <td className="py-3 px-4">{row.StateName}</td>
+                                            <td className="py-3 px-4">{row.CountryName}</td>
                                           
 
                                             <td className="py-3 px-4 flex gap-2">
@@ -564,7 +596,7 @@ function State() {
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogContent
                     className="sm:max-w-[600px]"
-                    title={isEdit ? "Edit Document" : "Add Document"}
+                    title={isEdit ? "Edit State" : "Add State"}
                     onClose={() => setDialogOpen(false)}
                 >
                     <div className="space-y-4">
@@ -588,6 +620,24 @@ function State() {
                                         storeDispatch(e.target.value, "StateName")
                                     }
                                 />
+                            </div>
+
+                            <div>
+                                <Label>Country *</Label>
+
+                                <select
+                                    className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 text-sm text-slate-100"
+                                    value={state.CountryID}
+                                    onChange={(e) => storeDispatch(e.target.value, "CountryID")}
+                                >
+                                    <option value="">Select Country</option>
+
+                                    {country.map((count) => (
+                                        <option key={count._id} value={count._id}>
+                                            {count.CountryName}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
 

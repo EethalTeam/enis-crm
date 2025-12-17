@@ -31,6 +31,7 @@ import Rolepages from '@/pages/Rolepages';
 import Document from '@/pages/Document';
 import State from '@/pages/State'
 import City from '@/pages/City'
+import Country from '@/pages/Country'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { DataProvider } from '@/contexts/DataContext';
 import MenuRegistry from '@/pages/MenuRegistry';
@@ -83,6 +84,7 @@ function App() {
             <Route path="/masters/Document" element={<Document />} />
             <Route path="/masters/state" element={<State />} />
             <Route path="/masters/city" element={<City />} />
+            <Route path="/masters/country" element={<Country />} />
             
           </Route>
         </Routes>

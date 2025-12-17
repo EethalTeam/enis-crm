@@ -28,7 +28,8 @@ import {
   ArrowLeftRight,
   UserCog,
   ShieldCheck,
-  MenuSquare
+  MenuSquare,
+  Flag
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -62,10 +63,8 @@ const iconMap = {
     ArrowLeftRight,
   UserCog,
   ShieldCheck,
-  MenuSquare
-
-
-
+  MenuSquare,
+  Flag
 };
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -98,7 +97,8 @@ const navItems = [
       { icon: Building2, label: 'City', path: '/masters/city' },
       { icon: Users, label: 'Employees', path: '/masters/employees' },
       { icon: Layers, label: 'Plot Status', path: '/masters/plotStatus' },
-      { icon: FileText, label: 'Document Type', path: '/masters/Document' }
+      { icon: FileText, label: 'Document Type', path: '/masters/Document' },
+      { icon: Flag, label: 'Country', path: '/masters/Country' }
 
 
     ]
