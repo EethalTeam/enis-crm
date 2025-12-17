@@ -274,7 +274,7 @@ export const AuthProvider = ({ children }) => {
   // };
 
   const getPermissionsByPath = async(path) => {
-  const roleName = user.role || localStorage.getItem("role"); // read role from localStorage
+  const roleName = localStorage.getItem("role"); // read role from localStorage
   if (!roleName) return null;
 
   try {
