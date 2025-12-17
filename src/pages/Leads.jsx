@@ -218,7 +218,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
 
     const getCountryList = useCallback(async () => {
         try {
-            let url = config.Api + "Country/getAllCountrys";
+            let url = config.Api + "Country/getAllCountry";
             const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), });
             const result = await response.json();
             setAvailableCountries(Array.isArray(result) ? result : result.data || []);

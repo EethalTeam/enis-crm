@@ -29,7 +29,9 @@ import {
   UserCog,
   ShieldCheck,
   MenuSquare,
-  Flag
+  Flag,
+  TrendingUp,
+  SquareCode
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -64,7 +66,9 @@ const iconMap = {
   UserCog,
   ShieldCheck,
   MenuSquare,
-  Flag
+  Flag,
+  TrendingUp,
+  SquareCode
 };
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -98,7 +102,9 @@ const navItems = [
       { icon: Users, label: 'Employees', path: '/masters/employees' },
       { icon: Layers, label: 'Plot Status', path: '/masters/plotStatus' },
       { icon: FileText, label: 'Document Type', path: '/masters/Document' },
-      { icon: Flag, label: 'Country', path: '/masters/Country' }
+      { icon: Flag, label: 'Country', path: '/masters/Country' },
+      { icon: TrendingUp, label: 'Lead Status', path: '/masters/leadstatus' },
+      { icon: SquareCode, label: 'Lead Source', path: '/masters/leadsource' }
 
 
     ]

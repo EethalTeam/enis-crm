@@ -35,6 +35,8 @@ import Country from '@/pages/Country'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { DataProvider } from '@/contexts/DataContext';
 import MenuRegistry from '@/pages/MenuRegistry';
+import LeadSource from '@/pages/LeadSource';
+import LeadStatus from '@/pages/LeadStatus'
 
 function PrivateRoute({ children }) {
    const token = localStorage.getItem('token');
@@ -85,6 +87,8 @@ function App() {
             <Route path="/masters/state" element={<State />} />
             <Route path="/masters/city" element={<City />} />
             <Route path="/masters/country" element={<Country />} />
+            <Route path="/masters/leadstatus" element={<LeadStatus />} />
+            <Route path="/masters/leadsource" element={<LeadSource />} />
             
           </Route>
         </Routes>
