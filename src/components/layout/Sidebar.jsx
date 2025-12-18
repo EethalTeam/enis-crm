@@ -161,7 +161,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   };
   const hasAccess = (path) => {
     const userRole = user.role;
-    if (userRole === 'superadmin') return true;
+    // if (userRole === 'superadmin') return true;
     const rolePermissions = menuPermissions[userRole];
     // const rolePermissions = ['*'];
     if (!rolePermissions) return false;
@@ -172,7 +172,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
   const filteredMenuItems = MENU.map(item => {
     // const filteredMenuItems = ALL_MENU_ITEMS.map(item => {
-    if (user.role === 'superadmin') return item;
+    // if (user.role === 'superadmin') return item;
 
     if (item.subItems.length > 0) {
       const accessibleSubItems = item.subItems.filter(sub => hasAccess(sub.path));
