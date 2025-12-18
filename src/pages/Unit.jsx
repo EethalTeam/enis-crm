@@ -496,9 +496,9 @@ function UnitsContent() {
     <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
       
       {/* HEADER */}
-      <div className="flex items-center justify-between">
+      <div className="flex md:flex-row flex-col items-start md:justify-between space-y-5">
         <h1 className="text-3xl font-bold text-white">Units</h1>
-        <div className="flex gap-3">
+        <div className="grid md:grid-cols-3 grid-cols-2 items-start gap-3">
           <Button variant="outline" onClick={handleImport} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
             <Upload className="w-4 h-4 mr-2" /> Import
           </Button>

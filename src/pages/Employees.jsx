@@ -227,31 +227,31 @@ function EmployeeContent() {
     const [isEdit, setIsEdit] = useState(false);
     const [viewData, setViewData] = useState({});
     const [role, setRole] = useState([])
-     const { getPermissionsByPath } = useAuth();
-  const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
+    const { getPermissionsByPath } = useAuth();
+    const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
     // ------------------- FETCH EMPLOYEES -------------------
     useEffect(() => {
-       
+
         getAllRole();
     }, []);
 
-     useEffect(() => {
-    getPermissionsByPath(window.location.pathname).then(res => {
-      if (res) {
-        console.log(res, "res")
-        setPermissions(res)
-      } else {
-        navigate('/dashboard')
-      }
-    })
+    useEffect(() => {
+        getPermissionsByPath(window.location.pathname).then(res => {
+            if (res) {
+                console.log(res, "res")
+                setPermissions(res)
+            } else {
+                navigate('/dashboard')
+            }
+        })
 
-  }, [])
+    }, [])
 
-useEffect(()=>{
-    if (Permissions.isView) {
-      getAllEmployees();
-    }
-},[Permissions])
+    useEffect(() => {
+        if (Permissions.isView) {
+            getAllEmployees();
+        }
+    }, [Permissions])
 
 
 
@@ -502,21 +502,21 @@ useEffect(()=>{
     return (
         <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
             {/* HEADER */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-start space-y-3 md:items-center justify-between">
                 <h1 className="text-3xl font-bold text-white">Employees</h1>
-              
-              {
-                Permissions.isAdd && 
-                 <Button
-                    onClick={() => {
-                        clear();
-                        setDialogOpen(true);
-                    }}
-                    className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white"
-                >
-                    <Plus className="w-4 h-4 mr-2" /> Add Employee
-                </Button>
-              } 
+
+                {
+                    Permissions.isAdd &&
+                    <Button
+                        onClick={() => {
+                            clear();
+                            setDialogOpen(true);
+                        }}
+                        className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white"
+                    >
+                        <Plus className="w-4 h-4 mr-2" /> Add Employee
+                    </Button>
+                }
 
                 {/* <Button
                     onClick={() => {
@@ -530,7 +530,7 @@ useEffect(()=>{
             </div>
 
             {/* TABLE */}
-            <Card>
+            <Card className={`md:block hidden`}>
                 <CardContent className="p-6">
                     {/* SEARCH */}
                     <div className="flex gap-4 mb-6">
@@ -602,28 +602,28 @@ useEffect(()=>{
                                                 >
                                                     <Eye className="w-4 h-4 text-blue-400" />
                                                 </Button>
-                                        {
-                                            Permissions.isEdit &&
-                                                <Button
-                                                    variant="icon"
-                                                    size="icon"
-                                                    onClick={() => handleEditClick(row)}
-                                                >
-                                                    <Pencil className="w-4 h-4 text-yellow-400" />
-                                                </Button>
-                                        }
-                                            
-                                             
-                                             {
-                                                Permissions.isDelete && <Button
-                                                    variant="icon"
-                                                    size="icon"
-                                                    onClick={() => triggerDeleteConfirm(row)}
-                                                >
-                                                    <Trash2 className="w-4 h-4 text-red-400" />
-                                                </Button>
-                                             }
-                                                
+                                                {
+                                                    Permissions.isEdit &&
+                                                    <Button
+                                                        variant="icon"
+                                                        size="icon"
+                                                        onClick={() => handleEditClick(row)}
+                                                    >
+                                                        <Pencil className="w-4 h-4 text-yellow-400" />
+                                                    </Button>
+                                                }
+
+
+                                                {
+                                                    Permissions.isDelete && <Button
+                                                        variant="icon"
+                                                        size="icon"
+                                                        onClick={() => triggerDeleteConfirm(row)}
+                                                    >
+                                                        <Trash2 className="w-4 h-4 text-red-400" />
+                                                    </Button>
+                                                }
+
                                             </td>
                                         </motion.tr>
                                     ))
@@ -631,6 +631,139 @@ useEffect(()=>{
                             </tbody>
                         </table>
                     </div>
+                </CardContent>
+            </Card>
+
+            {/* Mobile view Card */}
+
+            <Card className={`md:hidden`}>
+                <CardContent className="p-6">
+                    {/* SEARCH */}
+                    <div className="flex gap-4 mb-6">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" />
+                            <Input
+                                placeholder="Search employees..."
+                                value={searchTerm}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                                className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white"
+                            />
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={() => getAllEmployees()}
+                            className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
+                        >
+                            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                        </Button>
+                    </div>
+
+                    {/* MOBILE CARD VIEW */}
+                    <div className="md:hidden space-y-4">
+                        {loading && filteredData.length === 0 ? (
+                            <div className="text-center py-8 text-fuchsia-400">
+                                <Loader2 className="animate-spin inline mr-2" /> Loading...
+                            </div>
+                        ) : filteredData.length === 0 ? (
+                            <div className="text-center py-8 text-slate-400">
+                                No employees found.
+                            </div>
+                        ) : (
+                            filteredData.map((row, index) => (
+                                <motion.div
+                                    key={row._id || index}
+                                    initial={{ opacity: 0, y: 12 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                >
+                                    <Card className=" backdrop-blur-lg shadow-md">
+
+                                        {/* TOP ACCENT */}
+                                        {/* <div className="h-1 w-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-indigo-500" /> */}
+
+                                        <CardContent className="p-4 space-y-3">
+
+                                            {/* HEADER */}
+                                            <div className="flex items-start justify-between">
+                                                <div>
+                                                    <p className="text-xs text-fuchsia-300 uppercase tracking-wide">
+                                                        Employee
+                                                    </p>
+                                                    <h3 className="text-lg font-semibold text-white">
+                                                        {row.EmployeeName}
+                                                    </h3>
+                                                </div>
+
+                                                <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-fuchsia-900/40 text-fuchsia-300 border border-fuchsia-700">
+                                                    {row.EmployeeCode}
+                                                </span>
+                                            </div>
+
+                                            {/* DETAILS */}
+                                            <div className="space-y-2 text-sm text-slate-300">
+                                                <div>
+                                                    <p className="text-xs text-slate-400">Email</p>
+                                                    <p className="text-white font-medium break-all">
+                                                        {row.employeeEmail}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <p className="text-xs text-slate-400">Phone</p>
+                                                    <p className="text-white font-medium">
+                                                        {row.employeePhone}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <p className="text-xs text-slate-400">Role</p>
+                                                    <p className="text-white font-medium">
+                                                        {row.roleId?.RoleName}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* ACTIONS */}
+                                            <div className="flex justify-start gap-2 pt-3 border-t border-slate-700/50">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="hover:bg-blue-500/20"
+                                                    onClick={() => handleViewClick(row)}
+                                                >
+                                                    <Eye className="w-4 h-4 text-blue-400" />
+                                                </Button>
+
+                                                {Permissions.isEdit && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="hover:bg-yellow-500/20"
+                                                        onClick={() => handleEditClick(row)}
+                                                    >
+                                                        <Pencil className="w-4 h-4 text-yellow-400" />
+                                                    </Button>
+                                                )}
+
+                                                {Permissions.isDelete && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="hover:bg-red-500/20"
+                                                        onClick={() => triggerDeleteConfirm(row)}
+                                                    >
+                                                        <Trash2 className="w-4 h-4 text-red-400" />
+                                                    </Button>
+                                                )}
+                                            </div>
+
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            ))
+                        )}
+                    </div>
+
                 </CardContent>
             </Card>
 

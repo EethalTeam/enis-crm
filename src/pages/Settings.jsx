@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 
-export default function Settings() {
+export default function Settings() {                    
   const { toast } = useToast();
 
   const handleSave = () => {
@@ -25,9 +25,10 @@ export default function Settings() {
         <meta name="description" content="Configure your CRM settings, integrations, and preferences." />
       </Helmet>
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Settings</h1>
+        <h1 className="text-3xl font-bold text-white dark:text-white">Settings</h1>
 
         <Tabs defaultValue="general" className="space-y-6">
+          
           <TabsList>
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="channels">Channels</TabsTrigger>

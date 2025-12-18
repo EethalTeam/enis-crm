@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import PIOPIY from 'piopiyjs'; 
+import PIOPIY from 'piopiyjs';
 import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus, Phone, FileText, Contact, Clock, PhoneOff } from 'lucide-react';
 
 // --- CONFIGURATION & IMPORTS ---
@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 // TeleCMI Credentials
 const CREDENTIALS = {
-    userId: '5002_33336639', 
+    userId: '5002_33336639',
     password: 'admin@123',
     sbcUrl: 'sbcind.telecmi.com'
 };
@@ -116,10 +116,10 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
 
     const handleAction = () => {
         if (!isLoggedIn) return alert("Dialer connecting...");
-        
+
         if (callStatus === 'Idle') {
             const cleanNumber = number.replace(/\D/g, '');
-            console.log(cleanNumber,"cleanNumber")
+            console.log(cleanNumber, "cleanNumber")
             if (piopiyInstance) piopiyInstance.call(cleanNumber);
         } else {
             if (piopiyInstance) piopiyInstance.terminate();
@@ -137,9 +137,9 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
                         {callStatus !== 'Idle' && callStatus}
                     </p>
 
-                    <Button 
+                    <Button
                         className={`w-full ${callStatus === 'Idle' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
-                        onClick={handleAction} 
+                        onClick={handleAction}
                         disabled={!isLoggedIn}
                     >
                         {callStatus === 'Idle' ? (
@@ -353,14 +353,14 @@ function LeadsContent() {
         <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
             <div className="flex md:flex-row flex-col items-start md:justify-between gap-3">
                 <h1 className="text-3xl font-bold text-white">Leads</h1>
-                <div className="flex md:flex-row flex-col gap-3">
+                <div className="grid md:grid-cols-3 grid-cols-2 gap-3">
                     <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Upload className="w-4 h-4 mr-2" />Import</Button>
                     <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Download className="w-4 h-4 mr-2" />Export</Button>
                     {Permissions.isAdd && <Button onClick={() => { setDialogMode('create'); setSelectedLead(null); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0"><Plus className="w-4 h-4 mr-2" />Add Lead</Button>}
                 </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
+            <div className="flex  md:flex-row flex-col items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg md:w-fit w-full border border-slate-800">
                 <TabButton id="new" label="New Leads" icon={Plus} />
                 <TabButton id="followups" label="Follow-ups" icon={PhoneCall} />
                 <TabButton id="visits" label="Visits" icon={MapPin} />
@@ -395,23 +395,105 @@ function LeadsContent() {
             </Card>
 
             {/* Mobile Card View */}
-            <Card className='md:hidden block'>
-                <CardContent className="p-6">
-                    <div className="space-y-4">
-                        {getFilteredLeads().map((l) => (
-                            <div key={l._id} className="bg-slate-900 border border-fuchsia-700/40 rounded-xl p-4 shadow-lg hover:bg-purple-800/60 transition-all">
-                                <div className="flex justify-between items-center mb-2 gap-2"><h3 className=" font-bold text-white">{l.leadFirstName} {l.leadLastName}</h3><Badge className={statusColors[l.leadStatusId?.name] || 'bg-slate-600'}>{l.leadStatusId?.name || 'New'}</Badge></div>
-                                <div className="flex items-center gap-2 mb-1 text-purple-300 text-sm"><MapPin className="w-4 h-4" /><span>{l.leadSiteId?.sitename || 'N/A'}</span></div>
-                                <div className="flex items-center gap-2 mb-1 text-fuchsia-300 text-sm"><Phone className="w-4 h-4" /><span>{l.leadPhone}</span></div>
-                                <div className="flex justify-end gap-2 border-t border-purple-700/40 pt-2">
-                                    <Button variant="icon" size="icon" onClick={() => { setLeadToAssign({ id: l._id, original: l }); setAssignDialogOpen(true); }} className="text-green-400"><UserPlus className="w-4 h-4" /></Button>
-                                    <Button variant="icon" size="icon" onClick={() => { setSelectedLead(l); setDialogMode('view'); setDialogOpen(true); }} className="text-blue-400"><Eye className="w-4 h-4" /></Button>
-                                </div>
+            <div className="md:hidden space-y-4">
+                {getFilteredLeads().map((l) => (
+                    <Card
+                        key={l._id}
+                        className="bg-purple-900/40 border border-fuchsia-700/50"
+                    >
+                        <CardContent className="p-4 space-y-3">
+
+                            {/* NAME + STATUS */}
+                            <div className="flex justify-between items-start">
+                                <h3
+                                    className="text-fuchsia-400 font-semibold cursor-pointer"
+                                    onClick={() => {
+                                        setNotesLead(l);
+                                        setNoteText('');
+                                        setNotesDialogOpen(true);
+                                    }}
+                                >
+                                    {l.leadFirstName} {l.leadLastName}
+                                </h3>
+
+                                <Badge className={statusColors[l.leadStatusId?.name] || 'bg-slate-700'}>
+                                    {l.leadStatusId?.name || 'New'}
+                                </Badge>
                             </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+
+                            {/* SITE */}
+                            <p className="text-sm text-slate-300">
+                                <span className="text-slate-400">Site:</span>{" "}
+                                {l.leadSiteId?.sitename || 'N/A'}
+                            </p>
+
+                            {/* PHONE */}
+                            <div className="flex items-center gap-2 text-slate-300">
+                                <button
+                                    onClick={() => {
+                                        setCallNumber(l.leadPhone);
+                                        setCallDialogOpen(true);
+                                    }}
+                                >
+                                    <Phone size={18} className="hover:text-fuchsia-400" />
+                                </button>
+                                {l.leadPhone}
+                            </div>
+
+                            {/* ASSIGNED TO */}
+                            <p className="text-sm text-slate-300">
+                                <span className="text-slate-400">Assigned:</span>{" "}
+                                {l.leadAssignedId?.employeeName || 'Unassigned'}
+                            </p>
+
+                            {/* ACTIONS */}
+                            <div className="flex gap-3 pt-2 border-t border-slate-700">
+                                <Button
+                                    variant="icon"
+                                    size="icon"
+                                    onClick={() => {
+                                        setLeadToAssign({ id: l._id, name: l.leadFirstName, original: l });
+                                        setAssignDialogOpen(true);
+                                    }}
+                                    className="text-green-400"
+                                >
+                                    <UserPlus className="w-4 h-4" />
+                                </Button>
+
+                                <Button
+                                    variant="icon"
+                                    size="icon"
+                                    onClick={() => {
+                                        setSelectedLead(l);
+                                        setDialogMode('view');
+                                        setDialogOpen(true);
+                                    }}
+                                    className="text-blue-400"
+                                >
+                                    <Eye className="w-4 h-4" />
+                                </Button>
+
+                                {Permissions.isEdit && (
+                                    <Button
+                                        variant="icon"
+                                        size="icon"
+                                        onClick={() => {
+                                            setSelectedLead(l);
+                                            setDialogMode('edit');
+                                            setDialogOpen(true);
+                                        }}
+                                        className="text-yellow-400"
+                                    >
+                                        <Pencil className="w-4 h-4" />
+                                    </Button>
+                                )}
+                            </div>
+
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+
 
             <LeadDialog open={dialogOpen} onOpenChange={setDialogOpen} onSuccess={fetchLeads} initialData={selectedLead} mode={dialogMode} />
             <AssignDialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen} lead={leadToAssign} onSuccess={fetchLeads} />

@@ -775,7 +775,7 @@ function PlotsContent() {
         "
                 >
                   {/* SITE + STATUS ROW */}
-                  <div className="flex justify-between items-center mb-2">
+                  <div className=" space-y-2 mb-3">
                     <h3 className="text-xs font-bold text-white">
                       {row?.siteId?.sitename || '-'}
                     </h3>

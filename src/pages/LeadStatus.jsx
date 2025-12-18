@@ -1,4 +1,4 @@
-  import React, {
+import React, {
     useState,
     useEffect,
     useReducer,
@@ -23,10 +23,10 @@ import { useNavigate } from "react-router-dom";
 
 // ------------------- REDUCER -------------------
 const initialState = {
-   leadStatusCode:'',
-   leadStatustName:'',
-   leadStatusColor:'',
-   leadStatusTextColor:'',
+    leadStatusCode: '',
+    leadStatustName: '',
+    leadStatusColor: '',
+    leadStatusTextColor: '',
     isActive: true
 };
 
@@ -222,11 +222,11 @@ function LeadStatus() {
     const [state, dispatch] = useReducer(DocumentReducer, initialState);
     const [isEdit, setIsEdit] = useState(false);
     const [viewData, setViewData] = useState({});
-    
+
     // ------------------- FETCH EMPLOYEES -------------------
     useEffect(() => {
         getAllLeadStatus();
-        
+
     }, []);
 
 
@@ -340,7 +340,7 @@ function LeadStatus() {
             "LeadStatus Name": row.leadStatustName,
             "LeadStatus Color": row.leadStatusColor,
             "LeadStatusText Color": row.leadStatusTextColor,
-          
+
         });
         setViewOpen(true);
     };
@@ -363,7 +363,7 @@ function LeadStatus() {
             });
             return;
         }
-         if (!state.leadStatusColor) {
+        if (!state.leadStatusColor) {
             toast({
                 title: "Error",
                 description: "Enter LeadStatus Background Color",
@@ -464,7 +464,7 @@ function LeadStatus() {
     return (
         <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
             {/* HEADER */}
-            <div className="flex items-center justify-between">
+            <div className="flex md:flex-row flex-col items-start space-y-3 md:items-center md:justify-between">
                 <h1 className="text-3xl font-bold text-white">Lead Status</h1>
                 <Button
                     onClick={() => {
@@ -476,19 +476,11 @@ function LeadStatus() {
                     <Plus className="w-4 h-4 mr-2" /> Add LeadStatus
                 </Button>
 
-                {/* <Button
-                    onClick={() => {
-                        clear();
-                        setDialogOpen(true);
-                    }}
-                    className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white"
-                >
-                    <Plus className="w-4 h-4 mr-2" /> Add Employee
-                </Button> */}
+
             </div>
 
             {/* TABLE */}
-            <Card>
+            <Card className={`md:block hidden`}>
                 <CardContent className="p-6">
                     {/* SEARCH */}
                     <div className="flex gap-4 mb-6">
@@ -545,11 +537,11 @@ function LeadStatus() {
                                             transition={{ delay: index * 0.05 }}
                                             className="border-b border-slate-800 hover:bg-slate-800/50"
                                         >
-                                            <td className="py-3 px-4"> <input type="color" value={row.leadStatusColor}/></td>
-                                            <td className="py-3 px-4"> <input type='color' value={row.leadStatusTextColor}/></td>
+                                            <td className="py-3 px-4"> <input type="color" value={row.leadStatusColor} /></td>
+                                            <td className="py-3 px-4"> <input type='color' value={row.leadStatusTextColor} /></td>
                                             <td className="py-3 px-4">{row.leadStatusCode}</td>
                                             <td className="py-3 px-4">{row.leadStatustName}</td>
-                                          
+
 
                                             <td className="py-3 px-4 flex gap-2">
                                                 <Button
@@ -585,6 +577,131 @@ function LeadStatus() {
                 </CardContent>
             </Card>
 
+            {/* Mobile view Card */}
+
+            <Card className={`md:hidden`}>
+                <CardContent className="p-6">
+                    {/* SEARCH */}
+                    <div className="flex gap-4 mb-6">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" />
+                            <Input
+                                placeholder="Search LeadSource Name..."
+                                value={searchTerm}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                                className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white"
+                            />
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={() => getAllLeadStatus()}
+                            className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
+                        >
+                            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                        </Button>
+                    </div>
+
+                    {/* MOBILE CARD VIEW */}
+                    <div className="md:hidden space-y-4">
+                        {loading && filteredData.length === 0 ? (
+                            <div className="text-center py-8 text-fuchsia-400">
+                                <Loader2 className="animate-spin inline mr-2" /> Loading...
+                            </div>
+                        ) : filteredData.length === 0 ? (
+                            <div className="text-center py-8 text-slate-400">
+                                No LeadStatus found.
+                            </div>
+                        ) : (
+                            filteredData.map((row, index) => (
+                                <motion.div
+                                    key={row._id || index}
+                                    initial={{ opacity: 0, y: 12 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                >
+                                    <Card className=" backdrop-blur-lg shadow-md">
+
+                                        {/* TOP ACCENT */}
+                                        {/* <div className="h-1 w-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-indigo-500" /> */}
+
+                                        <CardContent className="p-4 space-y-3">
+
+                                            {/* HEADER */}
+                                            <div className="flex items-start justify-between">
+                                                <div>
+                                                    <p className="text-xs text-fuchsia-300 uppercase tracking-wide">
+                                                        Lead Status
+                                                    </p>
+                                                    <h3 className="text-lg font-semibold text-white">
+                                                        {row.leadStatustName}
+                                                    </h3>
+                                                </div>
+
+                                                <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-fuchsia-900/40 text-fuchsia-300 border border-fuchsia-700">
+                                                    {row.leadStatusCode}
+                                                </span>
+                                            </div>
+
+                                            {/* COLORS */}
+                                            <div className="flex items-center gap-6">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-slate-400">Lead Color</span>
+                                                    <span
+                                                        className="w-5 h-5 rounded border border-slate-500"
+                                                        style={{ backgroundColor: row.leadStatusColor }}
+                                                    />
+                                                </div>
+
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-slate-400">Text Color</span>
+                                                    <span
+                                                        className="w-5 h-5 rounded border border-slate-500"
+                                                        style={{ backgroundColor: row.leadStatusTextColor }}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* ACTIONS */}
+                                            <div className="flex justify-start gap-2 pt-3 border-t border-slate-700/50">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="hover:bg-blue-500/20"
+                                                    onClick={() => handleViewClick(row)}
+                                                >
+                                                    <Eye className="w-4 h-4 text-blue-400" />
+                                                </Button>
+
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="hover:bg-yellow-500/20"
+                                                    onClick={() => handleEditClick(row)}
+                                                >
+                                                    <Pencil className="w-4 h-4 text-yellow-400" />
+                                                </Button>
+
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="hover:bg-red-500/20"
+                                                    onClick={() => triggerDeleteConfirm(row)}
+                                                >
+                                                    <Trash2 className="w-4 h-4 text-red-400" />
+                                                </Button>
+                                            </div>
+
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            ))
+                        )}
+                    </div>
+
+
+                </CardContent>
+            </Card>
+
             {/* ADD/EDIT DIALOG */}
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogContent
@@ -596,7 +713,7 @@ function LeadStatus() {
                         {/* FORM */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                           <div>
+                            <div>
                                 <Label>LeadStatus Color *</Label>
                                 <Input type='color'
                                     value={state.leadStatusColor}
@@ -607,7 +724,7 @@ function LeadStatus() {
                             </div>
 
 
-                             <div>
+                            <div>
                                 <Label>LeadStatus TextColor *</Label>
                                 <Input type='color'
                                     value={state.leadStatusTextColor}

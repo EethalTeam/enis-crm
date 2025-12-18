@@ -21,8 +21,8 @@ import {
   Shield,
   ChevronDown,
   LandPlot,
-    Landmark,
-   Users2,   
+  Landmark,
+  Users2,
   Layers,
   FileText,
   ArrowLeftRight,
@@ -31,7 +31,8 @@ import {
   MenuSquare,
   Flag,
   TrendingUp,
-  SquareCode
+  SquareCode,
+  X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -59,10 +60,10 @@ const iconMap = {
   ChevronDown,
   LandPlot,
   Landmark,
-   Users2,   
+  Users2,
   Layers,
   FileText,
-    ArrowLeftRight,
+  ArrowLeftRight,
   UserCog,
   ShieldCheck,
   MenuSquare,
@@ -96,7 +97,7 @@ const navItems = [
     icon: ClipboardList, label: 'Master Forms',
     children: [
       { icon: Landmark, label: 'Site', path: '/masters/site' },
-      { icon:  Users2, label: 'Unit', path: '/masters/unit' },
+      { icon: Users2, label: 'Unit', path: '/masters/unit' },
       { icon: MapPin, label: 'State', path: '/masters/state' },
       { icon: Building2, label: 'City', path: '/masters/city' },
       { icon: Users, label: 'Employees', path: '/masters/employees' },
@@ -116,7 +117,7 @@ const navItems = [
   {
     icon: Shield, label: 'Admin Panel',
     children: [
-      {icon: MenuSquare,  label: 'Menu Registry', path: '/adminpanel/menu' },
+      { icon: MenuSquare, label: 'Menu Registry', path: '/adminpanel/menu' },
       { icon: ShieldCheck, label: 'Role', path: '/masters/rolepages' },
       { icon: UserCog, label: 'user Rights', path: '/adminpanel/rights' },
       { icon: ArrowLeftRight, label: 'Transfer', path: '/adminpanel/transfer' },
@@ -182,16 +183,21 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     }
     return hasAccess(item.path) ? item : null;
   }).filter(Boolean);
-  console.log(filteredMenuItems,"filteredMenuItems")
+  console.log(filteredMenuItems, "filteredMenuItems")
   return (
     <motion.aside
       initial={false}
-      animate={{ width: isOpen ? (window.innerWidth < 768 ? 220 : 280) : 80 }}
+      animate={{ width: isOpen ? (window.innerWidth < 768 ? 200 : 280) : 80 }}
       transition={{ duration: 0.3 }}
-      className="bg-black/20 backdrop-filter backdrop-blur-lg border-r border-purple-700/50 flex flex-col"
+      className={`
+    bg-black/20 bg-gradient-to-b from-[#1b0a2c] via-[#2a133b] to-[#3a1b4a]
+    border-r border-purple-700/50 flex flex-col
+  ${isOpen ? 'fixed ' : ''}   md:relative top-0 left-0 h-full
+    z-40
+  `}
     >
       <div className="p-6 border-b border-purple-700/50">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center md:gap-3 gap-10">
           <div className="w-10 h-10 bg-gradient-to-r from-pink-600 to-fuchsia-600 rounded-lg flex items-center justify-center">
             <Sparkles className="w-6 h-6 text-white" />
           </div>
@@ -202,24 +208,33 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               transition={{ delay: 0.1 }}
             >
               <h2 className="font-bold text-xl text-white text-glow hidden md:block">ENIS CRM</h2>
+              {/* ✅ MOBILE CLOSE BUTTON */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="md:hidden ml-7 p-2 rounded-full
+             bg-gradient-to-r from-pink-600 to-fuchsia-600
+             hover:opacity-90 transition"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
             </motion.div>
           )}
         </div>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-hide">
+      <nav className="md:flex-1 p-4 space-y-1 overflow-y-auto scrollbar-hide">
         {filteredMenuItems.sort((a, b) => {
-    const numA = +a.id.match(/\d+/)[0]; 
-    const numB = +b.id.match(/\d+/)[0];
-    return numA - numB;
-  })
-  .map((item) => {
-     let Icon = iconMap[item.icon] || CheckSquare
-          if (item.subItems.length > 0) {
-            // Render Parent with Submenu
-            const isActive = isParentActive(item.subItems);
-            const isOpenMenu = openMenu === item.label;
-           
+          const numA = +a.id.match(/\d+/)[0];
+          const numB = +b.id.match(/\d+/)[0];
+          return numA - numB;
+        })
+          .map((item) => {
+            let Icon = iconMap[item.icon] || CheckSquare
+            if (item.subItems.length > 0) {
+              // Render Parent with Submenu
+              const isActive = isParentActive(item.subItems);
+              const isOpenMenu = openMenu === item.label;
+
 
               return (
                 <div key={item.label} className="space-y-1">
@@ -252,39 +267,40 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     </div>
                   </div>
 
-                <AnimatePresence>
-                  {isOpen && isOpenMenu && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden ml-4 border-l-2 border-purple-700/30 pl-2 space-y-1"
-                    >
-                      {item.subItems.map((subItem) => {
-                        Icon = iconMap[subItem.icon]
-                        return (
-                        <NavLink
-                          key={subItem.path}
-                          to={subItem.path}
-                          className={({ isActive }) =>
-                            cn(
-                              'flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 text-sm',
-                              isActive
-                                ? 'text-white font-medium bg-white/10'
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'
-                            )
-                          }
-                        >
-                           <Icon className="w-5 h-5 flex-shrink-0" />
-                          {subItem.label}
-                        </NavLink>
-                      )})}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          }
+                  <AnimatePresence>
+                    {isOpen && isOpenMenu && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden ml-4 border-l-2 border-purple-700/30 pl-2 space-y-1"
+                      >
+                        {item.subItems.map((subItem) => {
+                          Icon = iconMap[subItem.icon]
+                          return (
+                            <NavLink
+                              key={subItem.path}
+                              to={subItem.path}
+                              className={({ isActive }) =>
+                                cn(
+                                  'flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 text-sm',
+                                  isActive
+                                    ? 'text-white font-medium bg-white/10'
+                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                )
+                              }
+                            >
+                              <Icon className="w-5 h-5 flex-shrink-0" />
+                              {subItem.label}
+                            </NavLink>
+                          )
+                        })}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            }
 
             // Render Standard Menu Item
             return (

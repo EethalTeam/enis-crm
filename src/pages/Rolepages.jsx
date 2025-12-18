@@ -615,7 +615,7 @@ function Rolepages() {
                         </Button>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3   gap-6">
                         {loading && filteredData.length === 0 ? (
                             <div className="text-center py-8">
                                 <Loader2 className="animate-spin inline mr-2" /> Loading...
@@ -632,8 +632,8 @@ function Rolepages() {
                                     className="border border-slate-800 rounded-lg p-4 
                                                   bg-slate-900/60 hover:bg-slate-900 
                                                     backdrop-blur-md shadow-lg hover:shadow-xl
-                                                      transition-all duration-300 
-                                                      flex flex-col gap-3 w-[260px]"
+                                                      
+                                                      flex flex-col gap-3 md:w-[260px]"
                                 >
                                     {/* ROLE DETAILS */}
                                     <div className="">

@@ -346,15 +346,15 @@ function MenuRegistryInner() {
   /* ---------------- JSX render ---------------- */
   return (
     <div className="space-y-6 p-4 min-h-screen bg-slate-950 text-slate-100">
-      <div className="flex items-center justify-between">
+      <div className="flex md:flex-row flex-col items-center justify-between">
         <h1 className="text-2xl font-bold">Menu Registry</h1>
-        <div className="flex items-center gap-3">
+        <div className=" flex  flex-row  items-start mt-5 gap-3">
           <Button onClick={() => fetchMenus()} variant="outline" className="flex items-center gap-2">
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Refresh
           </Button>
           {
             Permissions.isAdd && 
-             <Button onClick={openAdd} className="flex items-center gap-2">
+             <Button onClick={openAdd} className="flex items-center ">
             <Plus className="w-4 h-4" /> Add Menu
           </Button>
           }

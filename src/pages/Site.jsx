@@ -444,7 +444,7 @@ function SitesContent() {
     <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
       
       {/* HEADER */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4">
         <h1 className="text-3xl font-bold text-white flex items-center gap-2"><Building className="text-fuchsia-600"/> Sites</h1>
         <div className="flex gap-3">
           {
@@ -456,7 +456,7 @@ function SitesContent() {
       </div>
 
       {/* TABLE */}
-      <Card>
+      <Card className={`hidden md:block`}>
         <CardContent className="p-6">
           <div className="flex gap-4 mb-6">
             <div className="relative flex-1">
@@ -510,6 +510,121 @@ function SitesContent() {
           </div>
         </CardContent>
       </Card>
+
+
+      {/* mobile view Card */}
+      <Card className={` md:hidden`}>
+        <CardContent className="p-6">
+          <div className="flex gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" />
+              <Input placeholder="Search sites..." value={searchTerm} onChange={(e) => handleSearchChange(e.target.value)} className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white" />
+            </div>
+            <Button variant="outline" onClick={() => getSites()} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /></Button>
+          </div>
+
+          {/* MOBILE CARD VIEW */}
+<div className="md:hidden space-y-4">
+  {loading && filteredData.length === 0 ? (
+    <div className="text-center py-8 text-fuchsia-400">
+      <Loader2 className="animate-spin inline mr-2" /> Loading...
+    </div>
+  ) : filteredData.length === 0 ? (
+    <div className="text-center py-8 text-slate-400">
+      No sites found.
+    </div>
+  ) : (
+    filteredData.map((row, index) => (
+      <motion.div
+        key={row._id || index}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.05 }}
+      >
+        <Card className=" backdrop-blur-lg shadow-md">
+          
+          {/* TOP STRIP */}
+          {/* <div className="h-1 w-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-indigo-500" /> */}
+
+          <CardContent className="p-4 space-y-3">
+
+            {/* HEADER */}
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs text-fuchsia-300 uppercase tracking-wide">
+                  Site Name
+                </p>
+                <h3 className="text-lg font-semibold text-white">
+                  {row.sitename}
+                </h3>
+              </div>
+            </div>
+
+            {/* DETAILS */}
+            <div className="space-y-2 text-sm text-slate-300">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-fuchsia-400" />
+                <span>{row.location}</span>
+              </div>
+
+              <div>
+                <span className="text-xs text-slate-400">City</span>
+                <p className="text-white font-medium">
+                  {row.city?.CityName || row.city}
+                </p>
+              </div>
+
+              <div>
+                <span className="text-xs text-slate-400">State</span>
+                <p className="text-white font-medium">
+                  {row.state?.StateName || row.state}
+                </p>
+              </div>
+            </div>
+
+            {/* ACTIONS */}
+            <div className="flex justify-start gap-2 pt-3 border-t border-slate-700/50">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-blue-500/20"
+                onClick={() => handleViewClick(row)}
+              >
+                <Eye className="w-4 h-4 text-blue-400" />
+              </Button>
+
+              {Permissions.isEdit && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-yellow-500/20"
+                  onClick={() => handleEditClick(row)}
+                >
+                  <Pencil className="w-4 h-4 text-yellow-400" />
+                </Button>
+              )}
+
+              {Permissions.isDelete && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-red-500/20"
+                  onClick={() => triggerDeleteConfirm(row)}
+                >
+                  <Trash2 className="w-4 h-4 text-red-400" />
+                </Button>
+              )}
+            </div>
+
+          </CardContent>
+        </Card>
+      </motion.div>
+    ))
+  )}
+</div>
+
+          </CardContent>
+          </Card>
 
       {/* --- ADD/EDIT DIALOG --- */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

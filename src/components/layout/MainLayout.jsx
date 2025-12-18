@@ -9,9 +9,9 @@ export default function MainLayout() {
   return (
     <div className="flex h-screen bg-gradient-to-br from-[#1b0a2c] via-[#2a133b] to-[#3a1b4a] text-white">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="md:flex-1 flex flex-col overflow-hidden">
         <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 overflow-y-auto p-3 md:p-6 scrollbar-hide ">
+        <main className="md:flex-1 overflow-y-auto p-3 md:p-6 scrollbar-hide ">
           <Outlet />
         </main>
       </div>
