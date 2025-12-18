@@ -16,20 +16,13 @@ const CREDENTIALS = {
 };
 
 const statusColors = {
-    'New': 'bg-blue-600 text-white',
-    'Contacted': 'bg-indigo-600 text-white',
-    'Qualified': 'bg-purple-600 text-white',
-    'Proposal Sent': 'bg-yellow-600 text-white',
-    'Negotiation': 'bg-orange-600 text-white',
-    'Won': 'bg-green-600 text-white',
-    'Lost': 'bg-red-600 text-white',
-    'Follow Up': 'bg-pink-600 text-white',
-    'Site Visit': 'bg-emerald-600 text-white',
-    'Junk': 'bg-slate-600 text-slate-300',
-    'Closed': 'bg-slate-700 text-slate-300',
+    'New': 'bg-blue-600 text-white', 'Contacted': 'bg-indigo-600 text-white', 'Qualified': 'bg-purple-600 text-white',
+    'Proposal Sent': 'bg-yellow-600 text-white', 'Negotiation': 'bg-orange-600 text-white', 'Won': 'bg-green-600 text-white',
+    'Lost': 'bg-red-600 text-white', 'Follow Up': 'bg-pink-600 text-white', 'Site Visit': 'bg-emerald-600 text-white',
+    'Junk': 'bg-slate-600 text-slate-300', 'Closed': 'bg-slate-700 text-slate-300',
 };
 
-// --- UI COMPONENTS (UNCHANGED DESIGN) ---
+// --- UI COMPONENTS ---
 const Card = ({ className, children }) => (<div className={`rounded-lg border bg-slate-900 border-slate-800 shadow-sm ${className}`}>{children}</div>);
 const CardContent = ({ className, children }) => (<div className={className}>{children}</div>);
 const Badge = ({ className, children }) => (<div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent ${className}`}>{children}</div>);
@@ -96,57 +89,31 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
     );
 };
 
-// --- UPDATED CALL DIALOG WITH ENHANCED UI ---
+// --- CALL DIALOG ---
 const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) => {
-    const [callStatus, setCallStatus] = useState('Idle'); // Idle, Calling, Ringing, Connected
-
+    const [callStatus, setCallStatus] = useState('Idle');
     useEffect(() => {
         if (!piopiyInstance) return;
-
         piopiyInstance.on('trying', () => setCallStatus('Calling...'));
         piopiyInstance.on('ringing', () => setCallStatus('Ringing...'));
         piopiyInstance.on('answered', () => setCallStatus('Connected'));
         piopiyInstance.on('ended', () => setCallStatus('Idle'));
-        piopiyInstance.on('mediaFailed', () => {
-            setCallStatus('Idle');
-            alert('Please check your Audio Device/Permissions');
-        });
-
     }, [piopiyInstance]);
-
     const handleAction = () => {
-        if (!isLoggedIn) return alert("Dialer connecting...");
-
         if (callStatus === 'Idle') {
             const cleanNumber = number.replace(/\D/g, '');
-            console.log(cleanNumber, "cleanNumber")
             if (piopiyInstance) piopiyInstance.call(cleanNumber);
-        } else {
-            if (piopiyInstance) piopiyInstance.terminate();
-        }
+        } else { if (piopiyInstance) piopiyInstance.terminate(); }
     };
-
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[350px]">
                 <DialogHeader><div className="flex justify-between items-center w-full"><DialogTitle>Call Lead</DialogTitle><button onClick={() => onOpenChange(false)} className="text-slate-400 hover:text-white"><X size={20} /></button></div></DialogHeader>
                 <div className="p-6 text-center">
                     <p className="text-slate-400 mb-4">Phone Number</p>
-                    <h2 className="text-2xl font-bold text-white mb-2">{number}</h2>
-                    <p className={`text-sm mb-6 ${callStatus === 'Connected' ? 'text-green-400' : 'text-fuchsia-400'}`}>
-                        {callStatus !== 'Idle' && callStatus}
-                    </p>
-
-                    <Button
-                        className={`w-full ${callStatus === 'Idle' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
-                        onClick={handleAction}
-                        disabled={!isLoggedIn}
-                    >
-                        {callStatus === 'Idle' ? (
-                            <><Phone className="mr-2 w-4 h-4" /> Call Now</>
-                        ) : (
-                            <><PhoneOff className="mr-2 w-4 h-4" /> End Call</>
-                        )}
+                    <h2 className="text-2xl font-bold text-white mb-6">{number}</h2>
+                    <Button className={`w-full ${callStatus === 'Idle' ? 'bg-green-600' : 'bg-red-600'}`} onClick={handleAction} disabled={!isLoggedIn}>
+                        {callStatus === 'Idle' ? <><Phone className="mr-2 w-4 h-4" /> Call Now</> : <><PhoneOff className="mr-2 w-4 h-4" /> End Call</>}
                         {(callStatus === 'Calling...' || callStatus === 'Ringing...') && <Loader2 className="ml-2 w-4 h-4 animate-spin" />}
                     </Button>
                 </div>
@@ -180,6 +147,8 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
             fetchData("Country/getAllCountry", "country"); fetchData("LeadStatus/getAllLeadStatus", "status"); fetchData("LeadSource/getAllLeadSource", "source"); fetchData("Document/getAllDocument", "document"); fetchData("Site/getAllSites", "site");
             if (initialData) {
                 setFormData({ ...initialData, leadCountryId: initialData.leadCountryId?._id || '', leadStateId: initialData.leadStateId?._id || '', leadCityId: initialData.leadCityId?._id || '', leadStatusId: initialData.leadStatusId?._id || '', leadSourceId: initialData.leadSourceId?._id || '', leadSiteId: initialData.leadSiteId?._id || '', leadTags: Array.isArray(initialData.leadTags) ? initialData.leadTags.join(', ') : '' });
+                if (initialData.leadCountryId?._id) fetch(config.Api + "State/getAllStates", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ CountryID: initialData.leadCountryId._id }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, state: data })));
+                if (initialData.leadStateId?._id) fetch(config.Api + "City/getAllCitys", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ StateID: initialData.leadStateId._id }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, city: data })));
             } else { setFormData(initialFormState); }
             setDocRows([{ documentId: "", file: null }]);
         }
@@ -203,12 +172,25 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
     const handleSubmit = async (e) => {
         e.preventDefault(); setIsSubmitting(true);
         const endpoint = mode === 'edit' ? 'Lead/updateLead' : 'Lead/createLead';
+        
+        // Use FormData for integrated creation and update
         const payload = new FormData();
         Object.keys(formData).forEach(key => payload.append(key, formData[key]));
-        docRows.forEach(row => { if (row.file) payload.append('leadFiles', row.file); });
+        if (mode === 'edit') payload.append('leadId', initialData._id);
+        if (user?.id) payload.append('employeeId', user.id);
+
+        docRows.forEach(row => { 
+            if (row.file) {
+                payload.append('leadFiles', row.file);
+                payload.append('documentIds', row.documentId); 
+            }
+        });
+
         try {
-            const res = await fetch(config.Api + endpoint, { method: 'POST', body: mode === 'edit' ? JSON.stringify({ leadId: initialData._id, updateData: formData, employeeId: user?.id }) : payload, headers: mode === 'edit' ? { 'Content-Type': 'application/json' } : {} });
-            if ((await res.json()).success) { onOpenChange(false); onSuccess(); }
+            const res = await fetch(config.Api + endpoint, { method: 'POST', body: payload });
+            const result = await res.json();
+            if (result.success) { onOpenChange(false); onSuccess(); }
+            else { toast({ title: "Error", description: result.message, variant: "destructive" }); }
         } catch (e) { toast({ title: "Error", variant: "destructive" }); }
         finally { setIsSubmitting(false); }
     };
@@ -224,55 +206,31 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0">
                 <DialogHeader><div className="flex justify-between items-center w-full"><DialogTitle>{mode === 'create' ? 'Add New Lead' : mode === 'edit' ? 'Edit Lead' : 'Lead Details'}</DialogTitle><button onClick={() => onOpenChange(false)} className="text-slate-400 hover:text-white"><X size={20} /></button></div></DialogHeader>
-                <div className="overflow-y-auto p-6 custom-scrollbar flex-1">
-                    <form id="lead-form" onSubmit={handleSubmit} className="space-y-6">
-                        <div className="flex flex-wrap items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
-                            <TabButton id="contact" label="Contact Information" icon={Contact} active={activeFormTab} onClick={setActiveFormTab} />
-                            <TabButton id="deal" label="Deal & Status" icon={DollarSign} active={activeFormTab} onClick={setActiveFormTab} />
-                            <TabButton id="document" label="Document" icon={FileText} active={activeFormTab} onClick={setActiveFormTab} />
-                        </div>
-                        {activeFormTab === "contact" && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required disabled={isViewMode} /></div>
-                                <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange} disabled={isViewMode} /></div>
-                                <div><Label>Email *</Label><Input name="leadEmail" type="email" value={formData.leadEmail} onChange={handleChange} required disabled={isViewMode} /></div>
-                                <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled={isViewMode} /></div>
-                                <div><Label>Job Title</Label><Input name="leadJobTitle" value={formData.leadJobTitle} onChange={handleChange} disabled={isViewMode} /></div>
-                                <div><Label>LinkedIn Profile</Label><Input name="leadLinkedIn" value={formData.leadLinkedIn} onChange={handleChange} disabled={isViewMode} /></div>
-                                <div><Label>Street Address</Label><Input name="leadAddress" value={formData.leadAddress} onChange={handleChange} disabled={isViewMode} /></div>
-                                <div><Label>City</Label><select name="leadCityId" value={formData.leadCityId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.city.map(c => <option key={c._id} value={c._id}>{c.CityName || c.name}</option>)}</select></div>
-                                <div><Label>State</Label><select name="leadStateId" value={formData.leadStateId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.state.map(s => <option key={s._id} value={s._id}>{s.StateName || s.name}</option>)}</select></div>
-                                <div><Label>Country</Label><select name="leadCountryId" value={formData.leadCountryId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.country.map(c => <option key={c._id} value={c._id}>{c.CountryName || c.name}</option>)}</select></div>
-                                <div><Label>Site</Label><select name="leadSiteId" value={formData.leadSiteId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.site.map(s => <option key={s._id} value={s._id}>{s.sitename || s.name}</option>)}</select></div>
-                                <div><Label>Zip Code</Label><Input name="leadZipCode" value={formData.leadZipCode} onChange={handleChange} disabled={isViewMode} /></div>
-                            </div>
-                        )}
-                        {activeFormTab === "deal" && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><Label>Status</Label><select name="leadStatusId" value={formData.leadStatusId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.status.map(s => <option key={s._id} value={s._id}>{s.leadStatustName || s.name}</option>)}</select></div>
-                                <div><Label>Source</Label><select name="leadSourceId" value={formData.leadSourceId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.source.map(s => <option key={s._id} value={s._id}>{s.leadSourceName || s.name}</option>)}</select></div>
-                                <div><Label>Potential Value</Label><div className="flex gap-2"><Input name="leadPotentialValue" type="number" value={formData.leadPotentialValue} onChange={handleChange} disabled={isViewMode} /><Input value={'₹'} className="w-24 text-center" disabled /></div></div>
-                                <div><Label>Lead Score</Label><Input name="leadScore" type="number" value={formData.leadScore} onChange={handleChange} disabled={isViewMode} /></div>
-                                <div className="md:col-span-2"><Label>Tags</Label><Input name="leadTags" value={formData.leadTags} onChange={handleChange} disabled={isViewMode} /></div>
-                            </div>
-                        )}
-                        {activeFormTab === "document" && (
-                            <div>
-                                <SectionHeader icon={FileText} title="Document Attachment" />
-                                {docRows.map((row, index) => (
-                                    <div key={index} className="grid grid-cols-1 md:grid-cols-[220px_1fr_auto] gap-4 md:gap-20 items-end mb-4">
-                                        <div><select value={row.documentId} onChange={(e) => handleDocChange(index, e.target.value)} className="w-full h-10 bg-slate-800 border border-slate-700 rounded-md px-3 text-sm text-gray-300"><option value="">Select</option>{lookups.document.map(d => <option key={d._id} value={d._id}>{d.documentName}</option>)}</select></div>
-                                        <div>{row.documentId && <><Label>Upload File</Label><input type="file" className="w-full text-sm text-slate-300" onChange={(e) => handleFileChange(index, e.target.files[0])} /></>}</div>
-                                        <div className="flex gap-2 md:pb-1">
-                                            {docRows.length > 1 && <button type="button" onClick={() => setDocRows(docRows.filter((_, i) => i !== index))} className="h-8 w-8 rounded-md bg-white text-red-600 font-extrabold">–</button>}
-                                            {index === docRows.length - 1 && <button type="button" onClick={() => setDocRows([...docRows, { documentId: "", file: null }])} className="h-8 w-8 rounded-md bg-white text-green-600 font-extrabold">+</button>}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </form>
-                </div>
+                <div className="overflow-y-auto p-6 custom-scrollbar flex-1"><form id="lead-form" onSubmit={handleSubmit} className="space-y-6"><div className="flex flex-wrap items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800"><TabButton id="contact" label="Contact Information" icon={Contact} active={activeFormTab} onClick={setActiveFormTab} /><TabButton id="deal" label="Deal & Status" icon={DollarSign} active={activeFormTab} onClick={setActiveFormTab} /><TabButton id="document" label="Document" icon={FileText} active={activeFormTab} onClick={setActiveFormTab} /></div>
+                {activeFormTab === "contact" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required disabled={isViewMode} /></div>
+                    <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange} disabled={isViewMode} /></div>
+                    <div><Label>Email *</Label><Input name="leadEmail" type="email" value={formData.leadEmail} onChange={handleChange} required disabled={isViewMode} /></div>
+                    <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled={isViewMode} /></div>
+                    <div><Label>Job Title</Label><Input name="leadJobTitle" value={formData.leadJobTitle} onChange={handleChange} disabled={isViewMode} /></div>
+                    <div><Label>LinkedIn Profile</Label><Input name="leadLinkedIn" value={formData.leadLinkedIn} onChange={handleChange} disabled={isViewMode} /></div>
+                    <div><Label>Street Address</Label><Input name="leadAddress" value={formData.leadAddress} onChange={handleChange} disabled={isViewMode} /></div>
+                    <div><Label>City</Label><select name="leadCityId" value={formData.leadCityId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.city.map(c => <option key={c._id} value={c._id}>{c.CityName || c.name}</option>)}</select></div>
+                    <div><Label>State</Label><select name="leadStateId" value={formData.leadStateId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.state.map(s => <option key={s._id} value={s._id}>{s.StateName || s.name}</option>)}</select></div>
+                    <div><Label>Country</Label><select name="leadCountryId" value={formData.leadCountryId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.country.map(c => <option key={c._id} value={c._id}>{c.CountryName || c.name}</option>)}</select></div>
+                    <div><Label>Site</Label><select name="leadSiteId" value={formData.leadSiteId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.site.map(s => <option key={s._id} value={s._id}>{s.sitename || s.name}</option>)}</select></div>
+                    <div><Label>Zip Code</Label><Input name="leadZipCode" value={formData.leadZipCode} onChange={handleChange} disabled={isViewMode} /></div>
+                </div>)}
+                {activeFormTab === "deal" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><Label>Status</Label><select name="leadStatusId" value={formData.leadStatusId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.status.map(s => <option key={s._id} value={s._id}>{s.leadStatustName || s.name}</option>)}</select></div>
+                    <div><Label>Source</Label><select name="leadSourceId" value={formData.leadSourceId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.source.map(s => <option key={s._id} value={s._id}>{s.leadSourceName || s.name}</option>)}</select></div>
+                    <div><Label>Potential Value</Label><div className="flex gap-2"><Input name="leadPotentialValue" type="number" value={formData.leadPotentialValue} onChange={handleChange} disabled={isViewMode} /><Input value={'₹'} className="w-24 text-center" disabled /></div></div>
+                    <div><Label>Lead Score</Label><Input name="leadScore" type="number" value={formData.leadScore} onChange={handleChange} disabled={isViewMode} /></div>
+                    <div className="md:col-span-2"><Label>Tags</Label><Input name="leadTags" value={formData.leadTags} onChange={handleChange} disabled={isViewMode} /></div>
+                    {isViewMode && initialData?.leadHistory && (<div className="md:col-span-2 mt-4"><SectionHeader icon={Clock} title="History" /><div className="space-y-3">{initialData.leadHistory.map((h, i) => (<div key={i} className="text-sm border-l-2 border-fuchsia-600 pl-3"><p className="text-fuchsia-400 font-bold uppercase text-xs">{h.eventType}</p><p className="text-slate-300">{h.details}</p><p className="text-[10px] text-slate-500">{new Date(h.timestamp).toLocaleString()}</p></div>)).reverse()}</div></div>)}
+                </div>)}
+                {activeFormTab === "document" && (<div><SectionHeader icon={FileText} title="Document Attachment" />{docRows.map((row, index) => (<div key={index} className="grid grid-cols-1 md:grid-cols-[220px_1fr_auto] gap-4 md:gap-20 items-end mb-4"><div><select value={row.documentId} onChange={(e) => handleDocChange(index, e.target.value)} className="w-full h-10 bg-slate-800 border border-slate-700 rounded-md px-3 text-sm text-gray-300"><option value="">Select</option>{lookups.document.map(d => <option key={d._id} value={d._id}>{d.documentName}</option>)}</select></div><div>{row.documentId && <><Label>Upload File</Label><input type="file" className="w-full text-sm text-slate-300" onChange={(e) => handleFileChange(index, e.target.files[0])} /></>}</div><div className="flex gap-2 md:pb-1">{docRows.length > 1 && <button type="button" onClick={() => setDocRows(docRows.filter((_, i) => i !== index))} className="h-8 w-8 rounded-md bg-white text-red-600 font-extrabold">–</button>}{index === docRows.length - 1 && <button type="button" onClick={() => setDocRows([...docRows, { documentId: "", file: null }])} className="h-8 w-8 rounded-md bg-white text-green-600 font-extrabold">+</button>}</div></div>))}</div>)}
+                </form></div>
                 <DialogFooter><Button variant="ghost" onClick={() => onOpenChange(false)}>{isViewMode ? 'Close' : 'Cancel'}</Button>{!isViewMode && <Button type="submit" onClick={handleSubmit} disabled={isSubmitting}>{isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Save</Button>}</DialogFooter>
             </DialogContent>
         </Dialog>
@@ -295,10 +253,8 @@ function LeadsContent() {
     const [notesDialogOpen, setNotesDialogOpen] = useState(false);
     const [notesLead, setNotesLead] = useState(null);
     const [noteText, setNoteText] = useState('');
-
     const piopiyRef = useRef(null);
     const [isDialerLoggedIn, setIsDialerLoggedIn] = useState(false);
-
     const { toast } = useToast();
     const navigate = useNavigate();
     const { getPermissionsByPath, user } = useAuth();
@@ -360,7 +316,7 @@ function LeadsContent() {
                 </div>
             </div>
 
-            <div className="flex  md:flex-row flex-col items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg md:w-fit w-full border border-slate-800">
+            <div className="flex flex-wrap items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
                 <TabButton id="new" label="New Leads" icon={Plus} />
                 <TabButton id="followups" label="Follow-ups" icon={PhoneCall} />
                 <TabButton id="visits" label="Visits" icon={MapPin} />
@@ -371,7 +327,7 @@ function LeadsContent() {
             <Card className='md:block hidden'>
                 <CardContent className="p-6">
                     <div className="flex gap-4 mb-6">
-                        <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" /><Input placeholder="Search leads by name, email or phone..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white placeholder:text-purple-200" /></div>
+                        <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" /><Input placeholder="Search leads by name, email or phone..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white" /></div>
                         <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Filter className="w-4 h-4 mr-2" />Filter</Button>
                     </div>
                     <div className="overflow-x-auto"><table className="w-full text-left">
@@ -382,7 +338,7 @@ function LeadsContent() {
                                 <td className="py-3 px-4 text-slate-300">{l.leadSiteId?.sitename || 'N/A'}</td>
                                 <td className="py-3 px-4 text-slate-300 flex gap-2"><button onClick={() => { setCallNumber(l.leadPhone); setCallDialogOpen(true); }}><Phone size={18} className=' hover:text-fuchsia-400' /></button>{l.leadPhone}</td>
                                 <td className="py-3 px-4"><Badge className={statusColors[l.leadStatusId?.name] || 'bg-slate-700'}>{l.leadStatusId?.name || 'New'}</Badge></td>
-                                <td className="py-3 px-4 text-slate-300">{l.leadAssignedId?.employeeName || 'Unassigned'}</td>
+                                <td className="py-3 px-4 text-slate-300">{l.leadAssignedId?.EmployeeName || 'Unassigned'}</td>
                                 <td className="py-3 px-4 flex gap-2">
                                     <Button variant="icon" size="icon" onClick={() => { setLeadToAssign({ id: l._id, name: l.leadFirstName, original: l }); setAssignDialogOpen(true); }} className="text-green-400"><UserPlus className="w-4 h-4" /></Button>
                                     <Button variant="icon" size="icon" onClick={() => { setSelectedLead(l); setDialogMode('view'); setDialogOpen(true); }} className="text-blue-400"><Eye className="w-4 h-4" /></Button>
@@ -394,106 +350,25 @@ function LeadsContent() {
                 </CardContent>
             </Card>
 
-            {/* Mobile Card View */}
-            <div className="md:hidden space-y-4">
-                {getFilteredLeads().map((l) => (
-                    <Card
-                        key={l._id}
-                        className="bg-purple-900/40 border border-fuchsia-700/50"
-                    >
-                        <CardContent className="p-4 space-y-3">
-
-                            {/* NAME + STATUS */}
-                            <div className="flex justify-between items-start">
-                                <h3
-                                    className="text-fuchsia-400 font-semibold cursor-pointer"
-                                    onClick={() => {
-                                        setNotesLead(l);
-                                        setNoteText('');
-                                        setNotesDialogOpen(true);
-                                    }}
-                                >
-                                    {l.leadFirstName} {l.leadLastName}
-                                </h3>
-
-                                <Badge className={statusColors[l.leadStatusId?.name] || 'bg-slate-700'}>
-                                    {l.leadStatusId?.name || 'New'}
-                                </Badge>
-                            </div>
-
-                            {/* SITE */}
-                            <p className="text-sm text-slate-300">
-                                <span className="text-slate-400">Site:</span>{" "}
-                                {l.leadSiteId?.sitename || 'N/A'}
-                            </p>
-
-                            {/* PHONE */}
-                            <div className="flex items-center gap-2 text-slate-300">
-                                <button
-                                    onClick={() => {
-                                        setCallNumber(l.leadPhone);
-                                        setCallDialogOpen(true);
-                                    }}
-                                >
-                                    <Phone size={18} className="hover:text-fuchsia-400" />
-                                </button>
-                                {l.leadPhone}
-                            </div>
-
-                            {/* ASSIGNED TO */}
-                            <p className="text-sm text-slate-300">
-                                <span className="text-slate-400">Assigned:</span>{" "}
-                                {l.leadAssignedId?.employeeName || 'Unassigned'}
-                            </p>
-
-                            {/* ACTIONS */}
-                            <div className="flex gap-3 pt-2 border-t border-slate-700">
-                                <Button
-                                    variant="icon"
-                                    size="icon"
-                                    onClick={() => {
-                                        setLeadToAssign({ id: l._id, name: l.leadFirstName, original: l });
-                                        setAssignDialogOpen(true);
-                                    }}
-                                    className="text-green-400"
-                                >
-                                    <UserPlus className="w-4 h-4" />
-                                </Button>
-
-                                <Button
-                                    variant="icon"
-                                    size="icon"
-                                    onClick={() => {
-                                        setSelectedLead(l);
-                                        setDialogMode('view');
-                                        setDialogOpen(true);
-                                    }}
-                                    className="text-blue-400"
-                                >
-                                    <Eye className="w-4 h-4" />
-                                </Button>
-
-                                {Permissions.isEdit && (
-                                    <Button
-                                        variant="icon"
-                                        size="icon"
-                                        onClick={() => {
-                                            setSelectedLead(l);
-                                            setDialogMode('edit');
-                                            setDialogOpen(true);
-                                        }}
-                                        className="text-yellow-400"
-                                    >
-                                        <Pencil className="w-4 h-4" />
-                                    </Button>
-                                )}
-                            </div>
-
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-
+            <Card className='md:hidden block'>
+                <CardContent className="p-6">
+                    <div className="space-y-4">
+                        {getFilteredLeads().map((l) => (
+                            <Card key={l._id} className="bg-slate-900 border border-fuchsia-700/40 rounded-xl p-4 shadow-lg">
+                                <CardContent className="p-4 space-y-3">
+                                    <div className="flex justify-between items-center mb-2 gap-2"><h3 className=" font-bold text-white">{l.leadFirstName} {l.leadLastName}</h3><Badge className={statusColors[l.leadStatusId?.name] || 'bg-slate-600'}>{l.leadStatusId?.name || 'New'}</Badge></div>
+                                    <div className="flex items-center gap-2 mb-1 text-purple-300 text-sm"><MapPin className="w-4 h-4" /><span>{l.leadSiteId?.sitename || 'N/A'}</span></div>
+                                    <div className="flex items-center gap-2 mb-1 text-fuchsia-300 text-sm"><Phone className="w-4 h-4" /><span>{l.leadPhone}</span></div>
+                                    <div className="flex justify-end gap-2 border-t border-purple-700/40 pt-2">
+                                        <Button variant="icon" size="icon" onClick={() => { setLeadToAssign({ id: l._id, original: l }); setAssignDialogOpen(true); }} className="text-green-400"><UserPlus className="w-4 h-4" /></Button>
+                                        <Button variant="icon" size="icon" onClick={() => { setSelectedLead(l); setDialogMode('view'); setDialogOpen(true); }} className="text-blue-400"><Eye className="w-4 h-4" /></Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
 
             <LeadDialog open={dialogOpen} onOpenChange={setDialogOpen} onSuccess={fetchLeads} initialData={selectedLead} mode={dialogMode} />
             <AssignDialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen} lead={leadToAssign} onSuccess={fetchLeads} />
