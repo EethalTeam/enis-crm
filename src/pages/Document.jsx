@@ -1,4 +1,4 @@
- import React, {
+import React, {
     useState,
     useEffect,
     useReducer,
@@ -23,8 +23,8 @@ import { useNavigate } from "react-router-dom";
 
 // ------------------- REDUCER -------------------
 const initialState = {
-   documentCode:'',
-   documentName:'',
+    documentCode: '',
+    documentName: '',
     isActive: true
 };
 
@@ -220,11 +220,11 @@ function Document() {
     const [state, dispatch] = useReducer(DocumentReducer, initialState);
     const [isEdit, setIsEdit] = useState(false);
     const [viewData, setViewData] = useState({});
-    
+
     // ------------------- FETCH EMPLOYEES -------------------
     useEffect(() => {
         getAllDocument();
-        
+
     }, []);
 
 
@@ -336,7 +336,7 @@ function Document() {
         setViewData({
             "Document Code": row.documentCode,
             "Document Name": row.documentName,
-          
+
         });
         setViewOpen(true);
     };
@@ -443,7 +443,7 @@ function Document() {
     return (
         <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
             {/* HEADER */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row space-y-3 items-start  md:items-center  md:justify-between">
                 <h1 className="text-3xl font-bold text-white">Document Type</h1>
                 <Button
                     onClick={() => {
@@ -467,7 +467,7 @@ function Document() {
             </div>
 
             {/* TABLE */}
-            <Card>
+            <Card className={`hidden md:block`}>
                 <CardContent className="p-6">
                     {/* SEARCH */}
                     <div className="flex gap-4 mb-6">
@@ -524,7 +524,7 @@ function Document() {
                                         >
                                             <td className="py-3 px-4">{row.documentCode}</td>
                                             <td className="py-3 px-4">{row.documentName}</td>
-                                          
+
 
                                             <td className="py-3 px-4 flex gap-2">
                                                 <Button
@@ -557,6 +557,102 @@ function Document() {
                             </tbody>
                         </table>
                     </div>
+                </CardContent>
+            </Card>
+
+            {/* Mobile view card for Document Type */}
+
+            <Card className={`md:hidden`}>
+                <CardContent className="p-6">
+                    {/* SEARCH */}
+                    <div className="flex gap-4 mb-6">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" />
+                            <Input
+                                placeholder="Search Document Name..."
+                                value={searchTerm}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                                className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white"
+                            />
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={() => getAllDocument()}
+                            className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
+                        >
+                            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                        </Button>
+                    </div>
+
+                    {/* MOBILE VIEW */}
+                    <div className="md:hidden space-y-4">
+                        {loading && filteredData.length === 0 ? (
+                            <div className="text-center py-8">
+                                <Loader2 className="animate-spin inline mr-2" />
+                                Loading...
+                            </div>
+                        ) : filteredData.length === 0 ? (
+                            <div className="text-center py-8 text-slate-300">
+                                No Document found.
+                            </div>
+                        ) : (
+                            filteredData.map((row, index) => (
+                                <motion.div
+                                    key={row._id}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                >
+                                    <Card className="bg-purple-900/40 border border-fuchsia-700">
+                                        <CardContent className="p-4 space-y-3">
+
+                                            {/* DOCUMENT NAME */}
+                                            <div className="flex justify-between items-center">
+                                                <h3 className="font-semibold text-fuchsia-400">
+                                                    {row.documentName}
+                                                </h3>
+                                            </div>
+
+                                            {/* DOCUMENT CODE */}
+                                            <div className="text-sm text-slate-300">
+                                                <span className="text-slate-400">Code:</span>{' '}
+                                                {row.documentCode}
+                                            </div>
+
+                                            {/* ACTIONS */}
+                                            <div className="flex gap-3 pt-2">
+                                                <Button
+                                                    variant="icon"
+                                                    size="icon"
+                                                    onClick={() => handleViewClick(row)}
+                                                >
+                                                    <Eye className="w-4 h-4 text-blue-400" />
+                                                </Button>
+
+                                                <Button
+                                                    variant="icon"
+                                                    size="icon"
+                                                    onClick={() => handleEditClick(row)}
+                                                >
+                                                    <Pencil className="w-4 h-4 text-yellow-400" />
+                                                </Button>
+
+                                                <Button
+                                                    variant="icon"
+                                                    size="icon"
+                                                    onClick={() => triggerDeleteConfirm(row)}
+                                                >
+                                                    <Trash2 className="w-4 h-4 text-red-400" />
+                                                </Button>
+                                            </div>
+
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            ))
+                        )}
+                    </div>
+
                 </CardContent>
             </Card>
 
