@@ -10,9 +10,9 @@ import { useNavigate } from "react-router-dom";
 
 // TeleCMI Credentials
 const CREDENTIALS = {
-    userId: '5002_33336639',
-    password: 'admin@123',
-    sbcUrl: 'sbcind.telecmi.com'
+  userId: '5002_33336945', 
+  password: 'User@123',
+  sbcUrl: 'sbcind.telecmi.com'
 };
 
 const statusColors = {

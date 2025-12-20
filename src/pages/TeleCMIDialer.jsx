@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import PIOPIY from 'piopiyjs';
 
 const CREDENTIALS = {
-  userId: '5002_33336639', 
-  password: 'admin@123',
+  userId: '5002_33336945', 
+  password: 'User@123',
   sbcUrl: 'sbcind.telecmi.com'
 };
 
@@ -59,7 +59,7 @@ sdk.on('loginFailed', (res) => {
     } else {
         // Actual failure
         setIsLoggedIn(false);
-        alert("Login Failed: " + (res.msg || "Unknown Error"));
+        // alert("Login Failed: " + (res.msg || "Unknown Error"));
     }
 });
 
