@@ -297,6 +297,7 @@ function CallLogsContent() {
 
   return (
     <div className="space-y-6 p-4 bg-slate-950 min-h-screen text-slate-100">
+              <div className="sticky top-0 z-30 bg-slate-950 p-4 space-y-10">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-white">Call Logs</h1>
         {loading && <Loader2 className="animate-spin text-white" />}
@@ -308,6 +309,7 @@ function CallLogsContent() {
         <TabButton id="incoming" label="Incoming" />
         <TabButton id="outgoing" label="Outgoing" />
         <TabButton id="rnr" label="RNR" />
+      </div>
       </div>
 
       <Card className="bg-slate-900 border-slate-800 hidden md:block">

@@ -386,15 +386,17 @@ function PlotViewContent() {
 
   // --- RENDER ---
   return (
-    <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
+    <div className=" bg-slate-950 min-h-screen p-4 text-slate-100">
       
       {/* HEADER */}
+            <div className="sticky top-0 z-30 bg-slate-950 pb-4 space-y-10 overflow-hidden">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-white">Plot View</h1>
         <Button variant="outline" onClick={() => getPlotView()} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </Button>
       </div>
+      
 
       {/* FILTERS & CONTROLS */}
       <Card>
@@ -469,6 +471,7 @@ function PlotViewContent() {
             </div>
          </div>
       </Card>
+      </div>
 
       {/* PLOT GRID */}
       <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">

@@ -10,9 +10,9 @@ import { useNavigate } from "react-router-dom";
 
 // TeleCMI Credentials
 const CREDENTIALS = {
-  userId: '5002_33336945', 
-  password: 'User@123',
-  sbcUrl: 'sbcind.telecmi.com'
+    userId: '5002_33336945',
+    password: 'User@123',
+    sbcUrl: 'sbcind.telecmi.com'
 };
 
 const statusColors = {
@@ -122,9 +122,14 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
     );
 };
 
+
+
+
+
+
 // --- LEAD DIALOG COMPONENT ---
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create' }) => {
-    const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: 0, leadTags: '', leadSiteId: '' };
+    const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue:'' , leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '', };
     const [formData, setFormData] = useState(initialFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [] });
@@ -146,7 +151,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         if (open) {
             fetchData("Country/getAllCountry", "country"); fetchData("LeadStatus/getAllLeadStatus", "status"); fetchData("LeadSource/getAllLeadSource", "source"); fetchData("Document/getAllDocument", "document"); fetchData("Site/getAllSites", "site");
             if (initialData) {
-                setFormData({ ...initialData, leadCountryId: initialData.leadCountryId?._id || '', leadStateId: initialData.leadStateId?._id || '', leadCityId: initialData.leadCityId?._id || '', leadStatusId: initialData.leadStatusId?._id || '', leadSourceId: initialData.leadSourceId?._id || '', leadSiteId: initialData.leadSiteId?._id || '', leadTags: Array.isArray(initialData.leadTags) ? initialData.leadTags.join(', ') : '' });
+                setFormData({ ...initialData, leadCountryId: initialData.leadCountryId?._id || '', leadStateId: initialData.leadStateId?._id || '', leadCityId: initialData.leadCityId?._id || '', leadStatusId: initialData.leadStatusId?._id || '', leadSourceId: initialData.leadSourceId?._id || '',leadAssignedId:initialData.leadAssignedId?._id || '',  leadSiteId: initialData.leadSiteId?._id || '', leadTags: Array.isArray(initialData.leadTags) ? initialData.leadTags.join(', ') : '' });
                 if (initialData.leadCountryId?._id) fetch(config.Api + "State/getAllStates", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ CountryID: initialData.leadCountryId._id }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, state: data })));
                 if (initialData.leadStateId?._id) fetch(config.Api + "City/getAllCitys", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ StateID: initialData.leadStateId._id }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, city: data })));
             } else { setFormData(initialFormState); }
@@ -207,7 +212,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
             <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0">
                 <DialogHeader><div className="flex justify-between items-center w-full"><DialogTitle>{mode === 'create' ? 'Add New Lead' : mode === 'edit' ? 'Edit Lead' : 'Lead Details'}</DialogTitle><button onClick={() => onOpenChange(false)} className="text-slate-400 hover:text-white"><X size={20} /></button></div></DialogHeader>
                 <div className="overflow-y-auto p-6 custom-scrollbar flex-1"><form id="lead-form" onSubmit={handleSubmit} className="space-y-6"><div className="flex flex-wrap items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800"><TabButton id="contact" label="Contact Information" icon={Contact} active={activeFormTab} onClick={setActiveFormTab} /><TabButton id="deal" label="Deal & Status" icon={DollarSign} active={activeFormTab} onClick={setActiveFormTab} /><TabButton id="document" label="Document" icon={FileText} active={activeFormTab} onClick={setActiveFormTab} />
-                <TabButton id="history" label="History" icon={Clock} active={activeFormTab} onClick={setActiveFormTab} />
+                    <TabButton id="history" label="History" icon={Clock} active={activeFormTab} onClick={setActiveFormTab} />
                 </div>
                     {activeFormTab === "contact" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required disabled={isViewMode} /></div>
@@ -226,14 +231,23 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                     {activeFormTab === "deal" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div><Label>Status</Label><select name="leadStatusId" value={formData.leadStatusId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.status.map(s => <option key={s._id} value={s._id}>{s.leadStatustName || s.name}</option>)}</select></div>
                         <div><Label>Source</Label><select name="leadSourceId" value={formData.leadSourceId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.source.map(s => <option key={s._id} value={s._id}>{s.leadSourceName || s.name}</option>)}</select></div>
-                        <div><Label>Potential Value</Label><div className="flex gap-2"><Input name="leadPotentialValue" type="number" value={formData.leadPotentialValue} onChange={handleChange} disabled={isViewMode} /><Input value={'₹'} className="w-24 text-center" disabled /></div></div>
-                        <div><Label>Lead Score</Label><Input name="leadScore" type="number" value={formData.leadScore} onChange={handleChange} disabled={isViewMode} /></div>
-                        <div className="md:col-span-2"><Label>Tags</Label><Input name="leadTags" value={formData.leadTags} onChange={handleChange} disabled={isViewMode} /></div>
-                    </div>)}
-                    {activeFormTab === "document" && (<div><SectionHeader icon={FileText} title="Document Attachment" />{docRows.map((row, index) => (<div key={index} className="grid grid-cols-1 md:grid-cols-[220px_1fr_auto] gap-4 md:gap-20 items-end mb-4"><div><select value={row.documentId} onChange={(e) => handleDocChange(index, e.target.value)} className="w-full h-10 bg-slate-800 border border-slate-700 rounded-md px-3 text-sm text-gray-300"><option value="">Select</option>{lookups.document.map(d => <option key={d._id} value={d._id}>{d.documentName}</option>)}</select></div><div>{row.documentId && <><Label>Upload File</Label><input type="file" className="w-full text-sm text-slate-300" onChange={(e) => handleFileChange(index, e.target.files[0])} /></>}</div><div className="flex gap-2 md:pb-1">{docRows.length > 1 && <button type="button" onClick={() => setDocRows(docRows.filter((_, i) => i !== index))} className="h-8 w-8 rounded-md bg-white text-red-600 font-extrabold">–</button>}{index === docRows.length - 1 && <button type="button" onClick={() => setDocRows([...docRows, { documentId: "", file: null }])} className="h-8 w-8 rounded-md bg-white text-green-600 font-extrabold">+</button>}</div></div>))}</div>)}
-                    {/* {isViewMode && initialData?.leadHistory && (<div className="md:col-span-2 mt-4"><SectionHeader icon={Clock} title="History" /><div className="space-y-3">{initialData.leadHistory.map((h, i) => (<div key={i} className="text-sm border-l-2 border-fuchsia-600 pl-3"><p className="text-fuchsia-400 font-bold uppercase text-xs">{h.eventType}</p><p className="text-slate-300">{h.details}</p><p className="text-[10px] text-slate-500">{new Date(h.timestamp).toLocaleString()}</p></div>)).reverse()}</div></div>)} */}
-                    {activeFormTab === "history" && (<div> <SectionHeader icon={Clock} title="Lead History" /> {!initialData?.leadHistory?.length ? (<p className="text-sm text-slate-400">No history available</p> ) : ( <div className="space-y-4">{[...initialData.leadHistory].reverse().map((h, i) => (  <div key={i}   className="border-l-2 border-fuchsia-600 pl-4 py-2 bg-slate-900/40 rounded-md" > <p className="text-xs uppercase text-fuchsia-400 font-bold">    {h.eventType} </p> <p className="text-sm text-slate-200 mt-1">{h.details} </p> <p className="text-[11px] text-slate-500 mt-1"> {new Date(h.timestamp).toLocaleString()}</p></div>))}</div>)} </div>)}
-                </form></div>
+                        <div><Label>Potential Value</Label><div className="flex gap-2"><Input name="leadPotentialValue" type="number" value={formData.leadPotentialValue} onChange={handleChange} disabled={isViewMode} placeholder='₹'/></div></div>
+                            <div>
+                                <Label>Lead Score</Label>
+                                <select  name="leadScore" type="number" value={formData.leadScore} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"  >
+                                    <option>Select</option>
+                                    <option>25%</option>
+                                    <option>50%</option>
+                                    <option>75%</option>
+                                    <option>100%</option>
+                                </select>
+                            </div>
+                            <div className="md:col-span-2"><Label>Notes</Label><textarea name="leadNotes" value={formData.leadNotes} onChange={handleChange} disabled={isViewMode} className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-fuchsia-500" /></div>
+                        </div>)}
+                        {activeFormTab === "document" && (<div><SectionHeader icon={FileText} title="Document Attachment" />{docRows.map((row, index) => (<div key={index} className="grid grid-cols-1 md:grid-cols-[220px_1fr_auto] gap-4 md:gap-20 items-end mb-4"><div><select value={row.documentId} onChange={(e) => handleDocChange(index, e.target.value)} className="w-full h-10 bg-slate-800 border border-slate-700 rounded-md px-3 text-sm text-gray-300"><option value="">Select</option>{lookups.document.map(d => <option key={d._id} value={d._id}>{d.documentName}</option>)}</select></div><div>{row.documentId && <><Label>Upload File</Label><input type="file" className="w-full text-sm text-slate-300" onChange={(e) => handleFileChange(index, e.target.files[0])} /></>}</div><div className="flex gap-2 md:pb-1">{docRows.length > 1 && <button type="button" onClick={() => setDocRows(docRows.filter((_, i) => i !== index))} className="h-8 w-8 rounded-md bg-white text-red-600 font-extrabold">–</button>}{index === docRows.length - 1 && <button type="button" onClick={() => setDocRows([...docRows, { documentId: "", file: null }])} className="h-8 w-8 rounded-md bg-white text-green-600 font-extrabold">+</button>}</div></div>))}</div>)}
+                        {/* {isViewMode && initialData?.leadHistory && (<div className="md:col-span-2 mt-4"><SectionHeader icon={Clock} title="History" /><div className="space-y-3">{initialData.leadHistory.map((h, i) => (<div key={i} className="text-sm border-l-2 border-fuchsia-600 pl-3"><p className="text-fuchsia-400 font-bold uppercase text-xs">{h.eventType}</p><p className="text-slate-300">{h.details}</p><p className="text-[10px] text-slate-500">{new Date(h.timestamp).toLocaleString()}</p></div>)).reverse()}</div></div>)} */}
+                        {activeFormTab === "history" && (<div> <SectionHeader icon={Clock} title="Lead History" /> {!initialData?.leadHistory?.length ? (<p className="text-sm text-slate-400">No history available</p>) : (<div className="space-y-4">{[...initialData.leadHistory].reverse().map((h, i) => (<div key={i} className="border-l-2 border-fuchsia-600 pl-4 py-2 bg-slate-900/40 rounded-md" > <p className="text-xs uppercase text-fuchsia-400 font-bold">    {h.eventType} </p> <p className="text-sm text-slate-200 mt-1">{h.details} </p> <p className="text-[11px] text-slate-500 mt-1"> {new Date(h.timestamp).toLocaleString()}</p></div>))}</div>)} </div>)}
+                    </form></div>
                 <DialogFooter><Button variant="ghost" onClick={() => onOpenChange(false)}>{isViewMode ? 'Close' : 'Cancel'}</Button>{!isViewMode && <Button type="submit" onClick={handleSubmit} disabled={isSubmitting}>{isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Save</Button>}</DialogFooter>
 
             </DialogContent>
@@ -249,7 +263,7 @@ function LeadsContent() {
     const [searchTerm, setSearchTerm] = useState('');
     const [callDialogOpen, setCallDialogOpen] = useState(false);
     const [callNumber, setCallNumber] = useState('');
-    const [activeTab, setActiveTab] = useState('new');
+    const [activeTab, setActiveTab] = useState('all');
     const [selectedLead, setSelectedLead] = useState(null);
     const [dialogMode, setDialogMode] = useState('create');
     const [assignDialogOpen, setAssignDialogOpen] = useState(false);
@@ -258,6 +272,8 @@ function LeadsContent() {
     const [notesLead, setNotesLead] = useState(null);
     const [noteText, setNoteText] = useState('');
     const piopiyRef = useRef(null);
+    const [viewOpen, setViewOpen] = useState(false);
+    const [viewData, setViewData] = useState({});
     const [isDialerLoggedIn, setIsDialerLoggedIn] = useState(false);
     const { toast } = useToast();
     const navigate = useNavigate();
@@ -309,9 +325,24 @@ function LeadsContent() {
         </button>
     );
 
+    // ------------------- VIEW -------------------
+    const handleViewClick = (row) => {
+        setViewData({
+            "Lead Name": row.leadFirstName,
+            "Lead Site": row.leadSiteId.sitename,
+            "Lead Phone": row.leadPhone,
+            "Lead Status": row.leadStatusId.leadStatustName,
+            "Assigned To": row.leadAssignedId.EmployeeName,
+
+        });
+        setViewOpen(true);
+    };
+
     return (
+       
         <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
-            <div className="flex md:flex-row flex-col items-start md:justify-between gap-3">
+             <div className="sticky top-0 z-30 bg-slate-950 pb-4 space-y-10">
+            <div className="flex md:flex-row flex-col items-start md:justify-between gap-3 sticky ">
                 <h1 className="text-3xl font-bold text-white">Leads</h1>
                 <div className="grid md:grid-cols-3 grid-cols-2 gap-3">
                     <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Upload className="w-4 h-4 mr-2" />Import</Button>
@@ -319,14 +350,17 @@ function LeadsContent() {
                     {Permissions.isAdd && <Button onClick={() => { setDialogMode('create'); setSelectedLead(null); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0"><Plus className="w-4 h-4 mr-2" />Add Lead</Button>}
                 </div>
             </div>
-
-            <div className="flex md:flex-row flex-col items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
+            
+    
+            <div className="flex md:flex-row flex-col items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800  ">
+                <TabButton id="all" label="All Leads" icon={Users} />
                 <TabButton id="new" label="New Leads" icon={Plus} />
                 <TabButton id="followups" label="Follow-ups" icon={PhoneCall} />
                 <TabButton id="visits" label="Visits" icon={MapPin} />
                 <TabButton id="unassigned" label="Unassigned" icon={UserMinus} />
-                <TabButton id="all" label="All Leads" icon={Users} />
             </div>
+            </div>
+            
 
             <Card className='md:block hidden'>
                 <CardContent className="p-6">
@@ -345,7 +379,7 @@ function LeadsContent() {
                                 <td className="py-3 px-4 text-slate-300">{l.leadAssignedId?.EmployeeName || 'Unassigned'}</td>
                                 <td className="py-3 px-4 flex gap-2">
                                     <Button variant="icon" size="icon" onClick={() => { setLeadToAssign({ id: l._id, name: l.leadFirstName, original: l }); setAssignDialogOpen(true); }} className="text-green-400"><UserPlus className="w-4 h-4" /></Button>
-                                    <Button variant="icon" size="icon" onClick={() => { setSelectedLead(l); setDialogMode('view'); setDialogOpen(true); }} className="text-blue-400"><Eye className="w-4 h-4" /></Button>
+                                    <Button variant="icon" size="icon" onClick={() => handleViewClick(l)} className="text-blue-400"><Eye className="w-4 h-4" /></Button>
                                     {Permissions.isEdit && <Button variant="icon" size="icon" onClick={() => { setSelectedLead(l); setDialogMode('edit'); setDialogOpen(true); }} className="text-yellow-400"><Pencil className="w-4 h-4" /></Button>}
                                 </td>
                             </tr>
@@ -462,6 +496,45 @@ function LeadsContent() {
                     </div>
                 </CardContent>
             </Card>
+
+            {/* View icon popup */}
+            <Dialog open={viewOpen} onOpenChange={setViewOpen}>
+                <DialogContent className="sm:max-w-[450px] p-0">
+
+                    {/* HEADER (same as Employee Details) */}
+                    <DialogHeader className="!flex !flex-row !items-center !justify-between !text-left p-6 border-b border-slate-800">
+                        <DialogTitle className="text-lg font-semibold text-fuchsia-500">
+                            Lead Details
+                        </DialogTitle>
+
+                        <button
+                            onClick={() => setViewOpen(false)}
+                            className="p-1 rounded text-fuchsia-400 hover:text-white hover:bg-slate-800 transition"
+                        >
+                            <X size={20} />
+                        </button>
+                    </DialogHeader>
+
+
+                    {/* BODY */}
+                    <div className="p-6 space-y-3">
+                        {Object.entries(viewData).map(([key, value]) => (
+                            <div
+                                key={key}
+                                className="flex justify-between items-center border-b border-slate-800 pb-2"
+                            >
+                                <span className="text-slate-400 text-sm">
+                                    {key}
+                                </span>
+                                <span className="text-white text-sm font-semibold text-right">
+                                    {value || '—'}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+
+                </DialogContent>
+            </Dialog>
 
             <LeadDialog open={dialogOpen} onOpenChange={setDialogOpen} onSuccess={fetchLeads} initialData={selectedLead} mode={dialogMode} />
             <AssignDialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen} lead={leadToAssign} onSuccess={fetchLeads} />
