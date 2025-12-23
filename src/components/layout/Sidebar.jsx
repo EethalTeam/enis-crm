@@ -183,7 +183,6 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     }
     return hasAccess(item.path) ? item : null;
   }).filter(Boolean);
-  console.log(filteredMenuItems, "filteredMenuItems")
   return (
     <motion.aside
       initial={false}

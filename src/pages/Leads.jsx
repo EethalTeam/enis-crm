@@ -73,7 +73,7 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
         if (!selectedAgent) return;
         setIsSubmitting(true);
         try {
-            const res = await fetch(config.Api + "Lead/updateLead", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ leadId: lead.id, updateData: { leadAssignedId: selectedAgent }, employeeId: user?.id }) });
+            const res = await fetch(config.Api + "Lead/assignLead", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ leadId: lead.id,  leadAssignedId: selectedAgent , employeeName: user?.EmployeeName }) });
             if ((await res.json()).success) { toast({ title: "Assigned", variant: "success" }); onSuccess(); onOpenChange(false); }
         } catch (e) { toast({ title: "Error", variant: "destructive" }); }
         finally { setIsSubmitting(false); }
@@ -129,12 +129,14 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
 
 // --- LEAD DIALOG COMPONENT ---
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create' }) => {
-    const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue:'' , leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '', };
+    const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue:0 , leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '', };
     const [formData, setFormData] = useState(initialFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [] });
     const [docRows, setDocRows] = useState([{ documentId: "", file: null }]);
     const [activeFormTab, setActiveFormTab] = useState("contact");
+    const [previewUrl, setPreviewUrl] = useState(null);
+const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const { user } = useAuth();
     const { toast } = useToast();
     const isViewMode = mode === 'view';
@@ -147,17 +149,51 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         } catch (e) { console.error(e); }
     }, []);
 
-    useEffect(() => {
-        if (open) {
-            fetchData("Country/getAllCountry", "country"); fetchData("LeadStatus/getAllLeadStatus", "status"); fetchData("LeadSource/getAllLeadSource", "source"); fetchData("Document/getAllDocument", "document"); fetchData("Site/getAllSites", "site");
-            if (initialData) {
-                setFormData({ ...initialData, leadCountryId: initialData.leadCountryId?._id || '', leadStateId: initialData.leadStateId?._id || '', leadCityId: initialData.leadCityId?._id || '', leadStatusId: initialData.leadStatusId?._id || '', leadSourceId: initialData.leadSourceId?._id || '',leadAssignedId:initialData.leadAssignedId?._id || '',  leadSiteId: initialData.leadSiteId?._id || '', leadTags: Array.isArray(initialData.leadTags) ? initialData.leadTags.join(', ') : '' });
-                if (initialData.leadCountryId?._id) fetch(config.Api + "State/getAllStates", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ CountryID: initialData.leadCountryId._id }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, state: data })));
-                if (initialData.leadStateId?._id) fetch(config.Api + "City/getAllCitys", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ StateID: initialData.leadStateId._id }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, city: data })));
-            } else { setFormData(initialFormState); }
+useEffect(() => {
+    if (open) {
+        fetchData("Country/getAllCountry", "country"); 
+        fetchData("LeadStatus/getAllLeadStatus", "status"); 
+        fetchData("LeadSource/getAllLeadSource", "source"); 
+        fetchData("Document/getAllDocument", "document"); 
+        fetchData("Site/getAllSites", "site");
+
+        if (initialData) {
+            setFormData({ 
+                ...initialData, 
+                leadCountryId: initialData.leadCountryId?._id || '', 
+                leadStateId: initialData.leadStateId?._id || '', 
+                leadCityId: initialData.leadCityId?._id || '', 
+                leadStatusId: initialData.leadStatusId?._id || '', 
+                leadSourceId: initialData.leadSourceId?._id || '',
+                leadAssignedId: initialData.leadAssignedId?._id || '', 
+                leadSiteId: initialData.leadSiteId?._id || '', 
+                leadTags: Array.isArray(initialData.leadTags) ? initialData.leadTags.join(', ') : '' 
+            });
+
+            // Populate docRows from initialData.leadDocument
+            if (initialData.leadDocument && initialData.leadDocument.length > 0) {
+    const existingDocs = initialData.leadDocument
+        .filter(doc => doc && typeof doc === 'object' && doc.fileUrl)
+        .map(doc => ({
+            documentId: doc.documentId?._id || doc.documentId,
+            file: null,
+            // Clean the URL: remove backslashes so we only have the filename
+            existingUrl: doc.fileUrl.replace(/\\/g, ''), 
+            fileName: doc.fileName
+        }));
+    
+    setDocRows(existingDocs.length > 0 ? existingDocs : [{ documentId: "", file: null }]);
+           } else {
+                setDocRows([{ documentId: "", file: null }]);
+            }
+
+            // ... (rest of your state/city fetch logic)
+        } else { 
+            setFormData(initialFormState); 
             setDocRows([{ documentId: "", file: null }]);
         }
-    }, [open, initialData, fetchData]);
+    }
+}, [open, initialData, fetchData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -180,16 +216,28 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
 
         // Use FormData for integrated creation and update
         const payload = new FormData();
-        Object.keys(formData).forEach(key => payload.append(key, formData[key]));
+        Object.keys(formData).forEach(key => payload.append(key, formData[key] || ''));
         if (mode === 'edit') payload.append('leadId', initialData._id);
         if (user?.id) payload.append('employeeId', user.id);
 
-        docRows.forEach(row => {
-            if (row.file) {
-                payload.append('leadFiles', row.file);
-                payload.append('documentIds', row.documentId);
-            }
-        });
+// Filter for documents that are ALREADY on the server (they have an existingUrl)
+const retainedDocs = docRows
+    .filter(row => row.existingUrl && !row.file) // Keep if it has URL and wasn't replaced by new file
+    .map(row => ({
+        documentId: row.documentId,
+        fileName: row.fileName,
+        fileUrl: row.existingUrl
+    }));
+
+payload.append('existingDocs', JSON.stringify(retainedDocs));
+
+// Standard logic for new files remains the same
+docRows.forEach(row => {
+    if (row.file) {
+        payload.append('leadFiles', row.file);
+        payload.append('documentIds', row.documentId);
+    }
+});
 
         try {
             const res = await fetch(config.Api + endpoint, { method: 'POST', body: payload });
@@ -244,11 +292,116 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                             </div>
                             <div className="md:col-span-2"><Label>Notes</Label><textarea name="leadNotes" value={formData.leadNotes} onChange={handleChange} disabled={isViewMode} className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-fuchsia-500" /></div>
                         </div>)}
-                        {activeFormTab === "document" && (<div><SectionHeader icon={FileText} title="Document Attachment" />{docRows.map((row, index) => (<div key={index} className="grid grid-cols-1 md:grid-cols-[220px_1fr_auto] gap-4 md:gap-20 items-end mb-4"><div><select value={row.documentId} onChange={(e) => handleDocChange(index, e.target.value)} className="w-full h-10 bg-slate-800 border border-slate-700 rounded-md px-3 text-sm text-gray-300"><option value="">Select</option>{lookups.document.map(d => <option key={d._id} value={d._id}>{d.documentName}</option>)}</select></div><div>{row.documentId && <><Label>Upload File</Label><input type="file" className="w-full text-sm text-slate-300" onChange={(e) => handleFileChange(index, e.target.files[0])} /></>}</div><div className="flex gap-2 md:pb-1">{docRows.length > 1 && <button type="button" onClick={() => setDocRows(docRows.filter((_, i) => i !== index))} className="h-8 w-8 rounded-md bg-white text-red-600 font-extrabold">–</button>}{index === docRows.length - 1 && <button type="button" onClick={() => setDocRows([...docRows, { documentId: "", file: null }])} className="h-8 w-8 rounded-md bg-white text-green-600 font-extrabold">+</button>}</div></div>))}</div>)}
+{activeFormTab === "document" && (
+    <div>
+        <SectionHeader icon={FileText} title="Document Attachment" />
+        {docRows.map((row, index) => (
+            <div key={index} className="grid grid-cols-1 md:grid-cols-[220px_1fr_auto] gap-4 md:gap-20 items-end mb-4">
+                <div>
+                    <select 
+                        value={row.documentId} 
+                        onChange={(e) => handleDocChange(index, e.target.value)} 
+                        className="w-full h-10 bg-slate-800 border border-slate-700 rounded-md px-3 text-sm text-gray-300"
+                        disabled={isViewMode}
+                    >
+                        <option value="">Select</option>
+                        {lookups.document.map(d => <option key={d._id} value={d._id}>{d.documentName}</option>)}
+                    </select>
+                </div>
+                <div className="flex flex-col w-full">
+                    {row.documentId && (
+                        <>
+                            <Label>{row.existingUrl ? `Current File: ${row.fileName}` : 'Upload File'}</Label>
+                            <div className="flex items-center gap-2">
+                                {!isViewMode && (
+                                    <input 
+                                        type="file" 
+                                        className="flex-1 text-sm text-slate-300" 
+                                        onChange={(e) => handleFileChange(index, e.target.files[0])} 
+                                    />
+                                )}
+                                
+                                {/* Preview Logic for New File OR Existing File */}
+                                {(row.file || row.existingUrl) && (
+                                   <Button 
+    type="button" 
+    variant="outline" 
+    size="sm" 
+    className="h-8 w-8 p-0 border-fuchsia-500 text-fuchsia-500 hover:bg-fuchsia-500/10"
+    onClick={() => {
+        let url;
+        if (row.file) {
+            // Preview for newly selected local file
+            url = URL.createObjectURL(row.file);
+        } else if (row.existingUrl) {
+            // Preview for existing server file
+            // Format: config.Api + lead_documents/ + filename
+            url = `${config.Api}lead_documents/${row.existingUrl}`;
+           
+        }
+        
+        if (url) {
+            setPreviewUrl(url);
+            setIsPreviewOpen(true);
+        }
+    }}
+>
+    <Eye size={14} />
+</Button>
+                                )}
+                            </div>
+                        </>
+                    )}
+                </div>
+                <div className="flex gap-2 md:pb-1">
+                    {!isViewMode && (
+                        <>
+                            {docRows.length > 1 && (
+                                <button type="button" onClick={() => setDocRows(docRows.filter((_, i) => i !== index))} className="h-8 w-8 rounded-md bg-white text-red-600 font-extrabold">–</button>
+                            )}
+                            {index === docRows.length - 1 && (
+                                <button type="button" onClick={() => setDocRows([...docRows, { documentId: "", file: null }])} className="h-8 w-8 rounded-md bg-white text-green-600 font-extrabold">+</button>
+                            )}
+                        </>
+                    )}
+                </div>
+            </div>
+        ))}
+
+               {/* --- INTERNAL PREVIEW MODAL --- */}
+        <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+            <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden">
+                <DialogHeader className="flex flex-row items-center justify-between p-4 border-b border-slate-800">
+                    <DialogTitle className="text-sm">Document Preview</DialogTitle>
+                   <button 
+    type="button" // <--- Add this!
+    onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation(); // Prevents the click from reaching the form
+        setIsPreviewOpen(false);
+    }} 
+    className="text-slate-400 hover:text-white"
+>
+    <X size={18} />
+</button>
+                </DialogHeader>
+                <div className="flex-1 bg-slate-900 p-2">
+                    {previewUrl && (
+                        <iframe 
+                            src={previewUrl} 
+                            className="w-full h-full rounded border-0" 
+                            title="File Preview"
+                        />
+                    )}
+                </div>
+            </DialogContent>
+        </Dialog>
+    </div>
+)}
                         {/* {isViewMode && initialData?.leadHistory && (<div className="md:col-span-2 mt-4"><SectionHeader icon={Clock} title="History" /><div className="space-y-3">{initialData.leadHistory.map((h, i) => (<div key={i} className="text-sm border-l-2 border-fuchsia-600 pl-3"><p className="text-fuchsia-400 font-bold uppercase text-xs">{h.eventType}</p><p className="text-slate-300">{h.details}</p><p className="text-[10px] text-slate-500">{new Date(h.timestamp).toLocaleString()}</p></div>)).reverse()}</div></div>)} */}
                         {activeFormTab === "history" && (<div> <SectionHeader icon={Clock} title="Lead History" /> {!initialData?.leadHistory?.length ? (<p className="text-sm text-slate-400">No history available</p>) : (<div className="space-y-4">{[...initialData.leadHistory].reverse().map((h, i) => (<div key={i} className="border-l-2 border-fuchsia-600 pl-4 py-2 bg-slate-900/40 rounded-md" > <p className="text-xs uppercase text-fuchsia-400 font-bold">    {h.eventType} </p> <p className="text-sm text-slate-200 mt-1">{h.details} </p> <p className="text-[11px] text-slate-500 mt-1"> {new Date(h.timestamp).toLocaleString()}</p></div>))}</div>)} </div>)}
                     </form></div>
-                <DialogFooter><Button variant="ghost" onClick={() => onOpenChange(false)}>{isViewMode ? 'Close' : 'Cancel'}</Button>{!isViewMode && <Button type="submit" onClick={handleSubmit} disabled={isSubmitting}>{isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Save</Button>}</DialogFooter>
+                <DialogFooter><Button variant="ghost" onClick={() => onOpenChange(false)}>{isViewMode ? 'Close' : 'Cancel'}</Button>{!isViewMode && <Button type="submit" onClick={(e)=>{handleSubmit(e)}} disabled={isSubmitting}>{isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Save</Button>}</DialogFooter>
 
             </DialogContent>
         </Dialog>
