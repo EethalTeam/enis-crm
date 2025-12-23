@@ -443,6 +443,8 @@ function EmployeeContent() {
     // ------------------- SUBMIT -------------------
     const handleSubmit = async () => {
         setLoading(true);
+
+        
         try {
             if (isEdit) {
                 await updateEmployee(state);

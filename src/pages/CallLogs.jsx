@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, CheckCircle, Filter ,User,Phone ,Clock ,Hourglass  } from 'lucide-react';
+import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, CheckCircle, Filter, User, Phone, Clock, Hourglass } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
+import { LeadDialog } from "@/pages/Leads";
 
 // --- Inline UI Components for Portability ---
 
@@ -78,10 +79,10 @@ const ToastProvider = ({ children }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === 'destructive'
-                  ? 'bg-red-900/90 border-red-800 text-white'
-                  : t.variant === 'success'
-                    ? 'bg-green-900/90 border-green-800 text-white'
-                    : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
+                ? 'bg-red-900/90 border-red-800 text-white'
+                : t.variant === 'success'
+                  ? 'bg-green-900/90 border-green-800 text-white'
+                  : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
                 }`}
             >
               <div>
@@ -133,6 +134,17 @@ function CallLogsContent() {
 
   const audioRef = useRef(null);
   const [playingId, setPlayingId] = useState(null);
+  // const [popupOpen, setPopupOpen] = useState(false);
+  // const [formData, setFormData] = useState({
+  //   name: '',
+  //   phone: '',
+  //   email: '',
+  //   notes: '',
+  // });
+  const [leadDialogOpen, setLeadDialogOpen] = useState(false);
+  const [leadInitialData, setLeadInitialData] = useState(null);
+
+
 
   // Fetch Logs
   useEffect(() => {
@@ -281,8 +293,8 @@ function CallLogsContent() {
     <button
       onClick={() => setActiveTab(id)}
       className={`relative px-4 py-2 text-sm font-medium transition-all rounded-md ${activeTab === id
-          ? 'bg-blue-600 text-white shadow-md'
-          : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
+        ? 'bg-blue-600 text-white shadow-md'
+        : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
         }`}
     >
       {label}
@@ -297,19 +309,19 @@ function CallLogsContent() {
 
   return (
     <div className="space-y-6 p-4 bg-slate-950 min-h-screen text-slate-100">
-              <div className="sticky top-0 z-30 bg-slate-950 p-4 space-y-10">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">Call Logs</h1>
-        {loading && <Loader2 className="animate-spin text-white" />}
-      </div>
+      <div className="sticky top-0 z-30 bg-slate-950 p-4 space-y-10">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-white">Call Logs</h1>
+          {loading && <Loader2 className="animate-spin text-white" />}
+        </div>
 
-      {/* --- NEW: TABS SECTION --- */}
-      <div className="flex md:flex-row flex-col  items-center gap-2 p-1 bg-slate-900/50 rounded-lg md:w-fit w-full border border-slate-800">
-        <TabButton id="all" label="All Calls" />
-        <TabButton id="incoming" label="Incoming" />
-        <TabButton id="outgoing" label="Outgoing" />
-        <TabButton id="rnr" label="RNR" />
-      </div>
+        {/* --- NEW: TABS SECTION --- */}
+        <div className="flex md:flex-row flex-col  items-center gap-2 p-1 bg-slate-900/50 rounded-lg md:w-fit w-full border border-slate-800">
+          <TabButton id="all" label="All Calls" />
+          <TabButton id="incoming" label="Incoming" />
+          <TabButton id="outgoing" label="Outgoing" />
+          <TabButton id="rnr" label="RNR" />
+        </div>
       </div>
 
       <Card className="bg-slate-900 border-slate-800 hidden md:block">
@@ -397,33 +409,54 @@ function CallLogsContent() {
 
                     <td className="py-3 px-4">
                       {call.status === 'answered' && (
+                        // <Button
+                        //   size="sm"
+                        //   variant="outline"
+                        //   // onClick={() => handleQualify(call._id)}
+                        //   onClick={() => {
+                        //     setFormData({
+                        //       name: call.from || '',
+                        //       phone: call.to || '',
+                        //       email: '',
+                        //       notes: '',
+                        //     });
+                        //     setPopupOpen(true);
+                        //   }}
+                        //   disabled={qualifyingId === call._id}
+                        //   className="border-blue-800 bg-blue-900/20 text-blue-300 hover:bg-blue-800 hover:text-white min-w-[90px]"
+                        // >
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleQualify(call._id)}
-                          disabled={qualifyingId === call._id}
-                          className="border-blue-800 bg-blue-900/20 text-blue-300 hover:bg-blue-800 hover:text-white min-w-[90px]"
+                          onClick={() => {
+                            setLeadInitialData({
+                             
+                              leadPhone: call.from  || ""
+                            });
+                            setLeadDialogOpen(true);
+                          }}
                         >
+                       
                           {qualifyingId === call._id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <>
-                              <UserPlus className="w-3.5 h-3.5 mr-2" />
-                              Qualify
-                            </>
-                          )}
-                        </Button>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          <UserPlus className="w-3.5 h-3.5 mr-2" />
+                          Qualify
+                        </>
                       )}
-                    </td>
+                    </Button>
+                      )}
+                  </td>
 
                   </motion.tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-      {/* //card for mobile view */}
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
+      {/* //card for mobile view */ }
       <Card className="bg-slate-900 border-slate-800 md:hidden">
         <CardContent className="p-6">
           {/* MOBILE CARD VIEW */}
@@ -537,7 +570,24 @@ function CallLogsContent() {
 
         </CardContent>
       </Card>
-    </div>
+
+
+<LeadDialog
+  open={leadDialogOpen}
+  onOpenChange={setLeadDialogOpen}
+  mode="create"
+  initialData={leadInitialData}
+  onSuccess={() => {
+    toast({
+      title: "Lead Created",
+      description: "Lead saved successfully",
+      variant: "success",
+    });
+    setLeadDialogOpen(false);
+  }}
+/>
+       
+    </div >
   );
 }
 

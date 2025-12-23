@@ -128,7 +128,7 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
 
 
 // --- LEAD DIALOG COMPONENT ---
-const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create' }) => {
+const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create',disablePhone = true  }) => {
     const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue:0 , leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '', };
     const [formData, setFormData] = useState(initialFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -197,6 +197,12 @@ useEffect(() => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        
+         // ✅ Phone number: allow only digits & max 10
+    if (name === "leadPhone") { const numericValue = value.replace(/\D/g, "");
+    if (numericValue.length > 10) return;
+    setFormData(prev => ({ ...prev, [name]: numericValue, }));return; }
+
         setFormData(prev => ({ ...prev, [name]: value }));
         if (name === 'leadCountryId') fetch(config.Api + "State/getAllStates", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ CountryID: value }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, state: data, city: [] })));
         if (name === 'leadStateId') fetch(config.Api + "City/getAllCitys", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ StateID: value }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, city: data })));
@@ -266,7 +272,14 @@ docRows.forEach(row => {
                         <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required disabled={isViewMode} /></div>
                         <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange} disabled={isViewMode} /></div>
                         <div><Label>Email *</Label><Input name="leadEmail" type="email" value={formData.leadEmail} onChange={handleChange} required disabled={isViewMode} /></div>
-                        <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled={isViewMode} /></div>
+                        {/* <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled={isViewMode} /></div> */}
+                        <div>
+  <Label>Phone *</Label> <div className="flex">   <span className="inline-flex items-center px-3 rounded-l-md border border-slate-700 bg-slate-800 text-slate-300 text-sm"> +91 </span>  <input  type="text" name="leadPhone" value={formData.leadPhone} onChange={handleChange}  maxLength={10}   disablePhone={false} required 
+   className="flex-1 h-10 rounded-r-md border border-slate-700 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none"placeholder="Enter mobile number"
+    />
+  </div>
+</div>
+
                         <div><Label>Job Title</Label><Input name="leadJobTitle" value={formData.leadJobTitle} onChange={handleChange} disabled={isViewMode} /></div>
                         <div><Label>LinkedIn Profile</Label><Input name="leadLinkedIn" value={formData.leadLinkedIn} onChange={handleChange} disabled={isViewMode} /></div>
                         <div><Label>Street Address</Label><Input name="leadAddress" value={formData.leadAddress} onChange={handleChange} disabled={isViewMode} /></div>
@@ -292,13 +305,13 @@ docRows.forEach(row => {
                             </div>
                             <div className="md:col-span-2"><Label>Notes</Label><textarea name="leadNotes" value={formData.leadNotes} onChange={handleChange} disabled={isViewMode} className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-fuchsia-500" /></div>
                         </div>)}
-{activeFormTab === "document" && (
-    <div>
-        <SectionHeader icon={FileText} title="Document Attachment" />
-        {docRows.map((row, index) => (
-            <div key={index} className="grid grid-cols-1 md:grid-cols-[220px_1fr_auto] gap-4 md:gap-20 items-end mb-4">
-                <div>
-                    <select 
+                         {activeFormTab === "document" && (
+                             <div>
+                          <SectionHeader icon={FileText} title="Document Attachment" />
+                       {docRows.map((row, index) => (
+                       <div key={index} className="grid grid-cols-1 md:grid-cols-[220px_1fr_auto] gap-4 md:gap-20 items-end mb-4">
+                       <div>
+                        <select 
                         value={row.documentId} 
                         onChange={(e) => handleDocChange(index, e.target.value)} 
                         className="w-full h-10 bg-slate-800 border border-slate-700 rounded-md px-3 text-sm text-gray-300"
@@ -306,10 +319,10 @@ docRows.forEach(row => {
                     >
                         <option value="">Select</option>
                         {lookups.document.map(d => <option key={d._id} value={d._id}>{d.documentName}</option>)}
-                    </select>
-                </div>
-                <div className="flex flex-col w-full">
-                    {row.documentId && (
+                       </select>
+                       </div>
+                        <div className="flex flex-col w-full">
+                        {row.documentId && (
                         <>
                             <Label>{row.existingUrl ? `Current File: ${row.fileName}` : 'Upload File'}</Label>
                             <div className="flex items-center gap-2">
@@ -323,16 +336,12 @@ docRows.forEach(row => {
                                 
                                 {/* Preview Logic for New File OR Existing File */}
                                 {(row.file || row.existingUrl) && (
-                                   <Button 
-    type="button" 
-    variant="outline" 
-    size="sm" 
-    className="h-8 w-8 p-0 border-fuchsia-500 text-fuchsia-500 hover:bg-fuchsia-500/10"
-    onClick={() => {
-        let url;
-        if (row.file) {
+                                   <Button type="button" variant="outline" size="sm"   className="h-8 w-8 p-0 border-fuchsia-500 text-fuchsia-500 hover:bg-fuchsia-500/10"
+                                   onClick={() => {
+                                           let url;
+                                         if (row.file) {
             // Preview for newly selected local file
-            url = URL.createObjectURL(row.file);
+                                       url = URL.createObjectURL(row.file);
         } else if (row.existingUrl) {
             // Preview for existing server file
             // Format: config.Api + lead_documents/ + filename
@@ -485,7 +494,7 @@ function LeadsContent() {
             "Lead Site": row.leadSiteId.sitename,
             "Lead Phone": row.leadPhone,
             "Lead Status": row.leadStatusId.leadStatustName,
-            "Assigned To": row.leadAssignedId.EmployeeName,
+            "Assigned To": row.leadAssignedId?row.leadAssignedId.EmployeeName:'',
 
         });
         setViewOpen(true);
@@ -528,7 +537,7 @@ function LeadsContent() {
                                 <td className="py-3 px-4 font-medium text-white cursor-pointer" onClick={() => { setNotesLead(l); setNoteText(''); setNotesDialogOpen(true); }}><span className="underline-offset-4 group-hover:underline text-fuchsia-400">{l.leadFirstName} {l.leadLastName}</span></td>
                                 <td className="py-3 px-4 text-slate-300">{l.leadSiteId?.sitename || 'N/A'}</td>
                                 <td className="py-3 px-4 text-slate-300 flex gap-2"><button onClick={() => { setCallNumber(l.leadPhone); setCallDialogOpen(true); }}><Phone size={18} className=' hover:text-fuchsia-400' /></button>{l.leadPhone}</td>
-                                <td className="py-3 px-4"><Badge className={statusColors[l.leadStatusId?.name] || 'bg-slate-700'}>{l.leadStatusId?.name || 'New'}</Badge></td>
+                                <td className="py-3 px-4"><Badge className={statusColors[l.leadStatusId?.leadStatusColor] || 'bg-slate-700'}>{l.leadStatusId?.leadStatustName || 'New'}</Badge></td>
                                 <td className="py-3 px-4 text-slate-300">{l.leadAssignedId?.EmployeeName || 'Unassigned'}</td>
                                 <td className="py-3 px-4 flex gap-2">
                                     <Button variant="icon" size="icon" onClick={() => { setLeadToAssign({ id: l._id, name: l.leadFirstName, original: l }); setAssignDialogOpen(true); }} className="text-green-400"><UserPlus className="w-4 h-4" /></Button>
@@ -698,3 +707,4 @@ function LeadsContent() {
 }
 
 export default function Leads() { return (<ToastProvider><LeadsContent /></ToastProvider>); }
+export { LeadDialog };
