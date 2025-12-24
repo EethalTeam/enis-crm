@@ -2,11 +2,13 @@ import React, { useState, useEffect, useReducer, useCallback, createContext, use
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2,
-  X, ChevronDown, MapPin, UserPlus, RefreshCw, AlertTriangle,Home,Square ,Compass 
+  X, ChevronDown, MapPin, UserPlus, RefreshCw, AlertTriangle, Home, Square, Compass
 } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from "react-router-dom";
+
+import * as XLSX from "xlsx";  //for export execel
 // --- LOCAL REDUCER ---
 const initialState = {
   _id: '',
@@ -76,10 +78,10 @@ const ToastProvider = ({ children }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === 'destructive'
-                  ? 'bg-red-900/90 border-red-800 text-white'
-                  : t.variant === 'success'
-                    ? 'bg-green-900/90 border-green-800 text-white'
-                    : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
+                ? 'bg-red-900/90 border-red-800 text-white'
+                : t.variant === 'success'
+                  ? 'bg-green-900/90 border-green-800 text-white'
+                  : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
                 }`}
             >
               <div>
@@ -222,7 +224,7 @@ const ConfirmDialog = ({ open, title, description, onConfirm, onCancel, loading 
 
 function PlotsContent() {
   const { toast } = useToast();
-   const navigate = useNavigate()
+  const navigate = useNavigate()
 
   // State
   const [openView, setOpenView] = useState(false);
@@ -240,10 +242,12 @@ function PlotsContent() {
   const [isEdit, setIsEdit] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  const [Data, SetData] = useState([]); // Stores Units
+  // const [Data, SetData] = useState([]); // Stores Units
+  const [unitList, setUnitList] = useState([]);
+  const [visitorList, setVisitorList] = useState([]);
   const [siteList, setSiteList] = useState([]); // Stores Sites
-   const { getPermissionsByPath } = useAuth();
-    const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
+  const { getPermissionsByPath } = useAuth();
+  const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
 
   const [PlotStatus] = useState([
     { PlotStatusIDPK: 5, PlotStatusName: "Visited", colorCode: '#3b82f6' },
@@ -274,22 +278,22 @@ function PlotsContent() {
   }, []);
 
 
-   useEffect(() => {
-      getPermissionsByPath(window.location.pathname).then(res => {
-        if (res) {
-          setPermissions(res)
-        } else {
-          navigate('/dashboard')
-        }
-      })
-  
-    }, [])
-  
-  useEffect(()=>{
-      if (Permissions.isView) {
-        getPlot();
+  useEffect(() => {
+    getPermissionsByPath(window.location.pathname).then(res => {
+      if (res) {
+        setPermissions(res)
+      } else {
+        navigate('/dashboard')
       }
-  },[Permissions])
+    })
+
+  }, [])
+
+  useEffect(() => {
+    if (Permissions.isView) {
+      getPlot();
+    }
+  }, [Permissions])
 
 
 
@@ -341,7 +345,7 @@ function PlotsContent() {
       });
       if (!response.ok) throw new Error('Failed to get Units');
       const result = await response.json();
-      SetData(result.data || result);
+        setUnitList(result.data || result);
     } catch (error) { console.error('Error:', error); }
   };
 
@@ -362,7 +366,7 @@ function PlotsContent() {
       // For now, let's assume this updates a separate list or handle carefully.
       // NOTE: In original code Data was reused. I will fetch visitors directly in dropdown click or separate state if possible. 
       // For safety, I'll update SetData but be aware of conflict if opening Unit and Visitor dropdowns simultaneously.
-      SetData(result || []);
+       setVisitorList(result || []);
     } catch (error) { console.error('Error:', error); }
   };
 
@@ -466,9 +470,9 @@ function PlotsContent() {
     // Set Site if available (Assuming unitId carries siteId populated or plot carries siteId)
     // If backend doesn't populate site inside unit, we need to handle that. 
     // Assuming structure: Plot -> unitId -> siteId
-    if (data.unitId?.siteId) {
-      dispatch({ type: 'text', name: "siteId", value: data.unitId.siteId._id || data.unitId.siteId });
-      dispatch({ type: 'text', name: "sitename", value: data.unitId.siteId.sitename || '' });
+    if (data.siteId) {
+      dispatch({ type: 'text', name: "siteId", value: data.siteId._id || data.siteId });
+      dispatch({ type: 'text', name: "sitename", value: data.siteId.sitename || '' });
     }
 
     dispatch({ type: 'text', name: "plotCode", value: data.plotCode || '' });
@@ -489,6 +493,7 @@ function PlotsContent() {
       dispatch({ type: 'text', name: "unitId", value: data.unitId._id || '' });
       dispatch({ type: 'text', name: "UnitName", value: data.unitId.UnitName || '' });
     }
+   
     setDialogOpen(true);
   };
 
@@ -541,13 +546,29 @@ function PlotsContent() {
   const performSubmit = async (type) => {
     setLoading(true);
     try {
+      // const updateData = {
+      //   _id: state._id,
+      //   siteId: state.siteId, // Include Site
+      //   unitId: state.unitId,
+      //   plotCode: state.plotCode,
+      //   UnitName: state.UnitName,
+      // };
+
       const updateData = {
-        _id: state._id,
-        siteId: state.siteId, // Include Site
-        unitId: state.unitId,
-        plotCode: state.plotCode,
-        UnitName: state.UnitName,
-      };
+  _id: state._id,
+  siteId: state.siteId,
+  unitId: state.unitId || null,
+  plotNumber: state.plotNumber,
+  dimension: state.dimension,
+  areaInSqFt: state.areaInSqFt,
+  cents: state.cents,
+  road: state.road,
+  landmark: state.landmark,
+  remarks: state.remarks,
+  description: state.description,
+  facing: state.facing,
+};
+
       const saveData = {
         siteId: state.siteId, // Include Site
         plotNumber: state.plotNumber,
@@ -559,7 +580,8 @@ function PlotsContent() {
         remarks: state.remarks,
         description: state.description,
         facing: state.facing,
-        unitId: state.unitId
+        // unitId: state.unitId
+        ...(state.unitId && { unitId: state.unitId })
       };
 
       if (type === 'Update') {
@@ -583,7 +605,7 @@ function PlotsContent() {
   const performVisitorSubmit = async () => {
     setLoading(true);
     try {
-      const updateData = { plotId: RowData._id };
+      const updateData = { _id: RowData._id };
       if (state.statusName === 'Sold To') updateData.soldToVisitorId = state.visitorId;
       else if (state.statusName === 'Reserved By') updateData.reservedBy = state.visitorId;
       else if (state.statusName === 'Hold By') updateData.holdBy = state.visitorId;
@@ -607,7 +629,7 @@ function PlotsContent() {
   const handleView = (row) => {
     setViewData({
       "Plot Code": row.plotCode,
-      "Site": row.unitId?.siteId?.sitename || '-',
+       "Site": row.siteId?.sitename || '-',
       "Unit": row.unitId?.UnitName || '-'
     });
     setOpenView(true);
@@ -619,16 +641,74 @@ function PlotsContent() {
     setOpenVisitor(true);
   };
 
-  // Helper to filter units based on selected Site
+  // // Helper to filter units based on selected Site
+  // const getFilteredUnits = () => {
+  //   if (!state.siteId) return [];
+  //   // Filter units where unit.siteId matches state.siteId
+  //   // Ensure backend populates siteId in Unit/getAllUnits or returns siteId string
+  //   return Data.filter(u => {
+  //     const uSiteId = u.siteId?._id || u.siteId; // Handle populated object or ID string
+  //     return uSiteId === state.siteId;
+  //   });
+  // };
   const getFilteredUnits = () => {
-    if (!state.siteId) return [];
-    // Filter units where unit.siteId matches state.siteId
-    // Ensure backend populates siteId in Unit/getAllUnits or returns siteId string
-    return Data.filter(u => {
-      const uSiteId = u.siteId?._id || u.siteId; // Handle populated object or ID string
-      return uSiteId === state.siteId;
+  if (!state.siteId) return [];
+  return unitList.filter(u => {
+    const uSiteId = u.siteId?._id || u.siteId;
+    return uSiteId === state.siteId;
+  });
+};
+
+
+const exportPlotsToExcel = () => {
+  if (!filteredData || filteredData.length === 0) {
+    toast({
+      title: "No data to export",
+      description: "There are no plots available",
+      variant: "destructive",
     });
-  };
+    return;
+  }
+
+  // Prepare Excel rows
+  const excelData = filteredData.map((row, index) => ({
+    "S.No": index + 1,
+    "Site Name": row.siteId?.sitename || "",
+    "Unit Name": row.unitId?.UnitName || "",
+    "Plot Number": row.plotNumber || "",
+    "Area (Sq.ft)": row.areaInSqFt || "",
+    "Cents": row.cents || "",
+    "Facing": row.facing || "",
+    "Road": row.road || "",
+    "Landmark": row.landmark || "",
+    "Status": row.statusId?.statusName || "",
+    "Remarks": row.remarks || "",
+    "Description": row.description || "",
+    "Created Date": row.createdAt
+      ? new Date(row.createdAt).toLocaleString("en-IN")
+      : "",
+  }));
+
+  // 🔹 Create worksheet & workbook
+  const worksheet = XLSX.utils.json_to_sheet(excelData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Plots");
+
+  // 🔹 Auto column width
+  worksheet["!cols"] = Object.keys(excelData[0]).map((key) => ({
+    wch: Math.max(
+      key.length,
+      ...excelData.map((row) => String(row[key] || "").length)
+    ) + 2,
+  }));
+
+  // 🔹 Download file
+  XLSX.writeFile(
+    workbook,
+    `Plots_${new Date().toISOString().slice(0, 10)}.xlsx`
+  );
+};
+
 
   return (
     <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
@@ -637,19 +717,19 @@ function PlotsContent() {
       <div className="flex md:flex-row flex-col  items-start md:justify-between gap-2">
         <h1 className="text-3xl font-bold text-white">Plots</h1>
         <div className="flex  md:flex-row flex-col  gap-3">
-          <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
+          {/* <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
             <Upload className="w-4 h-4 mr-2" /> Import
-          </Button>
-          <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
+          </Button> */}
+          <Button variant="outline"   onClick={exportPlotsToExcel} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
             <Download className="w-4 h-4 mr-2" /> Export
           </Button>
           {
-            Permissions.isAdd && 
-             <Button onClick={() => { clear(); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
-            <Plus className="w-4 h-4 mr-2" /> Add Plot
-          </Button>
+            Permissions.isAdd &&
+            <Button onClick={() => { clear(); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
+              <Plus className="w-4 h-4 mr-2" /> Add Plot
+            </Button>
           }
-         
+
         </div>
       </div>
 
@@ -711,8 +791,8 @@ function PlotsContent() {
                       <td className="py-3 px-4 flex items-center gap-2">
                         <Button variant="icon" size="icon" onClick={() => handleView(row)} title="View"><Eye className="w-4 h-4 text-blue-400" /></Button>
                         {
-                          Permissions.isEdit && 
-                        <Button variant="icon" size="icon" onClick={() => editTable(row)} title="Edit"><Pencil className="w-4 h-4 text-yellow-400" /></Button>
+                          Permissions.isEdit &&
+                          <Button variant="icon" size="icon" onClick={() => editTable(row)} title="Edit"><Pencil className="w-4 h-4 text-yellow-400" /></Button>
 
                         }
                         <Button variant="icon" size="icon" onClick={() => handleAddVisitor(row)} title="Add Visitor"><UserPlus className="w-4 h-4 text-green-400" /></Button>
@@ -883,7 +963,8 @@ function PlotsContent() {
                     value={state.unitId}
                     disabled={!state.siteId} // Disable if no Site selected
                     onChange={(e) => {
-                      const selected = Data.find(d => d._id === e.target.value);
+                      // const selected = Data.find(d => d._id === e.target.value);
+                      const selected = unitList.find(u => u._id === e.target.value);
                       if (selected) storeDispatch(selected, 'unitId', 'select');
                       else storeDispatch({ _id: '', UnitName: '' }, 'unitId', 'select'); // Clear if reset
                     }}
@@ -986,12 +1067,12 @@ function PlotsContent() {
                   value={state.visitorId}
                   onClick={() => getVisitor()}
                   onChange={(e) => {
-                    const vis = Data.find(v => v._id === e.target.value);
+                    const vis = visitorList.find(v => v._id === e.target.value);
                     if (vis) storeDispatch({ _id: vis._id, visitorName: vis.visitorName || vis['Visitor Name'] }, 'VisitorID', 'select');
                   }}
                 >
                   <option value="">Select Visitor</option>
-                  {Data.map((v, i) => <option key={v._id || i} value={v._id}>{v.visitorName || v['Visitor Name']}</option>)}
+                  {visitorList.map((v, i) => <option key={v._id || i} value={v._id}>{v.visitorName || v['Visitor Name']}</option>)}
                 </select>
                 <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
               </div>

@@ -241,7 +241,7 @@ const handleCall = () => {
               <div style={styles.grid}>
                 <button onClick={toggleMute} style={styles.btnGrid}>{isMuted ? '🔇 Unmute' : '🎤 Mute'}</button>
                 <button onClick={toggleHold} style={styles.btnGrid}>{isOnHold ? '▶ Resume' : '⏸ Hold'}</button>
-                <button onClick={toggleSpeaker} style={styles.btnGrid}>{isSpeakerOn ? '🔊 Speaker Off' : '🔈 Speaker On'}</button>
+                {/* <button onClick={toggleSpeaker} style={styles.btnGrid}>{isSpeakerOn ? '🔊 Speaker Off' : '🔈 Speaker On'}</button> */}
                 <button onClick={() => alert('Keypad coming soon')} style={styles.btnGrid}>🔢 Keypad</button>
               </div>
             )}

@@ -498,13 +498,13 @@ function UnitsContent() {
       {/* HEADER */}
       <div className="flex md:flex-row flex-col items-start md:justify-between space-y-5">
         <h1 className="text-3xl font-bold text-white">Units</h1>
-        <div className="grid md:grid-cols-3 grid-cols-2 items-start gap-3">
-          <Button variant="outline" onClick={handleImport} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
+        <div className="grid md:grid-cols-1 grid-cols-1 items-start gap-3">
+          {/* <Button variant="outline" onClick={handleImport} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
             <Upload className="w-4 h-4 mr-2" /> Import
           </Button>
           <Button variant="outline" onClick={handleExport} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
             <Download className="w-4 h-4 mr-2" /> Export
-          </Button>
+          </Button> */}
           <Button onClick={() => { clear(); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
             <Plus className="w-4 h-4 mr-2" /> Add Unit
           </Button>

@@ -8,7 +8,8 @@ import { config } from '@/components/CustomComponents/config.js';
 import { useAuth } from '@/contexts/AuthContext';
 
 import { useNavigate } from "react-router-dom";
-
+//for Export 
+import * as XLSX from "xlsx";
 // TeleCMI Credentials
 const CREDENTIALS = {
     userId: '5002_33336945',
@@ -264,6 +265,8 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         </button>
     );
 
+   
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0">
@@ -503,31 +506,82 @@ function LeadsContent() {
         setViewOpen(true);
     };
 
+
+
+     const exportLeadsToExcel = () => {
+        if (!leads || leads.length === 0) {
+            toast({ title: "No data to export", variant: "destructive" });
+            return;
+        }
+
+        // 👉 Prepare Excel rows
+        const excelData = getFilteredLeads().map((l, index) => ({
+            "S.No": index + 1,
+            "First Name": l.leadFirstName || "",
+            "Last Name": l.leadLastName || "",
+            "Phone": l.leadPhone || "",
+            "Email": l.leadEmail || "",
+            "Site": l.leadSiteId?.sitename || "",
+            "Status": l.leadStatusId?.leadStatustName || "",
+            "Assigned To": l.leadAssignedId?.EmployeeName || "Unassigned",
+            "Created Date": l.createdAt
+                ? new Date(l.createdAt).toLocaleString("en-IN")
+                : ""
+        }));
+
+        // 👉 Create worksheet & workbook
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
+
+        // 👉 Auto column width
+        const colWidths = Object.keys(excelData[0]).map(key => ({
+            wch: Math.max(
+                key.length,
+                ...excelData.map(row => String(row[key] || "").length)
+            ) + 2
+        }));
+        worksheet["!cols"] = colWidths;
+
+        // 👉 Download file
+        XLSX.writeFile(workbook, `Leads_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    };
+
+
     return (
 
         <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
             <div className="sticky top-0 z-30 bg-slate-950 pb-4 space-y-10">
                 <div className="flex md:flex-row flex-col items-start md:justify-between gap-3 sticky ">
                     <h1 className="text-3xl font-bold text-white">Leads</h1>
-                    <div className="grid md:grid-cols-3 grid-cols-2 gap-3">
-                        <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Upload className="w-4 h-4 mr-2" />Import</Button>
-                        <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Download className="w-4 h-4 mr-2" />Export</Button>
+                    <div className="grid md:grid-cols-2 grid-cols-2 gap-3">
+                        {/* <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Upload className="w-4 h-4 mr-2" />Import</Button> */}
+                        {/* <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Download className="w-4 h-4 mr-2" />Export</Button> */}
+                        <Button
+                            variant="outline"
+                            onClick={exportLeadsToExcel}
+                            className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
+                        >
+                            <Download className="w-4 h-4 mr-2" />
+                            Export
+                        </Button>
+
                         {Permissions.isAdd && <Button onClick={() => { setDialogMode('create'); setSelectedLead(null); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0"><Plus className="w-4 h-4 mr-2" />Add Lead</Button>}
-                              {/* MOBILE SELECT */}
-            <div className="md:hidden w-full">
-                <select
-                    value={activeTab}
-                    onChange={(e) => setActiveTab(e.target.value)}
-                    className=" w-full h-11 rounded-md bg-slate-900 border border-slate-700 text-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-fuchsia-500" >
-                    <option value="all">All Leads</option>
-                    <option value="new">New Leads</option>
-                    <option value="followups">Follow-ups</option>
-                    <option value="visits">Visits</option>
-                    <option value="unassigned">Unassigned</option>
-                </select>
-            </div>
+                        {/* MOBILE SELECT */}
+                        <div className="md:hidden w-full">
+                            <select
+                                value={activeTab}
+                                onChange={(e) => setActiveTab(e.target.value)}
+                                className=" w-full h-11 rounded-md bg-slate-900 border border-slate-700 text-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-fuchsia-500" >
+                                <option value="all">All Leads</option>
+                                <option value="new">New Leads</option>
+                                <option value="followups">Follow-ups</option>
+                                <option value="visits">Visits</option>
+                                <option value="unassigned">Unassigned</option>
+                            </select>
+                        </div>
                     </div>
-              
+
                 </div>
 
 
@@ -540,7 +594,7 @@ function LeadsContent() {
                 </div>
             </div>
 
-        
+
 
 
             <Card className='md:block hidden'>

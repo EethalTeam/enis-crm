@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, CheckCircle, Filter, User, Phone, Clock, Hourglass } from 'lucide-react';
+import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, CheckCircle, Filter, User, Phone, Clock, Hourglass, Download } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
 import { LeadDialog } from "@/pages/Leads";
+
+import * as XLSX from "xlsx";  //for export execel
 
 // --- Inline UI Components for Portability ---
 
@@ -307,28 +309,83 @@ function CallLogsContent() {
     </button>
   );
 
+
+  const exportCallLogsToExcel = () => {
+    if (!filteredLogs || filteredLogs.length === 0) {
+      toast({
+        title: "No data to export",
+        description: "No call logs available",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const excelData = filteredLogs.map((call, index) => ({
+      "S.No": index + 1,
+      "Call Type":
+        call.direction === "inbound" || call.direction === "incoming"
+          ? "Incoming"
+          : "Outgoing",
+      "Caller ": call.direction === "inbound" ? call.from : (call.user || "Agent"),
+      "Phone Number": call.to || "",
+      "Status": call.status || "",
+      "Call Time": call.callDate
+        ? new Date(call.callDate).toLocaleString("en-IN")
+        : "",
+      "Duration (sec)": call.answeredsec || call.duration || 0,
+      "Duration (mm:ss)": formatDuration(call.answeredsec || call.duration),
+      "Recording Available": call.recordingUrl || call.filename ? "Yes" : "No",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Call Logs");
+
+    // Auto column width
+    worksheet["!cols"] = Object.keys(excelData[0]).map((key) => ({
+      wch: Math.max(
+        key.length,
+        ...excelData.map((row) => String(row[key] || "").length)
+      ) + 2,
+    }));
+
+    XLSX.writeFile(
+      workbook,
+      `CallLogs_${activeTab.toUpperCase()}_${new Date()
+        .toISOString()
+        .slice(0, 10)}.xlsx`
+    );
+  };
+
+
   return (
     <div className="space-y-6 p-4 bg-slate-950  min-h-screen text-slate-100">
       <div className="sticky top-0 z-30 bg-slate-950 p-4 space-y-10">
         <div className="flex md:flex-row flex-col items-start md:items-center space-y-4  justify-between">
           <h1 className="md:text-3xl text-2xl font-bold text-white">Call Logs</h1>
+          <Button
+            variant="outline"
+            onClick={exportCallLogsToExcel}
+            className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
+          >
+            <Download className="w-4 h-4 mr-2" /> Export
+          </Button>
           {loading && <Loader2 className="animate-spin text-white" />}
-         
 
-         {/* MOBILE SELECT */}
-        <div className="md:hidden w-full ">
-          <select
-            value={activeTab}
-            onChange={(e) => setActiveTab(e.target.value)}
-            className=" w-full h-11 rounded-md bg-slate-900 border border-slate-700 text-white text-sm px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 " >
-            <option value="all">All Calls</option>
-            <option value="incoming">Incoming</option>
-            <option value="outgoing">Outgoing</option>
-            <option value="rnr">RNR</option>
-          </select>
+          {/* MOBILE SELECT */}
+          <div className="md:hidden w-full ">
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value)}
+              className=" w-full h-11 rounded-md bg-slate-900 border border-slate-700 text-white text-sm px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 " >
+              <option value="all">All Calls</option>
+              <option value="incoming">Incoming</option>
+              <option value="outgoing">Outgoing</option>
+              <option value="rnr">RNR</option>
+            </select>
+          </div>
         </div>
-        </div>
-        
+
 
 
         {/* --- NEW: TABS SECTION --- */}
