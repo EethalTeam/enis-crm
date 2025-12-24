@@ -308,15 +308,31 @@ function CallLogsContent() {
   );
 
   return (
-    <div className="space-y-6 p-4 bg-slate-950 min-h-screen text-slate-100">
+    <div className="space-y-6 p-4 bg-slate-950  min-h-screen text-slate-100">
       <div className="sticky top-0 z-30 bg-slate-950 p-4 space-y-10">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-white">Call Logs</h1>
+        <div className="flex md:flex-row flex-col items-start md:items-center space-y-4  justify-between">
+          <h1 className="md:text-3xl text-2xl font-bold text-white">Call Logs</h1>
           {loading && <Loader2 className="animate-spin text-white" />}
+         
+
+         {/* MOBILE SELECT */}
+        <div className="md:hidden w-full ">
+          <select
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
+            className=" w-full h-11 rounded-md bg-slate-900 border border-slate-700 text-white text-sm px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 " >
+            <option value="all">All Calls</option>
+            <option value="incoming">Incoming</option>
+            <option value="outgoing">Outgoing</option>
+            <option value="rnr">RNR</option>
+          </select>
         </div>
+        </div>
+        
+
 
         {/* --- NEW: TABS SECTION --- */}
-        <div className="flex md:flex-row flex-col  items-center gap-2 p-1 bg-slate-900/50 rounded-lg md:w-fit w-full border border-slate-800">
+        <div className=" hidden md:flex md:flex-row flex-col  items-center gap-2 p-1 bg-slate-900/50 rounded-lg md:w-fit w-full border border-slate-800">
           <TabButton id="all" label="All Calls" />
           <TabButton id="incoming" label="Incoming" />
           <TabButton id="outgoing" label="Outgoing" />
@@ -430,33 +446,35 @@ function CallLogsContent() {
                           variant="outline"
                           onClick={() => {
                             setLeadInitialData({
-                             
-                              leadPhone: call.from  || ""
+
+                              leadPhone: call.from || ""
                             });
                             setLeadDialogOpen(true);
                           }}
                         >
-                       
+
                           {qualifyingId === call._id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <UserPlus className="w-3.5 h-3.5 mr-2" />
-                          Qualify
-                        </>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <UserPlus className="w-3.5 h-3.5 mr-2" />
+                              Qualify
+                            </>
+                          )}
+                        </Button>
                       )}
-                    </Button>
-                      )}
-                  </td>
+                    </td>
 
                   </motion.tr>
                 ))}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
-      {/* //card for mobile view */ }
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+
+      {/* //card for mobile view */}
       <Card className="bg-slate-900 border-slate-800 md:hidden">
         <CardContent className="p-6">
           {/* MOBILE CARD VIEW */}
@@ -548,10 +566,15 @@ function CallLogsContent() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleQualify(call._id)}
-                        disabled={qualifyingId === call._id}
-                        className="border-blue-800 bg-blue-900/20 text-blue-300 hover:bg-blue-800 hover:text-white min-w-[90px]"
+                        onClick={() => {
+                          setLeadInitialData({
+
+                            leadPhone: call.from || ""
+                          });
+                          setLeadDialogOpen(true);
+                        }}
                       >
+
                         {qualifyingId === call._id ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
                         ) : (
@@ -572,21 +595,21 @@ function CallLogsContent() {
       </Card>
 
 
-<LeadDialog
-  open={leadDialogOpen}
-  onOpenChange={setLeadDialogOpen}
-  mode="create"
-  initialData={leadInitialData}
-  onSuccess={() => {
-    toast({
-      title: "Lead Created",
-      description: "Lead saved successfully",
-      variant: "success",
-    });
-    setLeadDialogOpen(false);
-  }}
-/>
-       
+      <LeadDialog
+        open={leadDialogOpen}
+        onOpenChange={setLeadDialogOpen}
+        mode="create"
+        initialData={leadInitialData}
+        onSuccess={() => {
+          toast({
+            title: "Lead Created",
+            description: "Lead saved successfully",
+            variant: "success",
+          });
+          setLeadDialogOpen(false);
+        }}
+      />
+
     </div >
   );
 }

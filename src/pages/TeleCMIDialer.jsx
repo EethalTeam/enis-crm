@@ -208,7 +208,7 @@ console.log(sdk,"sdksdksdksdksdk")
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h3 style={styles.headerTitle}>Eethal Softphone</h3>
+        <h3 style={styles.headerTitle}> Softphone</h3>
         <div style={styles.headerSub}>
            {isLoggedIn ? `🟢 Online as ${agentName || 'Agent'}` : '🔴 Connecting...'}
         </div>

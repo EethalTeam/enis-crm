@@ -1,11 +1,12 @@
 import React, { useState, useEffect, createContext, useContext, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import PIOPIY from 'piopiyjs';
+import PIOPIY from 'piopiyjs'
 import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus, Phone, FileText, Contact, Clock, PhoneOff } from 'lucide-react';
 
 // --- CONFIGURATION & IMPORTS ---
 import { config } from '@/components/CustomComponents/config.js';
 import { useAuth } from '@/contexts/AuthContext';
+
 import { useNavigate } from "react-router-dom";
 
 // TeleCMI Credentials
@@ -73,7 +74,7 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
         if (!selectedAgent) return;
         setIsSubmitting(true);
         try {
-            const res = await fetch(config.Api + "Lead/assignLead", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ leadId: lead.id,  leadAssignedId: selectedAgent , employeeName: user?.EmployeeName }) });
+            const res = await fetch(config.Api + "Lead/assignLead", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ leadId: lead.id, leadAssignedId: selectedAgent, employeeName: user?.EmployeeName }) });
             if ((await res.json()).success) { toast({ title: "Assigned", variant: "success" }); onSuccess(); onOpenChange(false); }
         } catch (e) { toast({ title: "Error", variant: "destructive" }); }
         finally { setIsSubmitting(false); }
@@ -128,15 +129,15 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
 
 
 // --- LEAD DIALOG COMPONENT ---
-const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create',disablePhone = true  }) => {
-    const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue:0 , leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '', };
+const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create', disablePhone = true }) => {
+    const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '', };
     const [formData, setFormData] = useState(initialFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [] });
     const [docRows, setDocRows] = useState([{ documentId: "", file: null }]);
     const [activeFormTab, setActiveFormTab] = useState("contact");
     const [previewUrl, setPreviewUrl] = useState(null);
-const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const { user } = useAuth();
     const { toast } = useToast();
     const isViewMode = mode === 'view';
@@ -149,59 +150,61 @@ const [isPreviewOpen, setIsPreviewOpen] = useState(false);
         } catch (e) { console.error(e); }
     }, []);
 
-useEffect(() => {
-    if (open) {
-        fetchData("Country/getAllCountry", "country"); 
-        fetchData("LeadStatus/getAllLeadStatus", "status"); 
-        fetchData("LeadSource/getAllLeadSource", "source"); 
-        fetchData("Document/getAllDocument", "document"); 
-        fetchData("Site/getAllSites", "site");
+    useEffect(() => {
+        if (open) {
+            fetchData("Country/getAllCountry", "country");
+            fetchData("LeadStatus/getAllLeadStatus", "status");
+            fetchData("LeadSource/getAllLeadSource", "source");
+            fetchData("Document/getAllDocument", "document");
+            fetchData("Site/getAllSites", "site");
 
-        if (initialData) {
-            setFormData({ 
-                ...initialData, 
-                leadCountryId: initialData.leadCountryId?._id || '', 
-                leadStateId: initialData.leadStateId?._id || '', 
-                leadCityId: initialData.leadCityId?._id || '', 
-                leadStatusId: initialData.leadStatusId?._id || '', 
-                leadSourceId: initialData.leadSourceId?._id || '',
-                leadAssignedId: initialData.leadAssignedId?._id || '', 
-                leadSiteId: initialData.leadSiteId?._id || '', 
-                leadTags: Array.isArray(initialData.leadTags) ? initialData.leadTags.join(', ') : '' 
-            });
+            if (initialData) {
+                setFormData({
+                    ...initialData,
+                    leadCountryId: initialData.leadCountryId?._id || '',
+                    leadStateId: initialData.leadStateId?._id || '',
+                    leadCityId: initialData.leadCityId?._id || '',
+                    leadStatusId: initialData.leadStatusId?._id || '',
+                    leadSourceId: initialData.leadSourceId?._id || '',
+                    leadAssignedId: initialData.leadAssignedId?._id || '',
+                    leadSiteId: initialData.leadSiteId?._id || '',
+                    leadTags: Array.isArray(initialData.leadTags) ? initialData.leadTags.join(', ') : ''
+                });
 
-            // Populate docRows from initialData.leadDocument
-            if (initialData.leadDocument && initialData.leadDocument.length > 0) {
-    const existingDocs = initialData.leadDocument
-        .filter(doc => doc && typeof doc === 'object' && doc.fileUrl)
-        .map(doc => ({
-            documentId: doc.documentId?._id || doc.documentId,
-            file: null,
-            // Clean the URL: remove backslashes so we only have the filename
-            existingUrl: doc.fileUrl.replace(/\\/g, ''), 
-            fileName: doc.fileName
-        }));
-    
-    setDocRows(existingDocs.length > 0 ? existingDocs : [{ documentId: "", file: null }]);
-           } else {
+                // Populate docRows from initialData.leadDocument
+                if (initialData.leadDocument && initialData.leadDocument.length > 0) {
+                    const existingDocs = initialData.leadDocument
+                        .filter(doc => doc && typeof doc === 'object' && doc.fileUrl)
+                        .map(doc => ({
+                            documentId: doc.documentId?._id || doc.documentId,
+                            file: null,
+                            // Clean the URL: remove backslashes so we only have the filename
+                            existingUrl: doc.fileUrl.replace(/\\/g, ''),
+                            fileName: doc.fileName
+                        }));
+
+                    setDocRows(existingDocs.length > 0 ? existingDocs : [{ documentId: "", file: null }]);
+                } else {
+                    setDocRows([{ documentId: "", file: null }]);
+                }
+
+                // ... (rest of your state/city fetch logic)
+            } else {
+                setFormData(initialFormState);
                 setDocRows([{ documentId: "", file: null }]);
             }
-
-            // ... (rest of your state/city fetch logic)
-        } else { 
-            setFormData(initialFormState); 
-            setDocRows([{ documentId: "", file: null }]);
         }
-    }
-}, [open, initialData, fetchData]);
+    }, [open, initialData, fetchData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        
-         // ✅ Phone number: allow only digits & max 10
-    if (name === "leadPhone") { const numericValue = value.replace(/\D/g, "");
-    if (numericValue.length > 10) return;
-    setFormData(prev => ({ ...prev, [name]: numericValue, }));return; }
+
+        // ✅ Phone number: allow only digits & max 10
+        if (name === "leadPhone") {
+            const numericValue = value.replace(/\D/g, "");
+            if (numericValue.length > 10) return;
+            setFormData(prev => ({ ...prev, [name]: numericValue, })); return;
+        }
 
         setFormData(prev => ({ ...prev, [name]: value }));
         if (name === 'leadCountryId') fetch(config.Api + "State/getAllStates", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ CountryID: value }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, state: data, city: [] })));
@@ -226,24 +229,24 @@ useEffect(() => {
         if (mode === 'edit') payload.append('leadId', initialData._id);
         if (user?.id) payload.append('employeeId', user.id);
 
-// Filter for documents that are ALREADY on the server (they have an existingUrl)
-const retainedDocs = docRows
-    .filter(row => row.existingUrl && !row.file) // Keep if it has URL and wasn't replaced by new file
-    .map(row => ({
-        documentId: row.documentId,
-        fileName: row.fileName,
-        fileUrl: row.existingUrl
-    }));
+        // Filter for documents that are ALREADY on the server (they have an existingUrl)
+        const retainedDocs = docRows
+            .filter(row => row.existingUrl && !row.file) // Keep if it has URL and wasn't replaced by new file
+            .map(row => ({
+                documentId: row.documentId,
+                fileName: row.fileName,
+                fileUrl: row.existingUrl
+            }));
 
-payload.append('existingDocs', JSON.stringify(retainedDocs));
+        payload.append('existingDocs', JSON.stringify(retainedDocs));
 
-// Standard logic for new files remains the same
-docRows.forEach(row => {
-    if (row.file) {
-        payload.append('leadFiles', row.file);
-        payload.append('documentIds', row.documentId);
-    }
-});
+        // Standard logic for new files remains the same
+        docRows.forEach(row => {
+            if (row.file) {
+                payload.append('leadFiles', row.file);
+                payload.append('documentIds', row.documentId);
+            }
+        });
 
         try {
             const res = await fetch(config.Api + endpoint, { method: 'POST', body: payload });
@@ -274,11 +277,11 @@ docRows.forEach(row => {
                         <div><Label>Email *</Label><Input name="leadEmail" type="email" value={formData.leadEmail} onChange={handleChange} required disabled={isViewMode} /></div>
                         {/* <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled={isViewMode} /></div> */}
                         <div>
-  <Label>Phone *</Label> <div className="flex">   <span className="inline-flex items-center px-3 rounded-l-md border border-slate-700 bg-slate-800 text-slate-300 text-sm"> +91 </span>  <input  type="text" name="leadPhone" value={formData.leadPhone} onChange={handleChange}  maxLength={10}   disablePhone={false} required 
-   className="flex-1 h-10 rounded-r-md border border-slate-700 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none"placeholder="Enter mobile number"
-    />
-  </div>
-</div>
+                            <Label>Phone *</Label> <div className="flex">   <span className="inline-flex items-center px-3 rounded-l-md border border-slate-700 bg-slate-800 text-slate-300 text-sm"> +91 </span>  <input type="text" name="leadPhone" value={formData.leadPhone} onChange={handleChange} maxLength={10} disablePhone={false} required
+                                className="flex-1 h-10 rounded-r-md border border-slate-700 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none" placeholder="Enter mobile number"
+                            />
+                            </div>
+                        </div>
 
                         <div><Label>Job Title</Label><Input name="leadJobTitle" value={formData.leadJobTitle} onChange={handleChange} disabled={isViewMode} /></div>
                         <div><Label>LinkedIn Profile</Label><Input name="leadLinkedIn" value={formData.leadLinkedIn} onChange={handleChange} disabled={isViewMode} /></div>
@@ -292,125 +295,125 @@ docRows.forEach(row => {
                     {activeFormTab === "deal" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div><Label>Status</Label><select name="leadStatusId" value={formData.leadStatusId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.status.map(s => <option key={s._id} value={s._id}>{s.leadStatustName || s.name}</option>)}</select></div>
                         <div><Label>Source</Label><select name="leadSourceId" value={formData.leadSourceId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.source.map(s => <option key={s._id} value={s._id}>{s.leadSourceName || s.name}</option>)}</select></div>
-                        <div><Label>Potential Value</Label><div className="flex gap-2"><Input name="leadPotentialValue" type="number" value={formData.leadPotentialValue} onChange={handleChange} disabled={isViewMode} placeholder='₹'/></div></div>
-                            <div>
-                                <Label>Lead Score</Label>
-                                <select  name="leadScore" type="number" value={formData.leadScore} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"  >
-                                    <option>Select</option>
-                                    <option>25%</option>
-                                    <option>50%</option>
-                                    <option>75%</option>
-                                    <option>100%</option>
-                                </select>
-                            </div>
-                            <div className="md:col-span-2"><Label>Notes</Label><textarea name="leadNotes" value={formData.leadNotes} onChange={handleChange} disabled={isViewMode} className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-fuchsia-500" /></div>
-                        </div>)}
-                         {activeFormTab === "document" && (
-                             <div>
-                          <SectionHeader icon={FileText} title="Document Attachment" />
-                       {docRows.map((row, index) => (
-                       <div key={index} className="grid grid-cols-1 md:grid-cols-[220px_1fr_auto] gap-4 md:gap-20 items-end mb-4">
-                       <div>
-                        <select 
-                        value={row.documentId} 
-                        onChange={(e) => handleDocChange(index, e.target.value)} 
-                        className="w-full h-10 bg-slate-800 border border-slate-700 rounded-md px-3 text-sm text-gray-300"
-                        disabled={isViewMode}
-                    >
-                        <option value="">Select</option>
-                        {lookups.document.map(d => <option key={d._id} value={d._id}>{d.documentName}</option>)}
-                       </select>
-                       </div>
-                        <div className="flex flex-col w-full">
-                        {row.documentId && (
-                        <>
-                            <Label>{row.existingUrl ? `Current File: ${row.fileName}` : 'Upload File'}</Label>
-                            <div className="flex items-center gap-2">
-                                {!isViewMode && (
-                                    <input 
-                                        type="file" 
-                                        className="flex-1 text-sm text-slate-300" 
-                                        onChange={(e) => handleFileChange(index, e.target.files[0])} 
-                                    />
-                                )}
-                                
-                                {/* Preview Logic for New File OR Existing File */}
-                                {(row.file || row.existingUrl) && (
-                                   <Button type="button" variant="outline" size="sm"   className="h-8 w-8 p-0 border-fuchsia-500 text-fuchsia-500 hover:bg-fuchsia-500/10"
-                                   onClick={() => {
-                                           let url;
-                                         if (row.file) {
-            // Preview for newly selected local file
-                                       url = URL.createObjectURL(row.file);
-        } else if (row.existingUrl) {
-            // Preview for existing server file
-            // Format: config.Api + lead_documents/ + filename
-            url = `${config.Api}lead_documents/${row.existingUrl}`;
-           
-        }
-        
-        if (url) {
-            setPreviewUrl(url);
-            setIsPreviewOpen(true);
-        }
-    }}
->
-    <Eye size={14} />
-</Button>
-                                )}
-                            </div>
-                        </>
-                    )}
-                </div>
-                <div className="flex gap-2 md:pb-1">
-                    {!isViewMode && (
-                        <>
-                            {docRows.length > 1 && (
-                                <button type="button" onClick={() => setDocRows(docRows.filter((_, i) => i !== index))} className="h-8 w-8 rounded-md bg-white text-red-600 font-extrabold">–</button>
-                            )}
-                            {index === docRows.length - 1 && (
-                                <button type="button" onClick={() => setDocRows([...docRows, { documentId: "", file: null }])} className="h-8 w-8 rounded-md bg-white text-green-600 font-extrabold">+</button>
-                            )}
-                        </>
-                    )}
-                </div>
-            </div>
-        ))}
+                        <div><Label>Potential Value</Label><div className="flex gap-2"><Input name="leadPotentialValue" type="number" value={formData.leadPotentialValue} onChange={handleChange} disabled={isViewMode} placeholder='₹' /></div></div>
+                        <div>
+                            <Label>Lead Score</Label>
+                            <select name="leadScore" type="number" value={formData.leadScore} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"  >
+                                <option>Select</option>
+                                <option>25%</option>
+                                <option>50%</option>
+                                <option>75%</option>
+                                <option>100%</option>
+                            </select>
+                        </div>
+                        <div className="md:col-span-2"><Label>Notes</Label><textarea name="leadNotes" value={formData.leadNotes} onChange={handleChange} disabled={isViewMode} className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-fuchsia-500" /></div>
+                    </div>)}
+                    {activeFormTab === "document" && (
+                        <div>
+                            <SectionHeader icon={FileText} title="Document Attachment" />
+                            {docRows.map((row, index) => (
+                                <div key={index} className="grid grid-cols-1 md:grid-cols-[220px_1fr_auto] gap-4 md:gap-20 items-end mb-4">
+                                    <div>
+                                        <select
+                                            value={row.documentId}
+                                            onChange={(e) => handleDocChange(index, e.target.value)}
+                                            className="w-full h-10 bg-slate-800 border border-slate-700 rounded-md px-3 text-sm text-gray-300"
+                                            disabled={isViewMode}
+                                        >
+                                            <option value="">Select</option>
+                                            {lookups.document.map(d => <option key={d._id} value={d._id}>{d.documentName}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="flex flex-col w-full">
+                                        {row.documentId && (
+                                            <>
+                                                <Label>{row.existingUrl ? `Current File: ${row.fileName}` : 'Upload File'}</Label>
+                                                <div className="flex items-center gap-2">
+                                                    {!isViewMode && (
+                                                        <input
+                                                            type="file"
+                                                            className="flex-1 text-sm text-slate-300"
+                                                            onChange={(e) => handleFileChange(index, e.target.files[0])}
+                                                        />
+                                                    )}
 
-               {/* --- INTERNAL PREVIEW MODAL --- */}
-        <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-            <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden">
-                <DialogHeader className="flex flex-row items-center justify-between p-4 border-b border-slate-800">
-                    <DialogTitle className="text-sm">Document Preview</DialogTitle>
-                   <button 
-    type="button" // <--- Add this!
-    onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation(); // Prevents the click from reaching the form
-        setIsPreviewOpen(false);
-    }} 
-    className="text-slate-400 hover:text-white"
->
-    <X size={18} />
-</button>
-                </DialogHeader>
-                <div className="flex-1 bg-slate-900 p-2">
-                    {previewUrl && (
-                        <iframe 
-                            src={previewUrl} 
-                            className="w-full h-full rounded border-0" 
-                            title="File Preview"
-                        />
+                                                    {/* Preview Logic for New File OR Existing File */}
+                                                    {(row.file || row.existingUrl) && (
+                                                        <Button type="button" variant="outline" size="sm" className="h-8 w-8 p-0 border-fuchsia-500 text-fuchsia-500 hover:bg-fuchsia-500/10"
+                                                            onClick={() => {
+                                                                let url;
+                                                                if (row.file) {
+                                                                    // Preview for newly selected local file
+                                                                    url = URL.createObjectURL(row.file);
+                                                                } else if (row.existingUrl) {
+                                                                    // Preview for existing server file
+                                                                    // Format: config.Api + lead_documents/ + filename
+                                                                    url = `${config.Api}lead_documents/${row.existingUrl}`;
+
+                                                                }
+
+                                                                if (url) {
+                                                                    setPreviewUrl(url);
+                                                                    setIsPreviewOpen(true);
+                                                                }
+                                                            }}
+                                                        >
+                                                            <Eye size={14} />
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                    <div className="flex gap-2 md:pb-1">
+                                        {!isViewMode && (
+                                            <>
+                                                {docRows.length > 1 && (
+                                                    <button type="button" onClick={() => setDocRows(docRows.filter((_, i) => i !== index))} className="h-8 w-8 rounded-md bg-white text-red-600 font-extrabold">–</button>
+                                                )}
+                                                {index === docRows.length - 1 && (
+                                                    <button type="button" onClick={() => setDocRows([...docRows, { documentId: "", file: null }])} className="h-8 w-8 rounded-md bg-white text-green-600 font-extrabold">+</button>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* --- INTERNAL PREVIEW MODAL --- */}
+                            <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+                                <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden">
+                                    <DialogHeader className="flex flex-row items-center justify-between p-4 border-b border-slate-800">
+                                        <DialogTitle className="text-sm">Document Preview</DialogTitle>
+                                        <button
+                                            type="button" // <--- Add this!
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation(); // Prevents the click from reaching the form
+                                                setIsPreviewOpen(false);
+                                            }}
+                                            className="text-slate-400 hover:text-white"
+                                        >
+                                            <X size={18} />
+                                        </button>
+                                    </DialogHeader>
+                                    <div className="flex-1 bg-slate-900 p-2">
+                                        {previewUrl && (
+                                            <iframe
+                                                src={previewUrl}
+                                                className="w-full h-full rounded border-0"
+                                                title="File Preview"
+                                            />
+                                        )}
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
                     )}
-                </div>
-            </DialogContent>
-        </Dialog>
-    </div>
-)}
-                        {/* {isViewMode && initialData?.leadHistory && (<div className="md:col-span-2 mt-4"><SectionHeader icon={Clock} title="History" /><div className="space-y-3">{initialData.leadHistory.map((h, i) => (<div key={i} className="text-sm border-l-2 border-fuchsia-600 pl-3"><p className="text-fuchsia-400 font-bold uppercase text-xs">{h.eventType}</p><p className="text-slate-300">{h.details}</p><p className="text-[10px] text-slate-500">{new Date(h.timestamp).toLocaleString()}</p></div>)).reverse()}</div></div>)} */}
-                        {activeFormTab === "history" && (<div> <SectionHeader icon={Clock} title="Lead History" /> {!initialData?.leadHistory?.length ? (<p className="text-sm text-slate-400">No history available</p>) : (<div className="space-y-4">{[...initialData.leadHistory].reverse().map((h, i) => (<div key={i} className="border-l-2 border-fuchsia-600 pl-4 py-2 bg-slate-900/40 rounded-md" > <p className="text-xs uppercase text-fuchsia-400 font-bold">    {h.eventType} </p> <p className="text-sm text-slate-200 mt-1">{h.details} </p> <p className="text-[11px] text-slate-500 mt-1"> {new Date(h.timestamp).toLocaleString()}</p></div>))}</div>)} </div>)}
-                    </form></div>
-                <DialogFooter><Button variant="ghost" onClick={() => onOpenChange(false)}>{isViewMode ? 'Close' : 'Cancel'}</Button>{!isViewMode && <Button type="submit" onClick={(e)=>{handleSubmit(e)}} disabled={isSubmitting}>{isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Save</Button>}</DialogFooter>
+                    {/* {isViewMode && initialData?.leadHistory && (<div className="md:col-span-2 mt-4"><SectionHeader icon={Clock} title="History" /><div className="space-y-3">{initialData.leadHistory.map((h, i) => (<div key={i} className="text-sm border-l-2 border-fuchsia-600 pl-3"><p className="text-fuchsia-400 font-bold uppercase text-xs">{h.eventType}</p><p className="text-slate-300">{h.details}</p><p className="text-[10px] text-slate-500">{new Date(h.timestamp).toLocaleString()}</p></div>)).reverse()}</div></div>)} */}
+                    {activeFormTab === "history" && (<div> <SectionHeader icon={Clock} title="Lead History" /> {!initialData?.leadHistory?.length ? (<p className="text-sm text-slate-400">No history available</p>) : (<div className="space-y-4">{[...initialData.leadHistory].reverse().map((h, i) => (<div key={i} className="border-l-2 border-fuchsia-600 pl-4 py-2 bg-slate-900/40 rounded-md" > <p className="text-xs uppercase text-fuchsia-400 font-bold">    {h.eventType} </p> <p className="text-sm text-slate-200 mt-1">{h.details} </p> <p className="text-[11px] text-slate-500 mt-1"> {new Date(h.timestamp).toLocaleString()}</p></div>))}</div>)} </div>)}
+                </form></div>
+                <DialogFooter><Button variant="ghost" onClick={() => onOpenChange(false)}>{isViewMode ? 'Close' : 'Cancel'}</Button>{!isViewMode && <Button type="submit" onClick={(e) => { handleSubmit(e) }} disabled={isSubmitting}>{isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Save</Button>}</DialogFooter>
 
             </DialogContent>
         </Dialog>
@@ -494,35 +497,51 @@ function LeadsContent() {
             "Lead Site": row.leadSiteId.sitename,
             "Lead Phone": row.leadPhone,
             "Lead Status": row.leadStatusId.leadStatustName,
-            "Assigned To": row.leadAssignedId?row.leadAssignedId.EmployeeName:'',
+            "Assigned To": row.leadAssignedId ? row.leadAssignedId.EmployeeName : '',
 
         });
         setViewOpen(true);
     };
 
     return (
-       
+
         <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
-             <div className="sticky top-0 z-30 bg-slate-950 pb-4 space-y-10">
-            <div className="flex md:flex-row flex-col items-start md:justify-between gap-3 sticky ">
-                <h1 className="text-3xl font-bold text-white">Leads</h1>
-                <div className="grid md:grid-cols-3 grid-cols-2 gap-3">
-                    <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Upload className="w-4 h-4 mr-2" />Import</Button>
-                    <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Download className="w-4 h-4 mr-2" />Export</Button>
-                    {Permissions.isAdd && <Button onClick={() => { setDialogMode('create'); setSelectedLead(null); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0"><Plus className="w-4 h-4 mr-2" />Add Lead</Button>}
+            <div className="sticky top-0 z-30 bg-slate-950 pb-4 space-y-10">
+                <div className="flex md:flex-row flex-col items-start md:justify-between gap-3 sticky ">
+                    <h1 className="text-3xl font-bold text-white">Leads</h1>
+                    <div className="grid md:grid-cols-3 grid-cols-2 gap-3">
+                        <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Upload className="w-4 h-4 mr-2" />Import</Button>
+                        <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Download className="w-4 h-4 mr-2" />Export</Button>
+                        {Permissions.isAdd && <Button onClick={() => { setDialogMode('create'); setSelectedLead(null); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0"><Plus className="w-4 h-4 mr-2" />Add Lead</Button>}
+                              {/* MOBILE SELECT */}
+            <div className="md:hidden w-full">
+                <select
+                    value={activeTab}
+                    onChange={(e) => setActiveTab(e.target.value)}
+                    className=" w-full h-11 rounded-md bg-slate-900 border border-slate-700 text-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-fuchsia-500" >
+                    <option value="all">All Leads</option>
+                    <option value="new">New Leads</option>
+                    <option value="followups">Follow-ups</option>
+                    <option value="visits">Visits</option>
+                    <option value="unassigned">Unassigned</option>
+                </select>
+            </div>
+                    </div>
+              
+                </div>
+
+
+                <div className="hidden md:flex md:flex-row  items-start justify-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800  ">
+                    <TabButton id="all" label="All Leads" icon={Users} />
+                    <TabButton id="new" label="New Leads" icon={Plus} />
+                    <TabButton id="followups" label="Follow-ups" icon={PhoneCall} />
+                    <TabButton id="visits" label="Visits" icon={MapPin} />
+                    <TabButton id="unassigned" label="Unassigned" icon={UserMinus} />
                 </div>
             </div>
-            
-    
-            <div className="flex md:flex-row flex-col items-center justify-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800  ">
-                <TabButton id="all" label="All Leads" icon={Users} />
-                <TabButton id="new" label="New Leads" icon={Plus} />
-                <TabButton id="followups" label="Follow-ups" icon={PhoneCall} />
-                <TabButton id="visits" label="Visits" icon={MapPin} />
-                <TabButton id="unassigned" label="Unassigned" icon={UserMinus} />
-            </div>
-            </div>
-            
+
+        
+
 
             <Card className='md:block hidden'>
                 <CardContent className="p-6">
@@ -623,18 +642,8 @@ function LeadsContent() {
                                             <UserPlus className="w-4 h-4" />
                                         </Button>
 
-                                        <Button
-                                            variant="icon"
-                                            size="icon"
-                                            onClick={() => {
-                                                setSelectedLead(l);
-                                                setDialogMode('view');
-                                                setDialogOpen(true);
-                                            }}
-                                            className="text-blue-400"
-                                        >
-                                            <Eye className="w-4 h-4" />
-                                        </Button>
+                                        <Button variant="icon" size="icon" onClick={() => handleViewClick(l)} className="text-blue-400"><Eye className="w-4 h-4" /></Button>
+
 
                                         {Permissions.isEdit && (
                                             <Button
@@ -658,6 +667,7 @@ function LeadsContent() {
                     </div>
                 </CardContent>
             </Card>
+
 
             {/* View icon popup */}
             <Dialog open={viewOpen} onOpenChange={setViewOpen}>
