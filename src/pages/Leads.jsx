@@ -595,7 +595,7 @@ function LeadsContent() {
                                         <Badge
                                             className={statusColors[l.leadStatusId?.name] || 'bg-slate-700'}
                                         >
-                                            {l.leadStatusId?.name || 'New'}
+                                            {l.leadStatusId?.leadStatustName || 'New'}
                                         </Badge>
                                     </div>
 
