@@ -11,19 +11,27 @@ const decode = (value) => {
   }
 };
 
+
+
+
 const TeleCMIDialer = () => {
   const piopiyRef = useRef(null);
   const audioRef = useRef(typeof Audio !== "undefined" ? new Audio('') : null);
   const isMountedRef = useRef(true);
   const loginTimerRef = useRef(null);
-    const [TelecmiID, setTelecmiID] = useState(decode(localStorage.getItem("TelecmiID")));
+   const [TelecmiID, setTelecmiID] = useState(decode(localStorage.getItem("TelecmiID")));
   const [TelecmiPassword, setTelecmiPassword] = useState(decode(localStorage.getItem("TelecmiPassword")));
 
-  const CREDENTIALS = {
+ 
+
+ const CREDENTIALS = {
   userId: TelecmiID, 
   password: TelecmiPassword,
   sbcUrl: 'sbcind.telecmi.com'
 };
+console.log(TelecmiID,"TelecmiID")
+
+
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [agentName, setAgentName] = useState('');
