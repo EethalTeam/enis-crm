@@ -31,6 +31,8 @@ const initialState = {
     roleId: "",
     employeeAddress: "",
     password: "",
+    TelecmiID:'',
+    TelecmiPassword:'',
     isActive: true
 };
 
@@ -444,7 +446,7 @@ function EmployeeContent() {
     const handleSubmit = async () => {
         setLoading(true);
 
-        
+
         try {
             if (isEdit) {
                 await updateEmployee(state);
@@ -845,6 +847,30 @@ function EmployeeContent() {
                                     }
                                 />
                             </div>
+
+                                <div>
+                                <Label>TeleCmi Id</Label>
+                                <Input
+                                    type="text"
+                                    value={state.TelecmiID}
+                                    onChange={(e) =>
+                                        storeDispatch(e.target.value, "TelecmiID")
+                                    }
+                                />
+                            </div>
+
+                              <div>
+                                <Label>TeleCmi Password</Label>
+                                <Input
+                                    type="password"
+                                    value={state.TelecmiPassword}
+                                    onChange={(e) =>
+                                        storeDispatch(e.target.value, "TelecmiPassword")
+                                    }
+                                />
+                            </div>
+
+
                         </div>
 
                         <div>

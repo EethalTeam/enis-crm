@@ -62,7 +62,6 @@ function App() {
              <Route path="/"  element={<Dashboard />} />
             <Route path="leads" element={<Leads />} />
             <Route path="contacts" element={<Contacts />} />
-            <Route path="companies" element={<Companies />} />
             <Route path="call-logs" element={<CallLogs />} />
             <Route path="ivr-flow" element={<IVRFlow />} />
             <Route path="omni-channel" element={<OmniChannel />} />
@@ -89,6 +88,8 @@ function App() {
             <Route path="/masters/country" element={<Country />} />
             <Route path="/masters/leadstatus" element={<LeadStatus />} />
             <Route path="/masters/leadsource" element={<LeadSource />} />
+            <Route path="/masters/companies" element={<Companies />} />
+
             
           </Route>
         </Routes>

@@ -85,6 +85,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { login, isLoading } = useAuth();
   const { toast } = useToast();
+  
 
   useEffect(() => {
     const savedCode = localStorage.getItem('EmployeeCode_saved');
@@ -102,6 +103,8 @@ export default function Login() {
       }
     }
   }, []);
+
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();

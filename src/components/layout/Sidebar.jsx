@@ -105,7 +105,8 @@ const navItems = [
       { icon: FileText, label: 'Document Type', path: '/masters/Document' },
       { icon: Flag, label: 'Country', path: '/masters/Country' },
       { icon: TrendingUp, label: 'Lead Status', path: '/masters/leadstatus' },
-      { icon: SquareCode, label: 'Lead Source', path: '/masters/leadsource' }
+      { icon: SquareCode, label: 'Lead Source', path: '/masters/leadsource' },
+      { icon: Building2, label: 'Company Details', path: '/masters/companies' }
 
 
     ]

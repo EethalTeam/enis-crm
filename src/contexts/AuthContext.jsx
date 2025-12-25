@@ -173,6 +173,25 @@ export const AuthProvider = ({ children }) => {
   // const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
 
+
+
+  // ------------------ SIMPLE ENCRYPT / DECRYPT ------------------
+  const SECRET_KEY = "ENIS_TELECMI_2025";
+
+  const encrypt = (value) => {
+    if (!value) return "";
+    return btoa(`${value}::${SECRET_KEY}`);
+  };
+
+  const decrypt = (cipher) => {
+    if (!cipher) return "";
+    try {
+      return atob(cipher).split("::")[0];
+    } catch {
+      return "";
+    }
+  };
+
   // ------------------ RESTORE USER ON REFRESH ------------------
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -222,11 +241,20 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("EmployeeName", result.employee.EmployeeName);
       localStorage.setItem("role", result.employee.role);
 
+      
+      if (result.employee.TelecmiID && result.employee.TelecmiPassword) {
+        localStorage.setItem("TelecmiID",result.employee.TelecmiID);
+        localStorage.setItem("TelecmiPassword",result.employee.TelecmiPassword);
+      }
+
       const userData = {
         token: result.token,
         EmployeeCode: result.employee.EmployeeCode,
         EmployeeName: result.employee.EmployeeName,
         role: result.employee.role,
+        TelecmiID:result.employee.TelecmiID,
+        TelecmiPassword:result.employee.TelecmiPassword
+
       };
 
       setUser(userData);
@@ -236,7 +264,7 @@ export const AuthProvider = ({ children }) => {
         description: `Welcome ${result.employee.EmployeeName}`,
       });
 
-      return  result.employee.EmployeeName;
+      return result.employee.EmployeeName;
 
     } catch (error) {
       throw error;
@@ -246,10 +274,21 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ------------------------- LOGOUT -------------------------
+  // const logout = () => {
+  //   localStorage.clear();
+  //   setUser(null);
+  // };
+
   const logout = () => {
-    localStorage.clear();
-    setUser(null);
-  };
+  localStorage.removeItem("token");
+  localStorage.removeItem("EmployeeCode");
+  localStorage.removeItem("EmployeeName");
+  localStorage.removeItem("role");
+  localStorage.removeItem("TelecmiID");
+  localStorage.removeItem("TelecmiPassword");
+  setUser(null);
+};
+
 
   // ---------------- FETCH PERMISSIONS (PHYSIO STYLE) ------------------
   // const getPermissionsByPath = async (path) => {
@@ -273,29 +312,29 @@ export const AuthProvider = ({ children }) => {
   //   }
   // };
 
-  const getPermissionsByPath = async(path) => {
-  const roleName = localStorage.getItem("role"); // read role from localStorage
-  if (!roleName) return null;
+  const getPermissionsByPath = async (path) => {
+    const roleName = localStorage.getItem("role"); // read role from localStorage
+    if (!roleName) return null;
 
-  try {
-        const res = await fetch(config.Api + "RoleBased/getPermissions", {
+    try {
+      const res = await fetch(config.Api + "RoleBased/getPermissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({  roleName, path }),
+        body: JSON.stringify({ roleName, path }),
       });
 
-    const data = await res.json()
-    if (data.success) {
-      return data.permissions;
-    } else {
-      // navigate('/dashboard')
+      const data = await res.json()
+      if (data.success) {
+        return data.permissions;
+      } else {
+        // navigate('/dashboard')
+        return null;
+      }
+    } catch (err) {
+      console.error("Error fetching permissions:", err);
       return null;
     }
-  } catch (err) {
-    console.error("Error fetching permissions:", err);
-    return null;
   }
-}
 
 
   return (
@@ -305,7 +344,8 @@ export const AuthProvider = ({ children }) => {
         isLoading,
         login,
         logout,
-        getPermissionsByPath
+        getPermissionsByPath,
+        decrypt
       }}>
       {children}
     </AuthContext.Provider>
