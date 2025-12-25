@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PIOPIY from 'piopiyjs';
 
-const CREDENTIALS = {
-  userId: '5002_33336945', 
-  password: 'User@123',
-  sbcUrl: 'sbcind.telecmi.com'
+const decode = (value) => {
+  if (!value) return "";
+  try {
+    return atob(value);
+  } catch (err) {
+    console.error("Decode failed:", err);
+    return "";
+  }
 };
 
 const TeleCMIDialer = () => {
@@ -12,6 +16,14 @@ const TeleCMIDialer = () => {
   const audioRef = useRef(typeof Audio !== "undefined" ? new Audio('') : null);
   const isMountedRef = useRef(true);
   const loginTimerRef = useRef(null);
+    const [TelecmiID, setTelecmiID] = useState(decode(localStorage.getItem("TelecmiID")));
+  const [TelecmiPassword, setTelecmiPassword] = useState(decode(localStorage.getItem("TelecmiPassword")));
+
+  const CREDENTIALS = {
+  userId: TelecmiID, 
+  password: TelecmiPassword,
+  sbcUrl: 'sbcind.telecmi.com'
+};
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [agentName, setAgentName] = useState('');
