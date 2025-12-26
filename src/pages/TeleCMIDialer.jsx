@@ -27,7 +27,7 @@ const TeleCMIDialer = () => {
  const CREDENTIALS = {
   userId: TelecmiID, 
   password: TelecmiPassword,
-  sbcUrl: 'sbcind.telecmi.com'
+  sbcUrl: '@sbcind.telecmi.com'
 };
 console.log(TelecmiID,"TelecmiID")
 
@@ -115,18 +115,31 @@ sdk.on('cancel', () => {
         sdk.on('error', (err) => console.error('❌ SDK Error:', err));
     }
 
+    // loginTimerRef.current = setTimeout(() => {
+    //     if (isMountedRef.current && piopiyRef.current && !isLoggedIn) {
+    //         piopiyRef.current.login(CREDENTIALS.userId, CREDENTIALS.password, CREDENTIALS.sbcUrl);
+    //     }
+    // }, 800);
+
     loginTimerRef.current = setTimeout(() => {
-        if (isMountedRef.current && piopiyRef.current && !isLoggedIn) {
-            piopiyRef.current.login(CREDENTIALS.userId, CREDENTIALS.password, CREDENTIALS.sbcUrl);
-        }
-    }, 800);
+  isMountedRef.current && piopiyRef.current && !isLoggedIn
+    ? (TelecmiID && TelecmiPassword
+        ? piopiyRef.current.login(
+            CREDENTIALS.userId,
+            CREDENTIALS.password,
+            CREDENTIALS.sbcUrl
+          )
+        : null)
+    : null;
+}, 800);
+
 
     return () => {
       isMountedRef.current = false;
       stopRingtone();
       if (loginTimerRef.current) clearTimeout(loginTimerRef.current);
       if (piopiyRef.current) {
-        piopiyRef.current.logout();
+        piopiyRef.current?.logout();
         piopiyRef.current = null; 
       }
     };
@@ -239,7 +252,7 @@ const handleCall = () => {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h3 style={styles.headerTitle}>Eethal Softphone</h3>
+        <h3 style={styles.headerTitle}>Dailer</h3>
         <div style={styles.headerSub}>
            {isLoggedIn ? `🟢 Online as ${agentName || 'Agent'}` : '🔴 Connecting...'}
         </div>

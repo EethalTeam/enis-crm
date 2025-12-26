@@ -131,7 +131,7 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
 
 // --- LEAD DIALOG COMPONENT ---
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create', disablePhone = true }) => {
-    const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '', };
+    const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '', };
     const [formData, setFormData] = useState(initialFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [] });
@@ -200,11 +200,23 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // ✅ Phone number: allow only digits & max 10
+        //  Phone number: allow only digits & max 10
         if (name === "leadPhone") {
-            const numericValue = value.replace(/\D/g, "");
-            if (numericValue.length > 10) return;
-            setFormData(prev => ({ ...prev, [name]: numericValue, })); return;
+            let phone = value.replace(/\D/g, "");
+
+            // force 91 prefix
+            if (!phone.startsWith("91")) {
+                phone = "91";
+            }
+
+            // max length: 12 (91 + 10 digits)
+            phone = phone.slice(0, 12);
+
+            setFormData(prev => ({
+                ...prev,
+                leadPhone: phone
+            }));
+            return;
         }
 
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -265,7 +277,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         </button>
     );
 
-   
+
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -278,20 +290,15 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                         <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required disabled={isViewMode} /></div>
                         <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange} disabled={isViewMode} /></div>
                         <div><Label>Email *</Label><Input name="leadEmail" type="email" value={formData.leadEmail} onChange={handleChange} required disabled={isViewMode} /></div>
-                        {/* <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled={isViewMode} /></div> */}
-                        <div>
-                            <Label>Phone *</Label> <div className="flex">   <span className="inline-flex items-center px-3 rounded-l-md border border-slate-700 bg-slate-800 text-slate-300 text-sm"> +91 </span>  <input type="text" name="leadPhone" value={formData.leadPhone} onChange={handleChange} maxLength={10} disablePhone={false} required
-                                className="flex-1 h-10 rounded-r-md border border-slate-700 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none" placeholder="Enter mobile number"
-                            />
-                            </div>
-                        </div>
+                        <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled={isViewMode} /></div>
+
 
                         <div><Label>Job Title</Label><Input name="leadJobTitle" value={formData.leadJobTitle} onChange={handleChange} disabled={isViewMode} /></div>
                         <div><Label>LinkedIn Profile</Label><Input name="leadLinkedIn" value={formData.leadLinkedIn} onChange={handleChange} disabled={isViewMode} /></div>
                         <div><Label>Street Address</Label><Input name="leadAddress" value={formData.leadAddress} onChange={handleChange} disabled={isViewMode} /></div>
-                        <div><Label>City</Label><select name="leadCityId" value={formData.leadCityId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.city.map(c => <option key={c._id} value={c._id}>{c.CityName || c.name}</option>)}</select></div>
-                        <div><Label>State</Label><select name="leadStateId" value={formData.leadStateId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.state.map(s => <option key={s._id} value={s._id}>{s.StateName || s.name}</option>)}</select></div>
                         <div><Label>Country</Label><select name="leadCountryId" value={formData.leadCountryId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.country.map(c => <option key={c._id} value={c._id}>{c.CountryName || c.name}</option>)}</select></div>
+                        <div><Label>State</Label><select name="leadStateId" value={formData.leadStateId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.state.map(s => <option key={s._id} value={s._id}>{s.StateName || s.name}</option>)}</select></div>
+                        <div><Label>City</Label><select name="leadCityId" value={formData.leadCityId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.city.map(c => <option key={c._id} value={c._id}>{c.CityName || c.name}</option>)}</select></div>
                         <div><Label>Site</Label><select name="leadSiteId" value={formData.leadSiteId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.site.map(s => <option key={s._id} value={s._id}>{s.sitename || s.name}</option>)}</select></div>
                         <div><Label>Zip Code</Label><Input name="leadZipCode" value={formData.leadZipCode} onChange={handleChange} disabled={isViewMode} /></div>
                     </div>)}
@@ -508,7 +515,7 @@ function LeadsContent() {
 
 
 
-     const exportLeadsToExcel = () => {
+    const exportLeadsToExcel = () => {
         if (!leads || leads.length === 0) {
             toast({ title: "No data to export", variant: "destructive" });
             return;

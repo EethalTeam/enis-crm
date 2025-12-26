@@ -32,6 +32,7 @@ import {
   Flag,
   TrendingUp,
   SquareCode,
+   Activity,
   X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -69,7 +70,8 @@ const iconMap = {
   MenuSquare,
   Flag,
   TrendingUp,
-  SquareCode
+  SquareCode,
+   Activity
 };
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -113,7 +115,7 @@ const navItems = [
   },
   // { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   // { icon: Users, label: 'Users', path: '/users' },
-  { icon: ClipboardList, label: 'Reports', path: '/reports' },
+  { icon:  Activity, label: 'Reports', path: '/reports' },
   { icon: Settings, label: 'Settings', path: '/settings' },
   {
     icon: Shield, label: 'Admin Panel',

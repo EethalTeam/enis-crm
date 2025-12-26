@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import {
@@ -11,42 +11,146 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { config } from "@/components/CustomComponents/config.js";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const statsData = [
-  { label: 'Total Leads', value: '1,234', change: '+12%', icon: Users, color: 'bg-fuchsia-500' },
-  { label: 'Calls Today', value: '89', change: '+8%', icon: Phone, color: 'bg-emerald-500' },
-  { label: 'Messages', value: '456', change: '+23%', icon: MessageSquare, color: 'bg-indigo-500' },
-  { label: 'Conversion Rate', value: '34%', change: '+5%', icon: TrendingUp, color: 'bg-amber-500' },
-];
 
-const leadsBySource = [
-  { name: 'Website', value: 400 },
-  { name: 'Referral', value: 300 },
-  { name: 'Social Media', value: 200 },
-  { name: 'Direct', value: 150 },
-];
 
-const callStats = [
-  { day: 'Mon', calls: 45 },
-  { day: 'Tue', calls: 52 },
-  { day: 'Wed', calls: 48 },
-  { day: 'Thu', calls: 61 },
-  { day: 'Fri', calls: 55 },
-  { day: 'Sat', calls: 38 },
-  { day: 'Sun', calls: 42 },
-];
+
+// const leadsBySource = [
+//   { name: 'Website', value: 400 },
+//   { name: 'Referral', value: 300 },
+//   { name: 'Social Media', value: 200 },
+//   { name: 'Direct', value: 150 },
+// ];
+
+
 
 const COLORS = ['#f472b6', '#a78bfa', '#2dd4bf', '#fbbf24']; // Pink, purple, teal, amber
 
-const recentActivities = [
-  { id: 1, type: 'lead', message: 'New lead added: John Doe', time: '5 min ago', icon: Users },
-  { id: 2, type: 'call', message: 'Call completed with Sarah Smith', time: '15 min ago', icon: Phone },
-  { id: 3, type: 'task', message: 'Task completed: Follow-up email', time: '1 hour ago', icon: CheckCircle },
-  { id: 4, type: 'message', message: 'New message from WhatsApp', time: '2 hours ago', icon: MessageSquare },
-];
+// const recentActivities = [
+//   { id: 1, type: 'lead', message: 'New lead added: John Doe', time: '5 min ago', icon: Users },
+//   { id: 2, type: 'call', message: 'Call completed with Sarah Smith', time: '15 min ago', icon: Phone },
+//   { id: 3, type: 'task', message: 'Task completed: Follow-up email', time: '1 hour ago', icon: CheckCircle },
+//   { id: 4, type: 'message', message: 'New message from WhatsApp', time: '2 hours ago', icon: MessageSquare },
+// ];
+
+
 
 export default function Dashboard() {
+
+
+  const initialState = {
+    lead: '',
+    callog: '',
+
+  }
+  const [states, setStates] = useState(initialState)
+  const [callDays, setCallDays] = useState([])
+  const [dashboard, setDashBoard] = useState([])
+  const [leadSource, setLeadSource] = useState([]);
+  const isMobile = window.innerWidth < 768
+
+
+  const statsData = [
+    { label: 'Total Leads', value: states.lead, icon: Users, color: 'bg-fuchsia-500' },
+    { label: 'Today Calls ', value: states.callog, icon: Phone, color: 'bg-emerald-500' },
+    // { label: 'Messages', value: '456', change: '+23%', icon: MessageSquare, color: 'bg-indigo-500' },
+    { label: 'Conversion Rate', value: '34%', icon: TrendingUp, color: 'bg-amber-500' },
+  ];
+
+
+  // const callStats = [
+  //   { day: 'Mon', calls: states.callog },
+  //   { day: 'Tue', calls:states.callog},
+  //   { day: 'Wed', calls: states.callog},
+  //   { day: 'Thu', calls: states.callog },
+  //   { day: 'Fri', calls: states.callog },
+  //   { day: 'Sat', calls: states.callog},
+  //   { day: 'Sun', calls: states.callog },
+
+  // ];
+
+
+
+
+  useEffect(() => {
+    getAllDashBoard()
+    getDayWiseAnsweredCalls()
+    getLeadsBySource()
+  }, [])
+
+  const getAllDashBoard = async () => {
+    try {
+
+      let url = config.Api + "DashBoard/getAllDashBoard";
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+
+      const result = await res.json();
+      const data = result.data || result;
+
+      setDashBoard(data);
+      setStates(data)
+
+    } catch (err) {
+      console.log(err, "err")
+    }
+  };
+
+  const getDayWiseAnsweredCalls = async () => {
+    try {
+
+      let url = config.Api + "DashBoard/getDayWiseAnsweredCalls";
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+
+      const result = await res.json();
+      const data = result.data || result;
+
+
+      setCallDays(data)
+
+
+    } catch (err) {
+      console.log(err, "err")
+    }
+  };
+
+
+
+  const getLeadsBySource = async () => {
+    try {
+
+      let url = config.Api + "DashBoard/getLeadsBySource";
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+
+      const result = await res.json();
+      const data = result.data || result;
+
+
+      setLeadSource(data)
+
+
+    } catch (err) {
+      console.log(err, "err")
+    }
+  };
+
+
   return (
     <>
       <Helmet>
@@ -58,7 +162,7 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-white">Dashboard</h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {statsData.map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -91,7 +195,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={callStats}>
+                <BarChart data={callDays}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#4a235a" /> {/* Darker grid */}
                   <XAxis dataKey="day" stroke="#a78bfa" />
                   <YAxis stroke="#a78bfa" />
@@ -103,34 +207,53 @@ export default function Dashboard() {
           </Card>
 
           <Card>
-            <CardHeader>
+            <CardHeader className='md:max-w-full max-w-md'>
               <CardTitle>Leads by Source</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="p-2 md:p-6">
+              <ResponsiveContainer width="100%" height={isMobile ? 220 : 300}>
                 <PieChart>
                   <Pie
-                    data={leadsBySource}
+                    data={leadSource}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={!isMobile ? ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%` : false}
                     outerRadius={100} // Slightly larger pie
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {leadsBySource.map((entry, index) => (
+                    {leadSource.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip contentStyle={{ backgroundColor: '#2a133b', border: 'none', borderRadius: '8px' }} />
                 </PieChart>
               </ResponsiveContainer>
+
+              {/*  MOBILE LEGEND */}
+              {isMobile && (
+                <div className="mt-3 flex flex-wrap gap-3 justify-center">
+                  {leadSource.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 text-xs text-slate-300"
+                    >
+                      <span
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                      />
+                      <span>{item.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
             </CardContent>
           </Card>
         </div>
 
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Recent Activities</CardTitle>
           </CardHeader>
@@ -155,7 +278,7 @@ export default function Dashboard() {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </>
   );
