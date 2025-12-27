@@ -9,6 +9,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from "react-router-dom";
 
 import * as XLSX from "xlsx";  //for export execel
+
+const decode = (value) => {
+  if (!value) return "";
+  try {
+    return atob(value);
+  } catch (err) {
+    console.error("Decode failed:", err);
+    return "";
+  }
+};
+
 // --- LOCAL REDUCER ---
 const initialState = {
   _id: '',
@@ -313,14 +324,25 @@ function PlotsContent() {
   };
 
   const getPlot = async () => {
+
     try {
+
+      const role = localStorage.getItem("role");
+    const siteId = decode(localStorage.getItem("SiteId")); 
+
+      
       setLoading(true);
       let url = config.Api + "Plot/getAllPlots";
+
+       const payload =  role === "AGENT"   ? { siteId }   : {};   
+       console.log(payload,role,siteId,"payload")
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify(payload),
+       
       });
+      console.log(payload,"payload")
 
       if (!response.ok) throw new Error('Failed to get Plots');
 
@@ -628,9 +650,18 @@ function PlotsContent() {
 
   const handleView = (row) => {
     setViewData({
-      "Plot Code": row.plotCode,
+     
        "Site": row.siteId?.sitename || '-',
-      "Unit": row.unitId?.UnitName || '-'
+       "Plot No":row.plotNumber || '-',
+       "Status":row.statusId.statusName || '-',
+      "Unit": row.unitId?.UnitName || '-',
+      "Dimension":row.dimension || '-',
+      "Area (Sq.ft)":row.areaInSqFt || '-',
+      "	Facing":row.facing || '-',
+      "Cents":row.cents || '-',
+      "LandMark ":row.landmark || '-'
+
+      
     });
     setOpenView(true);
   };
@@ -720,9 +751,12 @@ const exportPlotsToExcel = () => {
           {/* <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
             <Upload className="w-4 h-4 mr-2" /> Import
           </Button> */}
+
+           {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
           <Button variant="outline"   onClick={exportPlotsToExcel} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
             <Download className="w-4 h-4 mr-2" /> Export
           </Button>
+           )}
           {
             Permissions.isAdd &&
             <Button onClick={() => { clear(); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
@@ -843,15 +877,7 @@ const exportPlotsToExcel = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.04 }}
-                  className="
-          bg-purple-900/40
-          border border-fuchsia-700/40
-          rounded-xl
-          p-4
-          shadow-lg
-          hover:bg-purple-800/60
-          transition-all
-        "
+                  className=" border border-fuchsia-700/40 rounded-xl p-4 shadow-lg transition-all "
                 >
                   {/* SITE + STATUS ROW */}
                   <div className=" space-y-2 mb-3">
@@ -889,7 +915,7 @@ const exportPlotsToExcel = () => {
                   </div>
 
                   {/* ACTION BUTTONS */}
-                  <div className="flex justify-end border-t border-purple-700/40 pt-2 gap-2">
+                  <div className="flex justify-start border-t border-purple-700/40 pt-2 gap-2">
                     <Button
                       variant="icon"
                       size="icon"

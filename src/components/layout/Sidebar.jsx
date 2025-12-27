@@ -162,6 +162,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       return {};
     }
   };
+
+  
   const hasAccess = (path) => {
     const userRole = user.role;
     // if (userRole === 'superadmin') return true;
@@ -283,6 +285,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                             <NavLink
                               key={subItem.path}
                               to={subItem.path}
+                              
                               className={({ isActive }) =>
                                 cn(
                                   'flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 text-sm',
@@ -310,6 +313,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                 key={item.path}
                 to={item.path}
                 end={item.path === '/'}
+                
                 className={({ isActive }) =>
                   cn(
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 relative',

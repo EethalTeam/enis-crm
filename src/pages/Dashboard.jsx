@@ -157,7 +157,7 @@ export default function Dashboard() {
         <title>Dashboard - ENIS CRM</title>
         <meta name="description" content="View your ENIS CRM dashboard with key metrics, analytics, and recent activities." />
       </Helmet>
-      <div className="space-y-6">
+      <div className="space-y-6 p-3">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-white">Dashboard</h1>
         </div>

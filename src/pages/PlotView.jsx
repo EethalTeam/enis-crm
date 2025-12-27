@@ -5,6 +5,16 @@ import {
   RefreshCw, Filter, Building2, User, Footprints, Building
 } from 'lucide-react';
 
+const decode = (value) => {
+  if (!value) return "";
+  try {
+    return atob(value);
+  } catch (err) {
+    console.error("Decode failed:", err);
+    return "";
+  }
+};
+
 // --- CONFIGURATION ---
 import { config } from '@/components/CustomComponents/config.js';
 import { useAuth } from '@/contexts/AuthContext';
@@ -204,8 +214,14 @@ function PlotViewContent() {
 
   const getSites = async () => {
     try {
+             const role = localStorage.getItem("role");
+    const _id = decode(localStorage.getItem("SiteId")); 
+                 const payload =  role === "AGENT"   ? { _id }   : {};   
+       console.log(payload,role,_id,"payload")
       const response = await fetch(config.Api + "Site/getAllSites", {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({})
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
       const result = await response.json();
       setSiteData(result.data || result);
@@ -243,12 +259,14 @@ function PlotViewContent() {
 
   const getPlotView = async () => {
     try {
+       const role = localStorage.getItem("role");
+    const siteId = decode(localStorage.getItem("SiteId")); 
       setLoading(true);
-      let url = config.Api + "Plot/getAllPlots";
       
+      let url = config.Api + "Plot/getAllPlots";
+       const payload={};   
       // Payload now includes both siteId and unitId
-      const payload = {};
-      if (state.siteId) payload.siteId = state.siteId;
+      if (state.siteId || siteId) payload.siteId = role === "AGENT" ? siteId : state.siteId;
       if (state.unitId) payload.unitId = state.unitId;
       
       const response = await fetch(url, {

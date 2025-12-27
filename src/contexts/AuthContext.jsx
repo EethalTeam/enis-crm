@@ -195,28 +195,28 @@ export const AuthProvider = ({ children }) => {
   // ------------------ RESTORE USER ON REFRESH ------------------
 
   const encode = (value) => {
-  if (!value) return "";
-  return btoa(value); // ENCRYPT
-};
+    if (!value) return "";
+    return btoa(value); // ENCRYPT
+  };
 
-const decode = (value) => {
-  if (!value) return "";
-  try {
-    return atob(value); // DECRYPT
-  } catch {
-    return "";
-  }
-};
+  const decode = (value) => {
+    if (!value) return "";
+    try {
+      return atob(value); // DECRYPT
+    } catch {
+      return "";
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const EmployeeCode = localStorage.getItem("EmployeeCode");
     const EmployeeName = localStorage.getItem("EmployeeName");
     const role = localStorage.getItem("role");
-  //  const  TelecmiID= decode(localStorage.getItem("TelecmiID"));
-  //   const   TelecmiPassword= decode(localStorage.getItem("TelecmiPassword"));
+    //  const  TelecmiID= decode(localStorage.getItem("TelecmiID"));
+    //   const   TelecmiPassword= decode(localStorage.getItem("TelecmiPassword"));
 
-    if (token && EmployeeCode && EmployeeName && role ) {
+    if (token && EmployeeCode && EmployeeName && role) {
       setUser({
         token,
         EmployeeCode,
@@ -257,32 +257,41 @@ const decode = (value) => {
       localStorage.setItem("EmployeeCode", result.employee.EmployeeCode);
       localStorage.setItem("EmployeeName", result.employee.EmployeeName);
       localStorage.setItem("role", result.employee.role);
+      // SITE
 
-      
+      if(result.employee.SiteId ){
+      localStorage.setItem("SiteId", encode(result.employee.SiteId));
+
+      }
+     
+
+
+
       // if (result.employee.TelecmiID && result.employee.TelecmiPassword) {
       //   localStorage.setItem(atob("TelecmiID",result.employee.TelecmiID));
       //   localStorage.setItem(atob("TelecmiPassword",result.employee.TelecmiPassword));
       // }
 
       if (result.employee.TelecmiID && result.employee.TelecmiPassword) {
-  localStorage.setItem(
-    "TelecmiID",
-    encode(result.employee.TelecmiID)
-  );
+        localStorage.setItem(
+          "TelecmiID",
+          encode(result.employee.TelecmiID)
+        );
 
-  localStorage.setItem(
-    "TelecmiPassword",
-    encode(result.employee.TelecmiPassword)
-  );
-}
+        localStorage.setItem(
+          "TelecmiPassword",
+          encode(result.employee.TelecmiPassword)
+        );
+      }
 
       const userData = {
         token: result.token,
         EmployeeCode: result.employee.EmployeeCode,
         EmployeeName: result.employee.EmployeeName,
         role: result.employee.role,
-        TelecmiID:result.employee.TelecmiID,
-        TelecmiPassword:result.employee.TelecmiPassword
+        TelecmiID: result.employee.TelecmiID,
+        TelecmiPassword: result.employee.TelecmiPassword,
+        SiteId:result.employee.SiteId
 
       };
 
@@ -309,14 +318,16 @@ const decode = (value) => {
   // };
 
   const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("EmployeeCode");
-  localStorage.removeItem("EmployeeName");
-  localStorage.removeItem("role");
-  localStorage.removeItem("TelecmiID");
-  localStorage.removeItem("TelecmiPassword");
-  setUser(null);
-};
+    localStorage.removeItem("token");
+    localStorage.removeItem("EmployeeCode");
+    localStorage.removeItem("EmployeeName");
+    localStorage.removeItem("role");
+    localStorage.removeItem("TelecmiID");
+    localStorage.removeItem("TelecmiPassword");
+    localStorage.removeItem("SiteId");
+    // localStorage.removeItem("sitename");
+    setUser(null);
+  };
 
 
   // ---------------- FETCH PERMISSIONS (PHYSIO STYLE) ------------------
@@ -374,7 +385,7 @@ const decode = (value) => {
         login,
         logout,
         getPermissionsByPath
-        
+
       }}>
       {children}
     </AuthContext.Provider>

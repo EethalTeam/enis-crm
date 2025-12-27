@@ -21,6 +21,8 @@ import { config } from "@/components/CustomComponents/config.js";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from "react-router-dom";
 
+
+
 // ------------------- REDUCER -------------------
 const initialState = {
     _id: "",
@@ -33,6 +35,7 @@ const initialState = {
     password: "",
     TelecmiID:'',
     TelecmiPassword:'',
+    SiteId:'',
     isActive: true
 };
 
@@ -229,11 +232,12 @@ function EmployeeContent() {
     const [isEdit, setIsEdit] = useState(false);
     const [viewData, setViewData] = useState({});
     const [role, setRole] = useState([])
+    const [site,setSite]=useState([])
     const { getPermissionsByPath } = useAuth();
     const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
     // ------------------- FETCH EMPLOYEES -------------------
     useEffect(() => {
-
+       getAllSite()
         getAllRole();
     }, []);
 
@@ -300,6 +304,33 @@ function EmployeeContent() {
             const data = result.data || result;
 
             setRole(data);
+
+        } catch (err) {
+            toast({
+                title: "Error",
+                description: "Could not fetch employees",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+       
+        const getAllSite = async () => {
+        try {
+            setLoading(true);
+            let url = config.Api + 'Site/getAllSites';
+
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({}),
+            });
+
+            const result = await res.json();
+            const data = result.data || result;
+
+            setSite(data);
 
         } catch (err) {
             toast({
@@ -382,8 +413,14 @@ function EmployeeContent() {
             row.roleId
                 ? (typeof row.roleId === "object" ? row.roleId._id : row.roleId)
                 : "";
+  dispatch({ type: "text", name: "roleId", value: roleValue });
 
-        dispatch({ type: "text", name: "roleId", value: roleValue });
+          const siteValue =
+    row.SiteId
+      ? (typeof row.SiteId === "object" ? row.SiteId._id : row.SiteId)
+      : "";
+
+        dispatch({ type: "text", name: "SiteId", value: siteValue });
 
         setDialogOpen(true);
     };
@@ -810,6 +847,17 @@ function EmployeeContent() {
                                 />
                             </div>
 
+                              <div>
+                                <Label>Password</Label>
+                                <Input
+                                    type="password"
+                                    value={state.password}
+                                    onChange={(e) =>
+                                        storeDispatch(e.target.value, "password")
+                                    }
+                                />
+                            </div>
+
                             <div>
                                 <Label>Phone</Label>
                                 <Input
@@ -835,18 +883,31 @@ function EmployeeContent() {
                                         </option>
                                     ))}
                                 </select>
+
+                            </div>
+                            {
+                                state.roleId &&
+                                 <div>
+                                <Label>Site *</Label>
+                                <select
+                                    className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100"
+                                    value={state.SiteId}
+                                    onChange={(e) => storeDispatch(e.target.value, "SiteId")}
+                                >
+                                    <option value="">-- Select Site --</option>
+
+                                    {site.map((r) => (
+                                        <option key={r._id} value={r._id}>
+                                            {r.sitename}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
-                            <div>
-                                <Label>Password</Label>
-                                <Input
-                                    type="password"
-                                    value={state.password}
-                                    onChange={(e) =>
-                                        storeDispatch(e.target.value, "password")
-                                    }
-                                />
-                            </div>
+                            }
+                             
+
+                          
 
                                 <div>
                                 <Label>TeleCmi Id</Label>
