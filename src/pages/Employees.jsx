@@ -36,6 +36,7 @@ const initialState = {
     TelecmiID:'',
     TelecmiPassword:'',
     SiteId:'',
+    
     isActive: true
 };
 

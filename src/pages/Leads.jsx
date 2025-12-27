@@ -287,11 +287,11 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                     <TabButton id="history" label="History" icon={Clock} active={activeFormTab} onClick={setActiveFormTab} />
                 </div>
                     {activeFormTab === "contact" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required disabled={isViewMode} /></div>
-                        <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange} disabled={isViewMode} /></div>
+                        <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required disabled /></div>
+                        <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange} disabled /></div>
                         <div><Label>Email *</Label><Input name="leadEmail" type="email" value={formData.leadEmail} onChange={handleChange} required disabled={isViewMode} /></div>
-                        <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled={isViewMode} /></div>
-
+                        <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled /></div>
+                        <div><Label>Alter phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled /></div>
 
                         <div><Label>Job Title</Label><Input name="leadJobTitle" value={formData.leadJobTitle} onChange={handleChange} disabled={isViewMode} /></div>
                         <div><Label>LinkedIn Profile</Label><Input name="leadLinkedIn" value={formData.leadLinkedIn} onChange={handleChange} disabled={isViewMode} /></div>
