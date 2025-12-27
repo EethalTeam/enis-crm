@@ -250,6 +250,7 @@ const handleCall = () => {
   };
 
   return (
+    <div className='p-6'>
     <div style={styles.container}>
       <div style={styles.header}>
         <h3 style={styles.headerTitle}>Dailer</h3>
@@ -296,6 +297,7 @@ const handleCall = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

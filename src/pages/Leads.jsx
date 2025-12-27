@@ -504,7 +504,7 @@ function LeadsContent() {
     const handleViewClick = (row) => {
         setViewData({
             "Lead Name": row.leadFirstName,
-            "Lead Site": row.leadSiteId.sitename,
+            "Lead Site": row.leadSiteId?.sitename || '-',
             "Lead Phone": row.leadPhone,
             "Lead Status": row.leadStatusId.leadStatustName,
             "Assigned To": row.leadAssignedId ? row.leadAssignedId.EmployeeName : '',
@@ -557,21 +557,24 @@ function LeadsContent() {
 
     return (
 
-        <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
+        <div className="space-y-6 bg-slate-950 min-h-screen p-4 mt-3 text-slate-100">
             <div className="sticky top-0 z-30 bg-slate-950 pb-4 space-y-10">
                 <div className="flex md:flex-row flex-col items-start md:justify-between gap-3 sticky ">
                     <h1 className="text-3xl font-bold text-white">Leads</h1>
                     <div className="grid md:grid-cols-2 grid-cols-2 gap-3">
                         {/* <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Upload className="w-4 h-4 mr-2" />Import</Button> */}
                         {/* <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Download className="w-4 h-4 mr-2" />Export</Button> */}
-                        <Button
-                            variant="outline"
-                            onClick={exportLeadsToExcel}
-                            className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
-                        >
-                            <Download className="w-4 h-4 mr-2" />
-                            Export
-                        </Button>
+
+                        {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
+                            <Button
+                                variant="outline"
+                                onClick={exportLeadsToExcel}
+                                className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
+                            >
+                                <Download className="w-4 h-4 mr-2" />
+                                Export
+                            </Button>
+                        )}
 
                         {Permissions.isAdd && <Button onClick={() => { setDialogMode('create'); setSelectedLead(null); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0"><Plus className="w-4 h-4 mr-2" />Add Lead</Button>}
                         {/* MOBILE SELECT */}

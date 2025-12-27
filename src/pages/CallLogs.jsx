@@ -359,10 +359,11 @@ function CallLogsContent() {
 
 
   return (
-    <div className="space-y-6 p-4 bg-slate-950  min-h-screen text-slate-100">
-      <div className="sticky top-0 z-30 bg-slate-950 p-4 space-y-10">
+    <div className="space-y-6 mt-3 p-4 bg-slate-950  min-h-screen text-slate-100">
+      <div  className="sticky top-0 z-30 bg-slate-950 px-2 pt-2 pb-2 ">
         <div className="flex md:flex-row flex-col items-start md:items-center space-y-4  justify-between">
           <h1 className="md:text-3xl text-2xl font-bold text-white">Call Logs</h1>
+         {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
           <Button
             variant="outline"
             onClick={exportCallLogsToExcel}
@@ -370,6 +371,7 @@ function CallLogsContent() {
           >
             <Download className="w-4 h-4 mr-2" /> Export
           </Button>
+         )}
           {loading && <Loader2 className="animate-spin text-white" />}
 
           {/* MOBILE SELECT */}
