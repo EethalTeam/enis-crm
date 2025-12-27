@@ -2,184 +2,164 @@ import React, { useState, useEffect, useRef } from 'react';
 import PIOPIY from 'piopiyjs';
 
 const decode = (value) => {
-  if (!value) return "";
-  try {
-    return atob(value);
-  } catch (err) {
-    console.error("Decode failed:", err);
-    return "";
-  }
+    if (!value) return "";
+    try {
+        return atob(value);
+    } catch (err) {
+        console.error("Decode failed:", err);
+        return "";
+    }
 };
-
-
-
 
 const TeleCMIDialer = () => {
-  const piopiyRef = useRef(null);
-  const audioRef = useRef(typeof Audio !== "undefined" ? new Audio('') : null);
-  const isMountedRef = useRef(true);
-  const loginTimerRef = useRef(null);
-   const [TelecmiID, setTelecmiID] = useState(decode(localStorage.getItem("TelecmiID")));
-  const [TelecmiPassword, setTelecmiPassword] = useState(decode(localStorage.getItem("TelecmiPassword")));
+    const piopiyRef = useRef(null);
+    const audioRef = useRef(typeof Audio !== "undefined" ? new Audio('') : null);
+    const isMountedRef = useRef(true);
+    const loginTimerRef = useRef(null);
 
- 
+    // Get credentials from local storage once
+    const [TelecmiID] = useState(() => decode(localStorage.getItem("TelecmiID")));
+    const [TelecmiPassword] = useState(() => decode(localStorage.getItem("TelecmiPassword")));
 
- const CREDENTIALS = {
-  userId: TelecmiID, 
-  password: TelecmiPassword,
-  sbcUrl: '@sbcind.telecmi.com'
-};
-console.log(TelecmiID,"TelecmiID")
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [agentName, setAgentName] = useState('');
+    const [callStatus, setCallStatus] = useState('Idle');
+    const [phoneNumber, setPhoneNumber] = useState('91');
+    const [incomingCallData, setIncomingCallData] = useState(null);
+    const [isMuted, setIsMuted] = useState(false);
+    const [isOnHold, setIsOnHold] = useState(false);
 
+    const resetCallState = () => {
+        stopRingtone();
+        setCallStatus('Idle');
+        setIncomingCallData(null);
+        setIsMuted(false);
+        setIsOnHold(false);
+    };
 
+    useEffect(() => {
+        isMountedRef.current = true;
+        if (audioRef.current) audioRef.current.loop = true;
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [agentName, setAgentName] = useState('');
-  const [callStatus, setCallStatus] = useState('Idle');
-  const [phoneNumber, setPhoneNumber] = useState('91');
-  const [incomingCallData, setIncomingCallData] = useState(null);
-  console.log(incomingCallData,"incomingCallData")
-  
-  const [isMuted, setIsMuted] = useState(false);
-  const [isOnHold, setIsOnHold] = useState(false);
-  const [isSpeakerOn, setIsSpeakerOn] = useState(false); // New state for speaker
+        // 1. Initialize SDK only IF it doesn't exist
+        if (!piopiyRef.current) {
+            piopiyRef.current = new PIOPIY({
+                name: 'Eethal CRM Agent',
+                debug: true, // Check browser console for SIP logs
+                autoplay: true,
+                ringTime: 60
+            });
 
-  // Reusable function to clear UI state
-  const resetCallState = () => {
-    stopRingtone();
-    setCallStatus('Idle');
-    setIncomingCallData(null);
-    setIsMuted(false);
-    setIsOnHold(false);
-    setIsSpeakerOn(false);
-  };
+            const sdk = piopiyRef.current;
 
-  useEffect(() => {
-    isMountedRef.current = true;
-    if (audioRef.current) audioRef.current.loop = true;
+            sdk.on('login', (res) => {
+                setIsLoggedIn(true);
+                if (res.agent && res.agent.name) setAgentName(res.agent.name);
+            });
 
-    if (!piopiyRef.current) {
-        piopiyRef.current = new PIOPIY({
-            name: 'Eethal CRM Agent',
-            debug: true, 
-            autoplay: true,
-            ringTime: 60
-        });
+            sdk.on('loginFailed', (res) => {
+                // TeleCMI sometimes fires loginFailed even for successful reconnections
+                if (res && (res.code === 200 || res.msg?.includes("successfully"))) {
+                    setIsLoggedIn(true);
+                } else {
+                    console.error("❌ Actual Login Failure:", res);
+                    setIsLoggedIn(false);
+                }
+            });
 
-        const sdk = piopiyRef.current;
+            sdk.on('trying', () => setCallStatus('Calling...'));
+            sdk.on('ringing', () => setCallStatus('Ringing...'));
+            sdk.on('answered', () => {
+                stopRingtone();
+                setCallStatus('Connected');
+            });
+            sdk.on('ended', () => {
+                stopRingtone();
+                resetCallState();
+            });
+            sdk.on('cancel', () => resetCallState());
+            sdk.on('inComingCall', (callObj) => {
+                playRingtone();
+                setIncomingCallData(callObj);
+                setCallStatus('Incoming Call...');
+            });
+            sdk.on('error', (err) => console.error('❌ SDK Error:', err));
+        }
 
-        sdk.on('login', (res) => handleSuccess(res));
-        
-        sdk.on('loginFailed', (res) => {
-            if (res && (res.code == 200 || res.msg === "User loged in successfully")) {
-                handleSuccess(res);
-            } else {
-                setIsLoggedIn(false);
+        // 2. TRIGGER LOGIN
+        // SBC URL should usually be the host string without the '@'
+        const sbcHost = 'sbcind.telecmi.com'; 
+
+        if (TelecmiID && TelecmiPassword && !isLoggedIn) {
+            if (loginTimerRef.current) clearTimeout(loginTimerRef.current);
+            
+            loginTimerRef.current = setTimeout(() => {
+                if (piopiyRef.current && isMountedRef.current) {
+                    piopiyRef.current.login(TelecmiID, TelecmiPassword, sbcHost);
+                }
+            }, 1000);
+        }
+        const performFreshLogin = async () => {
+      if (piopiyRef.current && isMountedRef.current) {
+        try {
+          // Force logout first to clear any existing socket bindings
+          await piopiyRef.current.logout(); 
+          
+          // Small delay to ensure the logout process completes in the SDK
+          setTimeout(() => {
+            if (isMountedRef.current) {
+              piopiyRef.current.login(TelecmiID, TelecmiPassword, sbcHost);
             }
-        });
-
-        const handleSuccess = (res) => {
-            if (!isMountedRef.current) return;
-            setIsLoggedIn(true);
-            if (res.agent && res.agent.name) setAgentName(res.agent.name);
-        };
-
-        sdk.on('trying', () => setCallStatus('Calling...'));
-        sdk.on('ringing', () => setCallStatus('Ringing...'));
-        sdk.on('answered', () => {
-            stopRingtone();
-            setCallStatus('Connected');
-        });
-        
-        // Triggers when the OTHER side hangs up
-sdk.on('ended', () => {
-    stopRingtone(); // Ensure ringtone stops immediately
-    resetCallState();
-});
-
-sdk.on('cancel', () => {
-    resetCallState();
-});
-
-        sdk.on('inComingCall', (callObj) => {
-            playRingtone(); 
-            setIncomingCallData(callObj);
-            setCallStatus('Incoming Call...');
-        });
-
-        sdk.on('mediaFailed', () => {
-            resetCallState();
-            alert('Please check your Audio Device');
-        });
-
-        sdk.on('error', (err) => console.error('❌ SDK Error:', err));
-    }
-
-    // loginTimerRef.current = setTimeout(() => {
-    //     if (isMountedRef.current && piopiyRef.current && !isLoggedIn) {
-    //         piopiyRef.current.login(CREDENTIALS.userId, CREDENTIALS.password, CREDENTIALS.sbcUrl);
-    //     }
-    // }, 800);
-
-    loginTimerRef.current = setTimeout(() => {
-  isMountedRef.current && piopiyRef.current && !isLoggedIn
-    ? (TelecmiID && TelecmiPassword
-        ? piopiyRef.current.login(
-            CREDENTIALS.userId,
-            CREDENTIALS.password,
-            CREDENTIALS.sbcUrl
-          )
-        : null)
-    : null;
-}, 800);
-
-
-    return () => {
-      isMountedRef.current = false;
-      stopRingtone();
-      if (loginTimerRef.current) clearTimeout(loginTimerRef.current);
-      if (piopiyRef.current) {
-        piopiyRef.current?.logout();
-        piopiyRef.current = null; 
+          }, 500); 
+        } catch (err) {
+          console.error("Logout/Login sequence failed", err);
+        }
       }
     };
-  }, []);
 
-  const playRingtone = () => {
-    if(audioRef.current && localStorage.muteRingtone !== 'true') {
-        audioRef.current.play().catch(e => console.log("Audio blocked", e));
+    if (!isLoggedIn) {
+      performFreshLogin();
     }
-  };
 
-  const stopRingtone = () => {
-    if(audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-    }
-  };
-const handleReject = () => {
-    console.log("Rejecting call...", incomingCallData);
-    stopRingtone();
-    
-    if (piopiyRef.current) {
-      piopiyRef.current.terminate();
-        setTimeout(() => {
-            resetCallState();
-        }, 1000); 
-    } else {
+        return () => {
+            // Clean up timers but keep SDK alive unless unmounting component permanently
+            if (loginTimerRef.current) clearTimeout(loginTimerRef.current);
+        };
+    }, [TelecmiID, TelecmiPassword, isLoggedIn]); // Re-run if credentials or login status changes
+
+    // --- Handlers ---
+    const playRingtone = () => {
+        if (audioRef.current) audioRef.current.play().catch(e => console.log("Audio blocked", e));
+    };
+
+    const stopRingtone = () => {
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+        }
+    };
+
+    const handleCall = () => {
+        if (!isLoggedIn) return alert("Still connecting to TeleCMI... Please wait.");
+        const cleanNumber = phoneNumber.replace(/\D/g, '');
+        if (cleanNumber.length < 10) return alert('Invalid Phone Number');
+        if (piopiyRef.current) piopiyRef.current.call(cleanNumber);
+    };
+
+    const handleHangup = () => {
+        if (piopiyRef.current) piopiyRef.current.terminate();
         resetCallState();
-    }
-};
+    };
 
-const handleAnswer = () => {
-    stopRingtone();
-    if (piopiyRef.current) {
-        piopiyRef.current.answer();
-        setCallStatus('Connected');
-        setPhoneNumber(incomingCallData.from || 'Unknown');
-        setIncomingCallData(null);
-    }
-};
+    const handleAnswer = () => {
+        stopRingtone();
+        if (piopiyRef.current) {
+            piopiyRef.current.answer();
+            setCallStatus('Connected');
+            setPhoneNumber(incomingCallData.from || 'Unknown');
+            setIncomingCallData(null);
+        }
+    };
   const handleInputChange = (e) => {
     const value = e.target.value;
     
@@ -193,27 +173,18 @@ const handleAnswer = () => {
         setPhoneNumber('91');
     }
 };
-
-const handleCall = () => {
-    if (!phoneNumber || phoneNumber === '91') return alert('Please enter a number after 91');
+const handleReject = () => {
+    stopRingtone();
     
-    const cleanNumber = phoneNumber.replace(/\D/g, '');
-    // Standard Indian mobile number would be 12 digits (91 + 10 digits)
-    if (cleanNumber.length < 10) return alert('Invalid Phone Number');
-    
-    console.log("Dialing:", cleanNumber);
     if (piopiyRef.current) {
-        piopiyRef.current.call(cleanNumber);
+      piopiyRef.current.terminate();
+        setTimeout(() => {
+            resetCallState();
+        }, 1000); 
+    } else {
+        resetCallState();
     }
 };
-
-  const handleHangup = () => {
-    if (piopiyRef.current) {
-        piopiyRef.current.terminate();
-    }
-    // Force UI reset immediately after clicking "End Call"
-    resetCallState();
-  };
 
   const toggleMute = () => {
     if (!piopiyRef.current) return;

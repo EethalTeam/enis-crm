@@ -291,7 +291,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                         <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange} disabled /></div>
                         <div><Label>Email *</Label><Input name="leadEmail" type="email" value={formData.leadEmail} onChange={handleChange} required disabled={isViewMode} /></div>
                         <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled /></div>
-                        <div><Label>Alter phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled /></div>
+
 
                         <div><Label>Job Title</Label><Input name="leadJobTitle" value={formData.leadJobTitle} onChange={handleChange} disabled={isViewMode} /></div>
                         <div><Label>LinkedIn Profile</Label><Input name="leadLinkedIn" value={formData.leadLinkedIn} onChange={handleChange} disabled={isViewMode} /></div>
