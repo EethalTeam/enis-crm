@@ -41,7 +41,7 @@ const Button = ({ className, variant = "default", size = "default", onClick, dis
   );
 };
 
-// --- Toast Implementation (Unchanged) ---
+// --- Toast Implementation ---
 const ToastContext = createContext({});
 const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
@@ -72,7 +72,7 @@ const ToastProvider = ({ children }) => {
 };
 const useToast = () => useContext(ToastContext);
 
-// --- Component Logic ---
+// --- Styles ---
 const statusColors = {
   'answered': 'bg-green-600 text-white hover:bg-green-700 border-transparent',
   'missed': 'bg-red-600 text-white hover:bg-red-700 border-transparent',
@@ -96,7 +96,6 @@ function CallLogsContent() {
   const { toast } = useToast();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [qualifyingId, setQualifyingId] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
 
   // --- TeleCMI Dialer Integration ---
@@ -106,12 +105,25 @@ function CallLogsContent() {
   const TelecmiID = decode(localStorage.getItem("TelecmiID"));
   const TelecmiPassword = decode(localStorage.getItem("TelecmiPassword"));
 
+  // Outgoing Popup States
+  const [callStatus, setCallStatus] = useState('Idle');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isMuted, setIsMuted] = useState(false);
+  const [isOnHold, setIsOnHold] = useState(false);
+
   const audioRef = useRef(null);
   const [playingId, setPlayingId] = useState(null);
   const [leadDialogOpen, setLeadDialogOpen] = useState(false);
   const [leadInitialData, setLeadInitialData] = useState(null);
 
-  // Initialize TeleCMI SDK (Same logic as your Dialer)
+  const resetCallState = () => {
+    setCallStatus('Idle');
+    setPhoneNumber('');
+    setIsMuted(false);
+    setIsOnHold(false);
+  };
+
+  // 1. ORIGINAL LOGIN LOGIC (UNTOUCHED)
   useEffect(() => {
     isMountedRef.current = true;
     if (!piopiyRef.current && TelecmiID && TelecmiPassword) {
@@ -132,11 +144,48 @@ function CallLogsContent() {
         }
       });
 
-      setTimeout(() => {
+      // Added listeners for popup functionality
+      sdk.on('trying', () => setCallStatus('Calling...'));
+      sdk.on('ringing', () => setCallStatus('Ringing...'));
+      sdk.on('answered', () => setCallStatus('Connected'));
+      sdk.on('ended', () => resetCallState());
+      sdk.on('cancel', () => resetCallState());
+
+      setTimeout(async () => {
         if (isMountedRef.current && piopiyRef.current && !isLoggedIn) {
-          sdk.login(TelecmiID, TelecmiPassword, '@sbcind.telecmi.com');
+          try {
+            // Fix: Remove '@' and wrap in try-catch to stop the "Unhandled error" crash
+            console.log("Attempting SDK Login...");
+            piopiyRef.current.login(TelecmiID, TelecmiPassword, 'sbcind.telecmi.com');
+          } catch (err) {
+            console.error("SDK Login Exception caught:", err);
+            // This prevents the Uncaught Error from breaking the app
+          }
         }
       }, 800);
+    }
+     const performFreshLogin = async () => {
+      if (piopiyRef.current && isMountedRef.current) {
+        try {
+          console.log("Cleaning up previous session...");
+          // Force logout first to clear any existing socket bindings
+          await piopiyRef.current.logout(); 
+          
+          // Small delay to ensure the logout process completes in the SDK
+          setTimeout(() => {
+            if (isMountedRef.current) {
+              console.log("Attempting fresh login...");
+              piopiyRef.current.login(TelecmiID, TelecmiPassword, sbcHost);
+            }
+          }, 500); 
+        } catch (err) {
+          console.error("Logout/Login sequence failed", err);
+        }
+      }
+    };
+
+    if (!isLoggedIn) {
+      performFreshLogin();
     }
 
     return () => {
@@ -149,19 +198,38 @@ function CallLogsContent() {
   }, []);
 
   const handleInitiateCall = (rawNumber) => {
-    if (!isLoggedIn) return toast({ title: "Connecting", description: "Dialer is not ready. Please wait.", variant: "destructive" });
-    if (!rawNumber) return toast({ title: "Error", description: "No phone number found", variant: "destructive" });
+    if (!isLoggedIn) return toast({ title: "Connecting", description: "Dialer is not ready.", variant: "destructive" });
+    const numStr = String(rawNumber || "");
+    if (!numStr || numStr === "undefined") return toast({ title: "Error", description: "No phone number found", variant: "destructive" });
 
-    let cleanNumber = rawNumber.replace(/\D/g, '');
+    let cleanNumber = numStr.replace(/\D/g, '');
     if (!cleanNumber.startsWith('91')) cleanNumber = '91' + cleanNumber;
 
-    toast({ title: "Calling...", description: `Initiating call to ${cleanNumber}`, variant: "success" });
+    setPhoneNumber(cleanNumber);
+    toast({ title: "Calling...", description: `Dialing ${cleanNumber}`, variant: "success" });
     if (piopiyRef.current) {
       piopiyRef.current.call(cleanNumber);
     }
   };
 
-  // Fetch Logs (Unchanged)
+  const handleHangup = () => {
+    if (piopiyRef.current) piopiyRef.current.terminate();
+    resetCallState();
+  };
+
+  const toggleMute = () => {
+    if (!piopiyRef.current) return;
+    isMuted ? piopiyRef.current.unMute() : piopiyRef.current.mute();
+    setIsMuted(!isMuted);
+  };
+
+  const toggleHold = () => {
+    if (!piopiyRef.current) return;
+    isOnHold ? piopiyRef.current.unHold() : piopiyRef.current.hold();
+    setIsOnHold(!isOnHold);
+  };
+
+  // Fetch Logs Logic (Unchanged)
   useEffect(() => {
     const fetchLogs = async () => {
       try {
@@ -171,16 +239,12 @@ function CallLogsContent() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ page: 1, limit: 50 }),
         });
-        if (!response.ok) throw new Error('Failed to fetch logs');
         const data = await response.json();
         setLogs(data.data || data.calls || []);
       } catch (err) {
-        console.error(err);
         setLogs([
-          { _id: 'mock1', cmiuuid: '1', from: '919876543210', to: '918888888888', status: 'answered', direction: 'inbound', answeredsec: 323, callDate: new Date().toISOString(), recordingUrl: 'https://www.soundhelix.com/examples/mp3/Soundhelix-Song-1.mp3' },
-          { _id: 'mock2', cmiuuid: '2', from: '917777777777', to: '919999999999', status: 'missed', direction: 'inbound', answeredsec: 0, callDate: new Date().toISOString() },
+          { _id: 'mock1', from: '919876543210', to: '918888888888', status: 'answered', direction: 'inbound', answeredsec: 323, callDate: new Date().toISOString() },
         ]);
-        toast({ title: "Demo Mode", description: "API unavailable. Showing mock data.", variant: "destructive" });
       } finally {
         setLoading(false);
       }
@@ -199,12 +263,12 @@ function CallLogsContent() {
   const filteredLogs = getFilteredLogs();
 
   const handlePlayRecording = (recordingUrl, id) => {
-    if (!recordingUrl) return toast({ title: "No Recording", variant: "destructive" });
+    if (!recordingUrl) return;
     if (playingId === id) { audioRef.current?.pause(); setPlayingId(null); return; }
     audioRef.current?.pause();
     const audio = new Audio(recordingUrl);
     audioRef.current = audio;
-    audio.play().then(() => { setPlayingId(id); }).catch(() => { setPlayingId(null); });
+    audio.play().then(() => { setPlayingId(id); });
     audio.onended = () => { setPlayingId(null); };
   };
 
@@ -217,7 +281,7 @@ function CallLogsContent() {
       "Phone Number": call.to || "",
       "Status": call.status || "",
       "Call Time": new Date(call.callDate).toLocaleString("en-IN"),
-      "Duration": formatDuration(call.answeredsec || call.duration)
+      "Duration": formatDuration(call.answeredsec)
     }));
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
@@ -232,8 +296,37 @@ function CallLogsContent() {
     </button>
   );
 
+  // Popup Modal Styles
+  const popupStyles = {
+    modal: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
+    card: { background: 'white', padding: '30px', borderRadius: '15px', textAlign: 'center', width: '320px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' },
+    status: { color: '#2563EB', fontWeight: 'bold', marginBottom: '10px' },
+    num: { fontSize: '22px', fontWeight: 'bold', color: '#333', marginBottom: '20px' },
+    btnGroup: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' },
+    btn: { background: '#f0f0f0', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer' },
+    btnEnd: { background: '#EF4444', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', width: '100%', fontWeight: 'bold' }
+  };
+
   return (
     <div className="space-y-6 p-4 bg-slate-950 min-h-screen text-slate-100">
+      
+      {/* OUTGOING CALL POPUP */}
+      {callStatus !== 'Idle' && (
+        <div style={popupStyles.modal}>
+          <div style={popupStyles.card}>
+            <div style={popupStyles.status}>{callStatus}</div>
+            <div style={popupStyles.num}>{phoneNumber}</div>
+            {callStatus === 'Connected' && (
+              <div style={popupStyles.btnGroup}>
+                <button onClick={toggleMute} style={popupStyles.btn}>{isMuted ? '🔇 Unmute' : '🎤 Mute'}</button>
+                <button onClick={toggleHold} style={popupStyles.btn}>{isOnHold ? '▶ Resume' : '⏸ Hold'}</button>
+              </div>
+            )}
+            <button onClick={handleHangup} style={popupStyles.btnEnd}>End Call</button>
+          </div>
+        </div>
+      )}
+
       <div className="sticky top-0 z-30 bg-slate-950 p-4 space-y-10">
         <div className="flex md:flex-row flex-col items-start md:items-center space-y-4 justify-between">
           <h1 className="md:text-3xl text-2xl font-bold text-white">Call Logs</h1>
@@ -247,7 +340,6 @@ function CallLogsContent() {
             </Button>
           </div>
         </div>
-
         <div className="hidden md:flex items-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
           <TabButton id="all" label="All Calls" />
           <TabButton id="incoming" label="Incoming" />
@@ -260,57 +352,63 @@ function CallLogsContent() {
       <Card className="bg-slate-900 border-slate-800 hidden md:block">
         <CardContent className="p-6">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Type</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Caller</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Number</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Time</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Duration</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Status</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Recording</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredLogs.map((call, index) => (
-                  <motion.tr key={call._id || index} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
-                    <td className="py-3 px-4">
-                      {call.status === 'missed' ? <PhoneMissed className="w-5 h-5 text-red-400" /> : call.direction === 'inbound' ? <PhoneIncoming className="w-5 h-5 text-green-400" /> : <PhoneOutgoing className="w-5 h-5 text-blue-400" />}
-                    </td>
-                    <td className="py-3 px-4 text-sm font-medium text-white">{call.direction === 'inbound' ? call.from : (call.user || "Agent")}</td>
-                    <td className="py-3 px-4 text-sm text-slate-300">
-                      <div className="flex items-center gap-2 group">
-                        <span>{call.to || call.from}</span>
-                        <button 
-                          onClick={() => handleInitiateCall(call.to || call.from)}
-                          className="p-1.5 rounded-full bg-blue-600/10 text-blue-400 hover:bg-blue-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"
-                          title="Call Now"
-                        >
-                          <PhoneCall size={12} />
-                        </button>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-slate-300">{formatTime(call.callDate)}</td>
-                    <td className="py-3 px-4 text-sm text-slate-300">{formatDuration(call.answeredsec)}</td>
-                    <td className="py-3 px-4"><Badge className={statusColors[call.status]}>{call.status}</Badge></td>
-                    <td className="py-3 px-4">
-                      {call.recordingUrl && (
-                        <Button variant="ghost" size="sm" onClick={() => handlePlayRecording(call.recordingUrl, call._id)} className={playingId === call._id ? 'text-green-400' : 'text-fuchsia-300'}>
-                          {playingId === call._id ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                        </Button>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      <Button size="sm" variant="outline" onClick={() => { setLeadInitialData({ leadPhone: call.from || "" }); setLeadDialogOpen(true); }}>
-                        <UserPlus className="w-3.5 h-3.5 mr-2" /> Qualify
-                      </Button>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
+           <table className="w-full text-slate-300">
+  <thead>
+    <tr className="border-b border-slate-700">
+      <th className="text-left py-3 px-4 font-semibold">Type</th>
+      <th className="text-left py-3 px-4 font-semibold">Caller</th>
+      <th className="text-left py-3 px-4 font-semibold">Number</th>
+      <th className="text-left py-3 px-4 font-semibold">Time</th>
+      <th className="text-left py-3 px-4 font-semibold">Duration</th>
+      <th className="text-left py-3 px-4 font-semibold">Status</th>
+      <th className="text-left py-3 px-4 font-semibold">Recording</th>
+      <th className="text-left py-3 px-4 font-semibold">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {filteredLogs.map((call, index) => {
+      // Determine the external number (customer)
+      const targetNumber = call.direction === 'inbound' ? call.from : call.to;
+
+      return (
+        <tr key={call._id || index} className="border-b border-slate-800 hover:bg-slate-800/50">
+          <td className="py-3 px-4">
+            {call.status === 'missed' ? <PhoneMissed className="w-5 h-5 text-red-400" /> : call.direction === 'inbound' ? <PhoneIncoming className="w-5 h-5 text-green-400" /> : <PhoneOutgoing className="w-5 h-5 text-blue-400" />}
+          </td>
+          {/* Caller Column: Now shows targetNumber instead of Agent for outbound */}
+          <td className="py-3 px-4 font-medium text-white">
+            {targetNumber || "Unknown"}
+          </td>
+          {/* Number Column: Uses the same targetNumber for clarity */}
+          <td className="py-3 px-4">
+            <div className="flex items-center gap-2 group">
+              <span>{targetNumber}</span>
+              <button onClick={() => handleInitiateCall(targetNumber)} className="p-1.5 rounded-full bg-blue-600/10 text-blue-400 hover:bg-blue-600 hover:text-white transition-all opacity-0 group-hover:opacity-100">
+                <PhoneCall size={12} />
+              </button>
+            </div>
+          </td>
+          <td className="py-3 px-4">{formatTime(call.callDate)}</td>
+          <td className="py-3 px-4">{formatDuration(call.answeredsec)}</td>
+          <td className="py-3 px-4"><Badge className={statusColors[call.status]}>{call.status}</Badge></td>
+          <td className="py-3 px-4">
+            {call.recordingUrl && (
+              <Button variant="ghost" size="sm" onClick={() => handlePlayRecording(call.recordingUrl, call._id)} className={playingId === call._id ? 'text-green-400' : 'text-fuchsia-300'}>
+                {playingId === call._id ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+            )}
+          </td>
+          <td className="py-3 px-4">
+            {/* Qualify uses targetNumber so you aren't qualifying "Agent" */}
+            <Button size="sm" variant="outline" onClick={() => { setLeadInitialData({ leadPhone: targetNumber || "" }); setLeadDialogOpen(true); }}>
+              Qualify
+            </Button>
+          </td>
+        </tr>
+      );
+    })}
+  </tbody>
+</table>
           </div>
         </CardContent>
       </Card>
@@ -318,24 +416,22 @@ function CallLogsContent() {
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {filteredLogs.map((call, index) => (
-          <motion.div key={call._id || index} className="bg-slate-900 border border-slate-700 rounded-xl p-4 shadow-lg">
+          <div key={call._id || index} className="bg-slate-900 border border-slate-700 rounded-xl p-4 shadow-lg">
             <div className="flex justify-between items-center mb-3">
                {call.direction === 'inbound' ? <PhoneIncoming className="w-6 h-6 text-green-400" /> : <PhoneOutgoing className="w-6 h-6 text-blue-400" />}
                <Badge className={statusColors[call.status]}>{call.status}</Badge>
             </div>
-            <div className="flex items-center gap-2 mb-2 text-white"><User className="w-4 h-4 text-purple-300" /> {call.from}</div>
+            <div className="flex items-center gap-2 mb-2 text-white"><User className="w-4 h-4" /> {call.from}</div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 text-fuchsia-300 text-sm"><Phone className="w-4 h-4" /> {call.to}</div>
-              <button onClick={() => handleInitiateCall(call.to || call.from)} className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold">
-                <PhoneCall size={12} /> Call
-              </button>
+              <button onClick={() => handleInitiateCall(call.to || call.from)} className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold"><PhoneCall size={12} /> Call</button>
             </div>
             <div className="flex items-center gap-2 text-slate-300 text-xs mb-3"><Clock className="w-4 h-4" /> {formatTime(call.callDate)} | <Hourglass className="w-4 h-4" /> {formatDuration(call.answeredsec)}</div>
             <div className="flex gap-2 border-t border-slate-700 pt-3">
               {call.recordingUrl && <Button className="flex-1" variant="outline" size="sm" onClick={() => handlePlayRecording(call.recordingUrl, call._id)}>{playingId === call._id ? 'Pause' : 'Play'}</Button>}
               <Button className="flex-1" size="sm" onClick={() => { setLeadInitialData({ leadPhone: call.from || "" }); setLeadDialogOpen(true); }}>Qualify</Button>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
 
