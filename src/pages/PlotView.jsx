@@ -217,7 +217,6 @@ function PlotViewContent() {
              const role = localStorage.getItem("role");
     const _id = decode(localStorage.getItem("SiteId")); 
                  const payload =  role === "AGENT"   ? { _id }   : {};   
-       console.log(payload,role,_id,"payload")
       const response = await fetch(config.Api + "Site/getAllSites", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

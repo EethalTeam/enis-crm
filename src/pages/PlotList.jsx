@@ -335,14 +335,12 @@ function PlotsContent() {
       let url = config.Api + "Plot/getAllPlots";
 
        const payload =  role === "AGENT"   ? { siteId }   : {};   
-       console.log(payload,role,siteId,"payload")
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
        
       });
-      console.log(payload,"payload")
 
       if (!response.ok) throw new Error('Failed to get Plots');
 

@@ -43,7 +43,6 @@ const TeleCMIDialer = () => {
 
         // 1. Initialize SDK only IF it doesn't exist
         if (!piopiyRef.current) {
-            console.log("Initializing TeleCMI SDK...");
             piopiyRef.current = new PIOPIY({
                 name: 'Eethal CRM Agent',
                 debug: true, // Check browser console for SIP logs
@@ -54,13 +53,11 @@ const TeleCMIDialer = () => {
             const sdk = piopiyRef.current;
 
             sdk.on('login', (res) => {
-                console.log("✅ SDK Login Success:", res);
                 setIsLoggedIn(true);
                 if (res.agent && res.agent.name) setAgentName(res.agent.name);
             });
 
             sdk.on('loginFailed', (res) => {
-                console.log("⚠️ Login Event (Check Status):", res);
                 // TeleCMI sometimes fires loginFailed even for successful reconnections
                 if (res && (res.code === 200 || res.msg?.includes("successfully"))) {
                     setIsLoggedIn(true);
@@ -98,7 +95,6 @@ const TeleCMIDialer = () => {
             
             loginTimerRef.current = setTimeout(() => {
                 if (piopiyRef.current && isMountedRef.current) {
-                    console.log("Attempting Login for User:", TelecmiID);
                     piopiyRef.current.login(TelecmiID, TelecmiPassword, sbcHost);
                 }
             }, 1000);
@@ -106,14 +102,12 @@ const TeleCMIDialer = () => {
         const performFreshLogin = async () => {
       if (piopiyRef.current && isMountedRef.current) {
         try {
-          console.log("Cleaning up previous session...");
           // Force logout first to clear any existing socket bindings
           await piopiyRef.current.logout(); 
           
           // Small delay to ensure the logout process completes in the SDK
           setTimeout(() => {
             if (isMountedRef.current) {
-              console.log("Attempting fresh login...");
               piopiyRef.current.login(TelecmiID, TelecmiPassword, sbcHost);
             }
           }, 500); 
@@ -180,7 +174,6 @@ const TeleCMIDialer = () => {
     }
 };
 const handleReject = () => {
-    console.log("Rejecting call...", incomingCallData);
     stopRingtone();
     
     if (piopiyRef.current) {
