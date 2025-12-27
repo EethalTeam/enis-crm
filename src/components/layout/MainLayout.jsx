@@ -16,7 +16,7 @@ export default function MainLayout() {
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0  z-30 md:hidden"
+          className="fixed inset-0  z-20 md:hidden"
         />
       )}
       <div className="md:flex-1 flex flex-col overflow-hidden">

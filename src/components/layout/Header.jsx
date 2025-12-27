@@ -23,7 +23,7 @@ export default function Header({ toggleSidebar }) {
   };
 
   return (
-    <header className="bg-transparent px-6 py-4">
+    <header className="relative z-30  bg-transparent px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
           <Button variant="ghost" size="icon" onClick={toggleSidebar}>
@@ -44,27 +44,31 @@ export default function Header({ toggleSidebar }) {
             <Sun className="w-5 h-5 text-purple-300" />
           </Button>
           
-          <Button variant="ghost" size="icon" className="relative">
+          <Button variant="ghost" size="icon" className="relative ">
             <Bell className="w-5 h-5 text-purple-300" />
             <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-gradient-to-r from-pink-500 to-yellow-500 rounded-full animate-pulse"></span>
           </Button>
 
-          <div className="flex items-center gap-3 pl-3 border-l border-purple-700/50">
+          <div className="flex items-start gap-3 pl-3 border-l border-purple-700/50">
             <motion.div whileHover={{ scale: 1.1 }}>
-<Avatar>
-  <AvatarImage
-    src={user?.avatar}
-  />
-  <AvatarFallback>🧑‍💼</AvatarFallback>
-</Avatar>
+
+               <Button variant="ghost" size="icon" onClick={handleLogout}>
+              <LogOut className="w-5 h-5 text-purple-300" />
+            </Button>
+
             </motion.div>
             <div className="hidden md:block">
               <p className="text-sm font-medium text-white">{user?.EmployeeName}</p>
               <p className="text-xs text-purple-400">{user?.role}</p>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleLogout}>
-              <LogOut className="w-5 h-5 text-purple-300" />
-            </Button>
+
+            <Avatar>
+  <AvatarImage
+    src={user?.avatar}
+  />
+  <AvatarFallback>🧑‍💼</AvatarFallback>
+</Avatar>
+           
           </div>
         </div>
       </div>

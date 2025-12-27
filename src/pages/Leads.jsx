@@ -6,6 +6,15 @@ import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X
 // --- CONFIGURATION & IMPORTS ---
 import { config } from '@/components/CustomComponents/config.js';
 import { useAuth } from '@/contexts/AuthContext';
+const decode = (value) => {
+  if (!value) return "";
+  try {
+    return atob(value);
+  } catch (err) {
+    console.error("Decode failed:", err);
+    return "";
+  }
+};
 
 import { useNavigate } from "react-router-dom";
 //for Export 
@@ -131,7 +140,7 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
 
 // --- LEAD DIALOG COMPONENT ---
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create', disablePhone = true }) => {
-    const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '', };
+    const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '',leadAltPhone:'91' };
     const [formData, setFormData] = useState(initialFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [] });
@@ -141,6 +150,9 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const { user } = useAuth();
     const { toast } = useToast();
+          const role = localStorage.getItem("role");
+    const siteId = decode(localStorage.getItem("SiteId")); 
+
     const isViewMode = mode === 'view';
 
     const fetchData = useCallback(async (endpoint, key) => {
@@ -277,6 +289,15 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         </button>
     );
 
+    useEffect(() => {
+  if (role === "AGENT" && siteId && open) {
+    setFormData(prev => ({
+      ...prev,
+      leadSiteId: siteId
+    }));
+  }
+}, [role, siteId, open]);
+
 
 
     return (
@@ -291,15 +312,18 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                         <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange} disabled /></div>
                         <div><Label>Email *</Label><Input name="leadEmail" type="email" value={formData.leadEmail} onChange={handleChange} required disabled={isViewMode} /></div>
                         <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled /></div>
+                        <div><Label>Alter Phone *</Label><Input name="leadAltPhone" value={formData.leadAltPhone} onChange={handleChange} required disabled={isViewMode}/></div>
 
 
-                        <div><Label>Job Title</Label><Input name="leadJobTitle" value={formData.leadJobTitle} onChange={handleChange} disabled={isViewMode} /></div>
-                        <div><Label>LinkedIn Profile</Label><Input name="leadLinkedIn" value={formData.leadLinkedIn} onChange={handleChange} disabled={isViewMode} /></div>
+                        {/* <div><Label>Job Title</Label><Input name="leadJobTitle" value={formData.leadJobTitle} onChange={handleChange} disabled={isViewMode} /></div>
+                        <div><Label>LinkedIn Profile</Label><Input name="leadLinkedIn" value={formData.leadLinkedIn} onChange={handleChange} disabled={isViewMode} /></div> */}
                         <div><Label>Street Address</Label><Input name="leadAddress" value={formData.leadAddress} onChange={handleChange} disabled={isViewMode} /></div>
                         <div><Label>Country</Label><select name="leadCountryId" value={formData.leadCountryId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.country.map(c => <option key={c._id} value={c._id}>{c.CountryName || c.name}</option>)}</select></div>
                         <div><Label>State</Label><select name="leadStateId" value={formData.leadStateId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.state.map(s => <option key={s._id} value={s._id}>{s.StateName || s.name}</option>)}</select></div>
                         <div><Label>City</Label><select name="leadCityId" value={formData.leadCityId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.city.map(c => <option key={c._id} value={c._id}>{c.CityName || c.name}</option>)}</select></div>
-                        <div><Label>Site</Label><select name="leadSiteId" value={formData.leadSiteId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.site.map(s => <option key={s._id} value={s._id}>{s.sitename || s.name}</option>)}</select></div>
+                       
+                      <div><Label>Site</Label><select name="leadSiteId" value={formData.leadSiteId} onChange={handleChange}     disabled={isViewMode || role === "AGENT"} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.site.map(s => <option key={s._id} value={s._id}>{s.sitename || s.name}</option>)}</select></div>
+                      
                         <div><Label>Zip Code</Label><Input name="leadZipCode" value={formData.leadZipCode} onChange={handleChange} disabled={isViewMode} /></div>
                     </div>)}
                     {activeFormTab === "deal" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -506,6 +530,7 @@ function LeadsContent() {
             "Lead Name": row.leadFirstName,
             "Lead Site": row.leadSiteId?.sitename || '-',
             "Lead Phone": row.leadPhone,
+            "Lead AlterPhone": row.leadAltPhone,
             "Lead Status": row.leadStatusId.leadStatustName,
             "Assigned To": row.leadAssignedId ? row.leadAssignedId.EmployeeName : '',
 
