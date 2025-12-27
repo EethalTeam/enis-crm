@@ -9,6 +9,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from "react-router-dom";
 
 import * as XLSX from "xlsx";  //for export execel
+
+const decode = (value) => {
+  if (!value) return "";
+  try {
+    return atob(value);
+  } catch (err) {
+    console.error("Decode failed:", err);
+    return "";
+  }
+};
+
 // --- LOCAL REDUCER ---
 const initialState = {
   _id: '',
@@ -313,14 +324,25 @@ function PlotsContent() {
   };
 
   const getPlot = async () => {
+
     try {
+
+      const role = localStorage.getItem("role");
+    const siteId = decode(localStorage.getItem("SiteId")); 
+
+      
       setLoading(true);
       let url = config.Api + "Plot/getAllPlots";
+
+       const payload =  role === "AGENT"   ? { siteId }   : {};   
+       console.log(payload,role,siteId,"payload")
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify(payload),
+       
       });
+      console.log(payload,"payload")
 
       if (!response.ok) throw new Error('Failed to get Plots');
 

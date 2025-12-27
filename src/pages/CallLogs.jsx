@@ -233,20 +233,12 @@ function CallLogsContent() {
   );
 
   return (
-<<<<<<< HEAD
+
     <div className="space-y-6 mt-3 p-4 bg-slate-950  min-h-screen text-slate-100">
       <div  className="sticky top-0 z-30 bg-slate-950 px-2 pt-2 pb-2 ">
         <div className="flex md:flex-row flex-col items-start md:items-center space-y-4  justify-between">
           <h1 className="md:text-3xl text-2xl font-bold text-white">Call Logs</h1>
-         {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
-          <Button
-            variant="outline"
-            onClick={exportCallLogsToExcel}
-            className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
-          >
-            <Download className="w-4 h-4 mr-2" /> Export
-          </Button>
-         )}
+        
           {loading && <Loader2 className="animate-spin text-white" />}
 
           {/* MOBILE SELECT */}
@@ -260,8 +252,10 @@ function CallLogsContent() {
               <option value="outgoing">Outgoing</option>
               <option value="rnr">RNR</option>
             </select>
-=======
-    <div className="space-y-6 p-4 bg-slate-950 min-h-screen text-slate-100">
+            </div>
+            
+
+    {/* <div className="space-y-6 p-4 bg-slate-950 min-h-screen text-slate-100">
       <div className="sticky top-0 z-30 bg-slate-950 p-4 space-y-10">
         <div className="flex md:flex-row flex-col items-start md:items-center space-y-4 justify-between">
           <h1 className="md:text-3xl text-2xl font-bold text-white">Call Logs</h1>
@@ -273,17 +267,33 @@ function CallLogsContent() {
             <Button variant="outline" onClick={exportCallLogsToExcel} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
               <Download className="w-4 h-4 mr-2" /> Export
             </Button>
->>>>>>> 0c873a8b90e245c3b0f9bf2ebc9dede09701daab
+            
+
           </div>
         </div>
+        </div> */}
 
-        <div className="hidden md:flex items-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
+           {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
+          <Button
+            variant="outline"
+            onClick={exportCallLogsToExcel}
+            className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
+          >
+            <Download className="w-4 h-4 mr-2" /> Export
+          </Button>
+         )}
+      </div>
+
+      
+        <div className="hidden  md:flex items-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800 mt-3">
           <TabButton id="all" label="All Calls" />
           <TabButton id="incoming" label="Incoming" />
           <TabButton id="outgoing" label="Outgoing" />
           <TabButton id="rnr" label="RNR" />
         </div>
+    
       </div>
+      
 
       {/* Desktop Table */}
       <Card className="bg-slate-900 border-slate-800 hidden md:block">
@@ -370,6 +380,7 @@ function CallLogsContent() {
 
       <LeadDialog open={leadDialogOpen} onOpenChange={setLeadDialogOpen} mode="create" initialData={leadInitialData} onSuccess={() => { toast({ title: "Lead Created", variant: "success" }); setLeadDialogOpen(false); }} />
     </div>
+    
   );
 }
 

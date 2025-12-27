@@ -258,7 +258,11 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("EmployeeName", result.employee.EmployeeName);
       localStorage.setItem("role", result.employee.role);
       // SITE
+
+      if(result.employee.SiteId ){
       localStorage.setItem("SiteId", encode(result.employee.SiteId));
+
+      }
      
 
 
@@ -320,6 +324,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("role");
     localStorage.removeItem("TelecmiID");
     localStorage.removeItem("TelecmiPassword");
+    localStorage.removeItem("SiteId");
+    // localStorage.removeItem("sitename");
     setUser(null);
   };
 

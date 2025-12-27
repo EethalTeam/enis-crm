@@ -21,6 +21,8 @@ import { config } from "@/components/CustomComponents/config.js";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from "react-router-dom";
 
+
+
 // ------------------- REDUCER -------------------
 const initialState = {
     _id: "",
@@ -411,8 +413,14 @@ function EmployeeContent() {
             row.roleId
                 ? (typeof row.roleId === "object" ? row.roleId._id : row.roleId)
                 : "";
+  dispatch({ type: "text", name: "roleId", value: roleValue });
 
-        dispatch({ type: "text", name: "roleId", value: roleValue });
+          const siteValue =
+    row.SiteId
+      ? (typeof row.SiteId === "object" ? row.SiteId._id : row.SiteId)
+      : "";
+
+        dispatch({ type: "text", name: "SiteId", value: siteValue });
 
         setDialogOpen(true);
     };
