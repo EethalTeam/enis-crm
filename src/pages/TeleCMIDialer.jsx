@@ -253,7 +253,7 @@ const handleCall = () => {
     <div className='p-6'>
     <div style={styles.container}>
       <div style={styles.header}>
-        <h3 style={styles.headerTitle}>Dailer</h3>
+        <h3 style={styles.headerTitle}>Dialer</h3>
         <div style={styles.headerSub}>
            {isLoggedIn ? `🟢 Online as ${agentName || 'Agent'}` : '🔴 Connecting...'}
         </div>
