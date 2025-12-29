@@ -32,7 +32,7 @@ import {
   Flag,
   TrendingUp,
   SquareCode,
-   Activity,
+  Activity,
   X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -71,7 +71,7 @@ const iconMap = {
   Flag,
   TrendingUp,
   SquareCode,
-   Activity
+  Activity
 };
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -115,7 +115,7 @@ const navItems = [
   },
   // { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   // { icon: Users, label: 'Users', path: '/users' },
-  { icon:  Activity, label: 'Reports', path: '/reports' },
+  { icon: Activity, label: 'Reports', path: '/reports' },
   { icon: Settings, label: 'Settings', path: '/settings' },
   {
     icon: Shield, label: 'Admin Panel',
@@ -163,7 +163,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     }
   };
 
-  
+
   const hasAccess = (path) => {
     const userRole = user.role;
     // if (userRole === 'superadmin') return true;
@@ -227,11 +227,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       </div>
 
       <nav className="md:flex-1 p-4 space-y-1 overflow-y-auto scrollbar-hide">
-        {filteredMenuItems.sort((a, b) => {
-          const numA = +a.id.match(/\d+/)[0];
-          const numB = +b.id.match(/\d+/)[0];
-          return numA - numB;
-        })
+        {filteredMenuItems
+          .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
           .map((item) => {
             let Icon = iconMap[item.icon] || CheckSquare
             if (item.subItems.length > 0) {
@@ -285,7 +282,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                             <NavLink
                               key={subItem.path}
                               to={subItem.path}
-                              
+
                               className={({ isActive }) =>
                                 cn(
                                   'flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 text-sm',
@@ -313,7 +310,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                 key={item.path}
                 to={item.path}
                 end={item.path === '/'}
-                
+
                 className={({ isActive }) =>
                   cn(
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 relative',

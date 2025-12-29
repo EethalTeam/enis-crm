@@ -2,7 +2,7 @@ import React, { useState, useEffect, useReducer, useCallback, createContext, use
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2,
-  X, ChevronDown, MapPin, UserPlus, RefreshCw, AlertTriangle, Home, Square, Compass
+  X, ChevronDown, MapPin, UserPlus, RefreshCw, AlertTriangle, Home, Square, Compass,ArrowUpFromLine
 } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
 import { useAuth } from '@/contexts/AuthContext';
@@ -752,7 +752,7 @@ const exportPlotsToExcel = () => {
 
            {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
           <Button variant="outline"   onClick={exportPlotsToExcel} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
-            <Download className="w-4 h-4 mr-2" /> Export
+            <ArrowUpFromLine className="w-4 h-4 mr-2" /> Export
           </Button>
            )}
           {

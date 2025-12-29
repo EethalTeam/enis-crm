@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, Filter, User, Phone, Clock, Hourglass, Download, PhoneCall } from 'lucide-react';
+import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, Filter, User, Phone, Clock, Hourglass, Download, PhoneCall, ArrowUpFromLine } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
 import { LeadDialog } from "@/pages/Leads";
 import PIOPIY from 'piopiyjs';
@@ -218,14 +218,21 @@ function CallLogsContent() {
 
     useEffect(() => {
         const fetchLogs = async () => {
+            const role = localStorage.getItem("role");
+            const TelecmiID = decode(localStorage.getItem("TelecmiID"));
             try {
+
                 let url = config.Api + "CallLogs/getAllCallLogs";
+                const payload = role === "AGENT" ? { TelecmiID ,role} : {};
+
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ page: 1, limit: 50 }),
+                    // body: JSON.stringify({ page: 1, limit: 50,  ...(role === "AGENT" && { TelecmiID })}),
+                    body: JSON.stringify(payload),
                 });
                 const data = await response.json();
+                console.log(data, "data")
                 setLogs(data.data || data.calls || []);
             } catch (err) {
                 setLogs([
@@ -324,7 +331,7 @@ function CallLogsContent() {
                         </div>
                         {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
                             <Button variant="outline" onClick={exportCallLogsToExcel} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
-                                <Download className="w-4 h-4 mr-2" /> Export
+                                <ArrowUpFromLine className="w-4 h-4 mr-2" /> Export
                             </Button>
                         )}
                     </div>

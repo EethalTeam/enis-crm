@@ -1,7 +1,7 @@
 import React, { useState, useEffect, createContext, useContext, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PIOPIY from 'piopiyjs'
-import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus, Phone, FileText, Contact, Clock, PhoneOff } from 'lucide-react';
+import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus, Phone, FileText, Contact, Clock, PhoneOff,ArrowUpFromLine } from 'lucide-react';
 
 // --- CONFIGURATION & IMPORTS ---
 import { config } from '@/components/CustomComponents/config.js';
@@ -240,9 +240,48 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         const updated = [...docRows]; updated[index].documentId = value; updated[index].file = null; setDocRows(updated);
     };
 
-    const handleFileChange = (index, file) => {
-        const updated = [...docRows]; updated[index].file = file; setDocRows(updated);
-    };
+    // const handleFileChange = (index, file) => {
+    //     const updated = [...docRows]; updated[index].file = file; setDocRows(updated);
+    // };
+
+  const handleFileChange = (index, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    //  Block audio & video
+    if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
+        toast({
+            title: "Invalid File",
+            description: "Audio and video files are not allowed",
+            variant: "destructive"
+        });
+         e.target.value = ""; //  THIS IS THE KEY LINE
+        return;
+    }
+
+    //  Allow only images & PDF
+    const allowedTypes = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'application/pdf'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+        toast({
+            title: "Invalid File",
+            description: "Only JPG, PNG images and PDF files are allowed",
+            variant: "destructive"
+        });
+        return;
+    }
+
+    //  Update state
+    const updated = [...docRows];
+    updated[index].file = file;
+    setDocRows(updated);
+};
+
 
     const handleSubmit = async (e) => {
         e.preventDefault(); setIsSubmitting(true);
@@ -308,8 +347,8 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                     <TabButton id="history" label="History" icon={Clock} active={activeFormTab} onClick={setActiveFormTab} />
                 </div>
                     {activeFormTab === "contact" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required disabled /></div>
-                        <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange} disabled /></div>
+                        <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required  /></div>
+                        <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange}  /></div>
                         <div><Label>Email *</Label><Input name="leadEmail" type="email" value={formData.leadEmail} onChange={handleChange} required disabled={isViewMode} /></div>
                         <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled /></div>
                         <div><Label>Alter Phone *</Label><Input name="leadAltPhone" value={formData.leadAltPhone} onChange={handleChange} required disabled={isViewMode}/></div>
@@ -366,8 +405,9 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                                                     {!isViewMode && (
                                                         <input
                                                             type="file"
+                                                            //   accept=".jpg,.jpeg,.png,.pdf"
                                                             className="flex-1 text-sm text-slate-300"
-                                                            onChange={(e) => handleFileChange(index, e.target.files[0])}
+                                                            onChange={(e) => handleFileChange(index, e)}
                                                         />
                                                     )}
 
@@ -596,7 +636,7 @@ function LeadsContent() {
                                 onClick={exportLeadsToExcel}
                                 className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
                             >
-                                <Download className="w-4 h-4 mr-2" />
+                                <ArrowUpFromLine  className="w-4 h-4 mr-2" />
                                 Export
                             </Button>
                         )}

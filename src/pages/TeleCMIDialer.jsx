@@ -72,10 +72,12 @@ const TeleCMIDialer = () => {
             sdk.on('answered', () => {
                 stopRingtone();
                 setCallStatus('Connected');
+                setPhoneNumber()
             });
             sdk.on('ended', () => {
                 stopRingtone();
                 resetCallState();
+                setPhoneNumber()
             });
             sdk.on('cancel', () => resetCallState());
             sdk.on('inComingCall', (callObj) => {
