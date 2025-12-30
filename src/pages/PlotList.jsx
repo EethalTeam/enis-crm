@@ -258,7 +258,9 @@ function PlotsContent() {
   const [unitList, setUnitList] = useState([]);
   const [visitorList, setVisitorList] = useState([]);
   const [siteList, setSiteList] = useState([]); // Stores Sites
+  const role = localStorage.getItem('role')
   const { getPermissionsByPath } = useAuth();
+
   const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
 
   const [PlotStatus] = useState([
@@ -651,8 +653,8 @@ function PlotsContent() {
 
   const handleView = (row) => {
     setViewData({
-     
-       "Site": row.siteId?.sitename || '-',
+    
+        "Site": row.siteId?.sitename || '-',
        "Plot No":row.plotNumber || '-',
        "Status":row.statusId.statusName || '-',
       "Unit": row.unitId?.UnitName || '-',
@@ -794,9 +796,15 @@ const exportPlotsToExcel = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-700">
+                  
+                  {
+                    role !== 'AGENT' && 
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Site</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Unit</th>
+
+                  }
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Plot No</th>
+
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Unit</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Status</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Area (Sq.ft)</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Facing</th>
@@ -815,9 +823,15 @@ const exportPlotsToExcel = () => {
                       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
                       className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors group"
                     >
+                      {
+                        role !== 'AGENT' && 
                       <td className="py-3 px-4 text-sm font-medium text-white">{row?.siteId?.sitename || '-'}</td>
-                      <td className="py-3 px-4 text-sm font-medium text-white">{row.unitId?.UnitName || '-'}</td>
+
+                      }
+
                       <td className="py-3 px-4 text-sm text-slate-300">{row.plotNumber}</td>
+
+                      <td className="py-3 px-4 text-sm font-medium text-white">{row.unitId?.UnitName || '-'}</td>
                       <td className="py-3 px-4">
                         <Badge color={row.statusId?.colorCode || '#64748b'}>
                           {row.statusId?.statusName || 'Unknown'}
@@ -965,9 +979,12 @@ const exportPlotsToExcel = () => {
             <form onSubmit={(e) => { e.preventDefault(); Validate(); }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
               {/* SITE SELECTION (MANDATORY) */}
-              <div>
+               {
+                    role !== 'AGENT' && 
+                         <div>
                 <Label>Site <span className="text-red-500">*</span></Label>
                 <div className="relative">
+                 
                   <select
                     className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
                     value={state.siteId}
@@ -982,6 +999,8 @@ const exportPlotsToExcel = () => {
                   <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
                 </div>
               </div>
+                  }
+         
 
               {/* UNIT SELECTION (FILTERED BY SITE) */}
               <div>
