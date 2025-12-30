@@ -693,7 +693,12 @@ function LeadsContent() {
                         <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Filter className="w-4 h-4 mr-2" />Filter</Button>
                     </div>
                     <div className="overflow-x-auto"><table className="w-full text-left">
-                        <thead><tr className="border-b border-slate-700 text-white"><th className="py-3 px-4">Name</th><th className="py-3 px-4">Site</th><th className="py-3 px-4">Phone</th><th className="py-3 px-4">Status</th><th className="py-3 px-4">Assigned To</th><th className="py-3 px-4">Actions</th></tr></thead>
+                        <thead><tr className="border-b border-slate-700 text-white"><th className="py-3 px-4">Name</th><th className="py-3 px-4">Site</th><th className="py-3 px-4">Phone</th><th className="py-3 px-4">Status</th><th className="py-3 px-4">Assigned To</th>
+                       {
+                        role !== "AGENT" &&
+                        <th className="py-3 px-4">Actions</th>
+                       } 
+                        </tr></thead>
                         <tbody>{getFilteredLeads().map(l => (
                             <tr key={l._id} className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors group">
                                 <td className="py-3 px-4 font-medium text-white cursor-pointer" onClick={() => { setNotesLead(l); setNoteText(''); setNotesDialogOpen(true); }}><span className="underline-offset-4 group-hover:underline text-fuchsia-400">{l.leadFirstName} {l.leadLastName}</span></td>

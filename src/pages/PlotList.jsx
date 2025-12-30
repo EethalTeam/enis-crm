@@ -2,7 +2,7 @@ import React, { useState, useEffect, useReducer, useCallback, createContext, use
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2,
-  X, ChevronDown, MapPin, UserPlus, RefreshCw, AlertTriangle, Home, Square, Compass,ArrowUpFromLine
+  X, ChevronDown, MapPin, UserPlus, RefreshCw, AlertTriangle, Home, Square, Compass, ArrowUpFromLine
 } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,7 +30,7 @@ const initialState = {
   dimension: '',
   areaInSqFt: '',
   cents: '',
-  SquareFeet:'',
+  SquareFeet: '',
   road: '',
   landmark: '',
   isActive: '',
@@ -331,18 +331,18 @@ function PlotsContent() {
     try {
 
       const role = localStorage.getItem("role");
-    const siteId = decode(localStorage.getItem("SiteId")); 
+      const siteId = decode(localStorage.getItem("SiteId"));
 
-      
+
       setLoading(true);
       let url = config.Api + "Plot/getAllPlots";
 
-       const payload =  role === "AGENT"   ? { siteId }   : {};   
+      const payload = role === "AGENT" ? { siteId } : {};
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-       
+
       });
 
       if (!response.ok) throw new Error('Failed to get Plots');
@@ -368,7 +368,7 @@ function PlotsContent() {
       });
       if (!response.ok) throw new Error('Failed to get Units');
       const result = await response.json();
-        setUnitList(result.data || result);
+      setUnitList(result.data || result);
     } catch (error) { console.error('Error:', error); }
   };
 
@@ -389,7 +389,7 @@ function PlotsContent() {
       // For now, let's assume this updates a separate list or handle carefully.
       // NOTE: In original code Data was reused. I will fetch visitors directly in dropdown click or separate state if possible. 
       // For safety, I'll update SetData but be aware of conflict if opening Unit and Visitor dropdowns simultaneously.
-       setVisitorList(result || []);
+      setVisitorList(result || []);
     } catch (error) { console.error('Error:', error); }
   };
 
@@ -498,7 +498,7 @@ function PlotsContent() {
       dispatch({ type: 'text', name: "sitename", value: data.siteId.sitename || '' });
     }
 
-    
+
 
     dispatch({ type: 'text', name: "plotCode", value: data.plotCode || '' });
     dispatch({ type: 'text', name: "plotNumber", value: data.plotNumber || '' });
@@ -519,7 +519,7 @@ function PlotsContent() {
       dispatch({ type: 'text', name: "unitId", value: data.unitId._id || '' });
       dispatch({ type: 'text', name: "UnitName", value: data.unitId.UnitName || '' });
     }
-   
+
     setDialogOpen(true);
   };
 
@@ -581,20 +581,20 @@ function PlotsContent() {
       // };
 
       const updateData = {
-  _id: state._id,
-  siteId: state.siteId,
-  unitId: state.unitId || null,
-  plotNumber: state.plotNumber,
-  dimension: state.dimension,
-  areaInSqFt: state.areaInSqFt,
-  cents: state.cents,
-  SquareFeet:state.SquareFeet,
-  road: state.road,
-  landmark: state.landmark,
-  remarks: state.remarks,
-  description: state.description,
-  facing: state.facing,
-};
+        _id: state._id,
+        siteId: state.siteId,
+        unitId: state.unitId || null,
+        plotNumber: state.plotNumber,
+        dimension: state.dimension,
+        areaInSqFt: state.areaInSqFt,
+        cents: state.cents,
+        SquareFeet: state.SquareFeet,
+        road: state.road,
+        landmark: state.landmark,
+        remarks: state.remarks,
+        description: state.description,
+        facing: state.facing,
+      };
 
       const saveData = {
         siteId: state.siteId, // Include Site
@@ -602,7 +602,7 @@ function PlotsContent() {
         dimension: state.dimension,
         areaInSqFt: state.areaInSqFt,
         cents: state.cents,
-        SquareFeet:state.SquareFeet,
+        SquareFeet: state.SquareFeet,
         road: state.road,
         landmark: state.landmark,
         remarks: state.remarks,
@@ -656,19 +656,19 @@ function PlotsContent() {
 
   const handleView = (row) => {
     setViewData({
-    
-        "Site": row.siteId?.sitename || '-',
-       "Plot No":row.plotNumber || '-',
-       "Status":row.statusId.statusName || '-',
-      "Unit": row.unitId?.UnitName || '-',
-      "Dimension":row.dimension || '-',
-      "Area (Sq.ft)":row.areaInSqFt || '-',
-      "	Facing":row.facing || '-',
-      "Cents":row.cents || '-',
-      "SquareFeet":row.SquareFeet || '-',
-      "LandMark ":row.landmark || '-'
 
-      
+      "Site": row.siteId?.sitename || '-',
+      "Plot No": row.plotNumber || '-',
+      "Status": row.statusId.statusName || '-',
+      "Unit": row.unitId?.UnitName || '-',
+      "Dimension": row.dimension || '-',
+      "Area (Sq.ft)": row.areaInSqFt || '-',
+      "	Facing": row.facing || '-',
+      "Cents": row.cents || '-',
+      "SquareFeet": row.SquareFeet || '-',
+      "LandMark ": row.landmark || '-'
+
+
     });
     setOpenView(true);
   };
@@ -690,63 +690,63 @@ function PlotsContent() {
   //   });
   // };
   const getFilteredUnits = () => {
-  if (!state.siteId) return [];
-  return unitList.filter(u => {
-    const uSiteId = u.siteId?._id || u.siteId;
-    return uSiteId === state.siteId;
-  });
-};
-
-
-const exportPlotsToExcel = () => {
-  if (!filteredData || filteredData.length === 0) {
-    toast({
-      title: "No data to export",
-      description: "There are no plots available",
-      variant: "destructive",
+    if (!state.siteId) return [];
+    return unitList.filter(u => {
+      const uSiteId = u.siteId?._id || u.siteId;
+      return uSiteId === state.siteId;
     });
-    return;
-  }
+  };
 
-  // Prepare Excel rows
-  const excelData = filteredData.map((row, index) => ({
-    "S.No": index + 1,
-    "Site Name": row.siteId?.sitename || "",
-    "Unit Name": row.unitId?.UnitName || "",
-    "Plot Number": row.plotNumber || "",
-    "Area (Sq.ft)": row.areaInSqFt || "",
-    "Cents": row.cents || "",
-    "SquareFeet":row.SquareFeet || '',
-    "Facing": row.facing || "",
-    "Road": row.road || "",
-    "Landmark": row.landmark || "",
-    "Status": row.statusId?.statusName || "",
-    "Remarks": row.remarks || "",
-    "Description": row.description || "",
-    "Created Date": row.createdAt
-      ? new Date(row.createdAt).toLocaleString("en-IN")
-      : "",
-  }));
 
-  // 🔹 Create worksheet & workbook
-  const worksheet = XLSX.utils.json_to_sheet(excelData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Plots");
+  const exportPlotsToExcel = () => {
+    if (!filteredData || filteredData.length === 0) {
+      toast({
+        title: "No data to export",
+        description: "There are no plots available",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  // 🔹 Auto column width
-  worksheet["!cols"] = Object.keys(excelData[0]).map((key) => ({
-    wch: Math.max(
-      key.length,
-      ...excelData.map((row) => String(row[key] || "").length)
-    ) + 2,
-  }));
+    // Prepare Excel rows
+    const excelData = filteredData.map((row, index) => ({
+      "S.No": index + 1,
+      "Site Name": row.siteId?.sitename || "",
+      "Unit Name": row.unitId?.UnitName || "",
+      "Plot Number": row.plotNumber || "",
+      "Area (Sq.ft)": row.areaInSqFt || "",
+      "Cents": row.cents || "",
+      "SquareFeet": row.SquareFeet || '',
+      "Facing": row.facing || "",
+      "Road": row.road || "",
+      "Landmark": row.landmark || "",
+      "Status": row.statusId?.statusName || "",
+      "Remarks": row.remarks || "",
+      "Description": row.description || "",
+      "Created Date": row.createdAt
+        ? new Date(row.createdAt).toLocaleString("en-IN")
+        : "",
+    }));
 
-  // 🔹 Download file
-  XLSX.writeFile(
-    workbook,
-    `Plots_${new Date().toISOString().slice(0, 10)}.xlsx`
-  );
-};
+    // 🔹 Create worksheet & workbook
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Plots");
+
+    // 🔹 Auto column width
+    worksheet["!cols"] = Object.keys(excelData[0]).map((key) => ({
+      wch: Math.max(
+        key.length,
+        ...excelData.map((row) => String(row[key] || "").length)
+      ) + 2,
+    }));
+
+    // 🔹 Download file
+    XLSX.writeFile(
+      workbook,
+      `Plots_${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
+  };
 
 
   return (
@@ -760,11 +760,11 @@ const exportPlotsToExcel = () => {
             <Upload className="w-4 h-4 mr-2" /> Import
           </Button> */}
 
-           {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
-          <Button variant="outline"   onClick={exportPlotsToExcel} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
-            <ArrowUpFromLine className="w-4 h-4 mr-2" /> Export
-          </Button>
-           )}
+          {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
+            <Button variant="outline" onClick={exportPlotsToExcel} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
+              <ArrowUpFromLine className="w-4 h-4 mr-2" /> Export
+            </Button>
+          )}
           {
             Permissions.isAdd &&
             <Button onClick={() => { clear(); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
@@ -776,7 +776,7 @@ const exportPlotsToExcel = () => {
       </div>
 
       {/* --- TABLE CARD --- */}
-      <Card className='hidden md:block'>
+      <Card >
         <CardContent className="p-6">
           {/* FILTER BAR */}
           <div className="flex gap-4 mb-6">
@@ -795,18 +795,18 @@ const exportPlotsToExcel = () => {
           </div>
 
           {/* DATA TABLE */}
-          <div className="overflow-x-auto overflow-y-hidden">
+          <div className="overflow-x-auto overflow-y-hidden hidden md:block">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-700">
-                  
-               
+
+
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Plot No</th>
 
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Unit</th>
-                     {
-                    role !== 'AGENT' && 
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Site</th>
+                  {
+                    role !== 'AGENT' &&
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-white">Site</th>
 
                   }
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Status</th>
@@ -827,14 +827,14 @@ const exportPlotsToExcel = () => {
                       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
                       className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors group"
                     >
-                     
+
 
                       <td className="py-3 px-4 text-sm text-slate-300">{row.plotNumber}</td>
 
                       <td className="py-3 px-4 text-sm font-medium text-white">{row.unitId?.UnitName || '-'}</td>
-                       {
-                        role !== 'AGENT' && 
-                      <td className="py-3 px-4 text-sm font-medium text-white">{row?.siteId?.sitename || '-'}</td>
+                      {
+                        role !== 'AGENT' &&
+                        <td className="py-3 px-4 text-sm font-medium text-white">{row?.siteId?.sitename || '-'}</td>
 
                       }
                       <td className="py-3 px-4">
@@ -859,122 +859,134 @@ const exportPlotsToExcel = () => {
               </tbody>
             </table>
           </div>
+
+              {/* card for mobile */}
+          <Card className="md:hidden">
+            <CardContent className="p-4 space-y-4">
+              {loading && filteredData.length === 0 ? (
+                <div className="text-center py-6 text-fuchsia-400">
+                  <Loader2 className="animate-spin inline mr-2" /> Loading...
+                </div>
+              ) : filteredData.length === 0 ? (
+                <div className="text-center py-6 text-slate-400">
+                  No plots found.
+                </div>
+              ) : (
+                filteredData.map((row, index) => (
+                  <motion.div
+                    key={row._id || index}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="
+            relative
+            rounded-2xl
+            bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950
+            border border-fuchsia-700/30
+            p-4
+            shadow-lg
+            space-y-3
+          "
+                  >
+                    {/* HEADER: Plot No + Status */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-slate-400">Plot No</p>
+                        <p className="text-lg font-bold text-white">
+                          {row.plotNumber}
+                        </p>
+                      </div>
+
+                      <Badge
+                        color={row.statusId?.colorCode || "#64748b"}
+                        className="px-3 py-1 text-xs"
+                      >
+                        {row.statusId?.statusName || "Unknown"}
+                      </Badge>
+                    </div>
+
+                    <div className="h-px bg-slate-800" />
+
+                    {/* DETAILS GRID */}
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                      {/* Unit */}
+                      <div>
+                        <p className="text-xs text-slate-400">Unit</p>
+                        <p className="text-slate-200 font-medium">
+                          {row.unitId?.UnitName || "-"}
+                        </p>
+                      </div>
+
+                      {/* Area */}
+                      <div>
+                        <p className="text-xs text-slate-400">Area (Sq.ft)</p>
+                        <p className="text-slate-200 font-medium">
+                          {row.areaInSqFt || "-"}
+                        </p>
+                      </div>
+
+                      {/* Site */}
+                      {role !== "AGENT" && (
+                        <div className="col-span-2">
+                          <p className="text-xs text-slate-400">Site</p>
+                          <p className="text-slate-200 font-medium">
+                            {row.siteId?.sitename || "-"}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Facing */}
+                      <div>
+                        <p className="text-xs text-slate-400">Facing</p>
+                        <p className="text-slate-200 font-medium">
+                          {row.facing || "-"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* ACTIONS */}
+                    <div className="flex justify-start gap-2 pt-3 border-t border-slate-800">
+                      <Button
+                        variant="icon"
+                        size="icon"
+                        onClick={() => handleView(row)}
+                        title="View"
+                        className="hover:bg-blue-900/30"
+                      >
+                        <Eye className="w-4 h-4 text-blue-400" />
+                      </Button>
+
+                      {Permissions.isEdit && (
+                        <Button
+                          variant="icon"
+                          size="icon"
+                          onClick={() => editTable(row)}
+                          title="Edit"
+                          className="hover:bg-yellow-900/30"
+                        >
+                          <Pencil className="w-4 h-4 text-yellow-400" />
+                        </Button>
+                      )}
+
+                      <Button
+                        variant="icon"
+                        size="icon"
+                        onClick={() => handleAddVisitor(row)}
+                        title="Add Visitor"
+                        className="hover:bg-green-900/30"
+                      >
+                        <UserPlus className="w-4 h-4 text-green-400" />
+                      </Button>
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+
         </CardContent>
       </Card>
 
-      {/* //card for Mobile view */}
-      <Card className=' md:hidden'>
-        <CardContent className="p-6">
-          {/* FILTER BAR */}
-          <div className="flex gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" />
-              <Input
-                placeholder="Search plots..."
-                value={searchTerm}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white placeholder:text-purple-200 focus-visible:ring-fuchsia-500"
-              />
-            </div>
-            <Button variant="outline" onClick={() => getPlot()} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20" title="Refresh">
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            </Button>
-          </div>
-
-          {/* DATA TABLE */}
-          {/* CARD LIST FOR MOBILE */}
-          <div className="space-y-4">
-            {loading && filteredData.length === 0 ? (
-              <div className="text-center py-6 text-fuchsia-400">
-                <Loader2 className="animate-spin inline mr-2" /> Loading...
-              </div>
-            ) : filteredData.length === 0 ? (
-              <div className="text-center py-6 text-slate-400">
-                No plots found.
-              </div>
-            ) : (
-              filteredData.map((row, index) => (
-                <motion.div
-                  key={row._id || index}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.04 }}
-                  className=" border border-fuchsia-700/40 rounded-xl p-4 shadow-lg transition-all "
-                >
-                  {/* SITE + STATUS ROW */}
-                  <div className=" space-y-2 mb-3">
-                    <h3 className="text-xs font-bold text-white">
-                      {row?.siteId?.sitename || '-'}
-                    </h3>
-
-                    <Badge color={row.statusId?.colorCode || '#64748b'}>
-                      {row.statusId?.statusName || 'Unknown'}
-                    </Badge>
-                  </div>
-
-                  {/* UNIT */}
-                  <div className="flex items-center gap-2 text-purple-300 text-sm mb-1">
-                    <Home className="w-4 h-4" />
-                    <span>{row.unitId?.UnitName || '-'}</span>
-                  </div>
-
-                  {/* PLOT NO */}
-                  <div className="flex items-center gap-2 text-fuchsia-300 text-sm mb-1">
-                    <MapPin className="w-4 h-4" />
-                    <span>{row.plotNumber}</span>
-                  </div>
-
-                  {/* AREA */}
-                  <div className="flex items-center gap-2 text-slate-300 text-sm mb-1">
-                    <Square className="w-4 h-4" />
-                    <span>{row.areaInSqFt} Sq.ft</span>
-                  </div>
-
-                  {/* FACING */}
-                  <div className="flex items-center gap-2 text-slate-300 text-sm mb-3">
-                    <Compass className="w-4 h-4" />
-                    <span>{row.facing}</span>
-                  </div>
-
-                  {/* ACTION BUTTONS */}
-                  <div className="flex justify-start border-t border-purple-700/40 pt-2 gap-2">
-                    <Button
-                      variant="icon"
-                      size="icon"
-                      onClick={() => handleView(row)}
-                      title="View"
-                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
-
-                    <Button
-                      variant="icon"
-                      size="icon"
-                      onClick={() => editTable(row)}
-                      title="Edit"
-                      className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/20"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-
-                    <Button
-                      variant="icon"
-                      size="icon"
-                      onClick={() => handleAddVisitor(row)}
-                      title="Add Visitor"
-                      className="text-green-400 hover:text-green-300 hover:bg-green-900/20"
-                    >
-                      <UserPlus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </div>
-
-        </CardContent>
-      </Card>
 
 
       {/* --- ADD / EDIT PLOT DIALOG --- */}
@@ -984,28 +996,28 @@ const exportPlotsToExcel = () => {
             <form onSubmit={(e) => { e.preventDefault(); Validate(); }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
               {/* SITE SELECTION (MANDATORY) */}
-               {
-                    role !== 'AGENT' && 
-                         <div>
-                <Label>Site <span className="text-red-500">*</span></Label>
-                <div className="relative">
-                 
-                  <select
-                    className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
-                    value={state.siteId}
-                    onChange={(e) => {
-                      const selected = siteList.find(s => s._id === e.target.value);
-                      if (selected) storeDispatch(selected, 'siteId', 'select');
-                    }}
-                  >
-                    <option value="">Select Site</option>
-                    {siteList.map(s => <option key={s._id} value={s._id}>{s.sitename}</option>)}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
+              {
+                role !== 'AGENT' &&
+                <div>
+                  <Label>Site <span className="text-red-500">*</span></Label>
+                  <div className="relative">
+
+                    <select
+                      className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
+                      value={state.siteId}
+                      onChange={(e) => {
+                        const selected = siteList.find(s => s._id === e.target.value);
+                        if (selected) storeDispatch(selected, 'siteId', 'select');
+                      }}
+                    >
+                      <option value="">Select Site</option>
+                      {siteList.map(s => <option key={s._id} value={s._id}>{s.sitename}</option>)}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50 pointer-events-none" />
+                  </div>
                 </div>
-              </div>
-                  }
-         
+              }
+
 
               {/* UNIT SELECTION (FILTERED BY SITE) */}
               <div>
@@ -1046,14 +1058,14 @@ const exportPlotsToExcel = () => {
 
               <div className='flex w-sm gap-2'>
                 <div>
-                    <Label>Cents</Label>
-                <Input type="number" value={state.cents} onChange={(e) => storeDispatch(e.target.value, "cents", "text")} />
+                  <Label>Cents</Label>
+                  <Input type="number" value={state.cents} onChange={(e) => storeDispatch(e.target.value, "cents", "text")} />
                 </div>
                 <div>
-                   <Label>SquareFeet</Label>
-                <Input type="number" value={state.SquareFeet} onChange={(e) => storeDispatch(e.target.value, "SquareFeet", "text")} />
+                  <Label>SquareFeet</Label>
+                  <Input type="number" value={state.SquareFeet} onChange={(e) => storeDispatch(e.target.value, "SquareFeet", "text")} />
                 </div>
-              
+
               </div>
 
               <div>
