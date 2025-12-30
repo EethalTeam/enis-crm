@@ -697,7 +697,12 @@ function LeadsContent() {
                         <tbody>{getFilteredLeads().map(l => (
                             <tr key={l._id} className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors group">
                                 <td className="py-3 px-4 font-medium text-white cursor-pointer" onClick={() => { setNotesLead(l); setNoteText(''); setNotesDialogOpen(true); }}><span className="underline-offset-4 group-hover:underline text-fuchsia-400">{l.leadFirstName} {l.leadLastName}</span></td>
+                               
+                               {
+                                role !== 'AGENT' &&
                                 <td className="py-3 px-4 text-slate-300">{l.leadSiteId?.sitename || 'N/A'}</td>
+
+                               }
                                 <td className="py-3 px-4 text-slate-300 flex gap-2"><button onClick={() => { setCallNumber(l.leadPhone); setCallDialogOpen(true); }}><Phone size={18} className=' hover:text-fuchsia-400' /></button>{l.leadPhone}</td>
                                 <td className="py-3 px-4"><Badge className={statusColors[l.leadStatusId?.leadStatusColor] || 'bg-slate-700'}>{l.leadStatusId?.leadStatustName || 'New'}</Badge></td>
                                 <td className="py-3 px-4 text-slate-300">{l.leadAssignedId?.EmployeeName || 'Unassigned'}</td>

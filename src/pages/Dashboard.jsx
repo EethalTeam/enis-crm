@@ -14,7 +14,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { config } from "@/components/CustomComponents/config.js";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-
+const decode = (value) => {
+  if (!value) return "";
+  try {
+    return atob(value);
+  } catch (err) {
+    console.error("Decode failed:", err);
+    return "";
+  }
+};
 
 
 // const leadsBySource = [
@@ -49,6 +57,7 @@ export default function Dashboard() {
   const [callDays, setCallDays] = useState([])
   const [dashboard, setDashBoard] = useState([])
   const [leadSource, setLeadSource] = useState([]);
+  const [callReport, setCallReport] = useState([]);
   const isMobile = window.innerWidth < 768
 
 
@@ -78,17 +87,20 @@ export default function Dashboard() {
     getAllDashBoard()
     getDayWiseAnsweredCalls()
     getLeadsBySource()
+    getCallReport()
   }, [])
 
   const getAllDashBoard = async () => {
     try {
+       const role = localStorage.getItem("role");
+      const TelecmiID = decode(localStorage.getItem("TelecmiID"))
 
       let url = config.Api + "DashBoard/getAllDashBoard";
-
+ const payload = role === "AGENT" ? { TelecmiID, role } : {};
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();
@@ -105,12 +117,15 @@ export default function Dashboard() {
   const getDayWiseAnsweredCalls = async () => {
     try {
 
+       const role = localStorage.getItem("role");
+      const TelecmiID = decode(localStorage.getItem("TelecmiID"))
+     
       let url = config.Api + "DashBoard/getDayWiseAnsweredCalls";
-
+ const payload = role === "AGENT" ? { TelecmiID, role } : {};
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();
@@ -126,16 +141,34 @@ export default function Dashboard() {
   };
 
 
+  const getCallReport = async () => {
+    const role = localStorage.getItem("role");
+    const TelecmiID = decode(localStorage.getItem("TelecmiID"))
+    const payload = role === "AGENT" ? { TelecmiID, role } : {};
+    const res = await fetch(config.Api + "DashBoard/getCallStatusReport", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    setCallReport(data);
+  };
+
+
 
   const getLeadsBySource = async () => {
     try {
 
+      const role = localStorage.getItem("role");
+      const TelecmiID = decode(localStorage.getItem("TelecmiID"))
+      const payload = role === "AGENT" ? { TelecmiID, role } : {};
       let url = config.Api + "DashBoard/getLeadsBySource";
 
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();
@@ -186,6 +219,36 @@ export default function Dashboard() {
               </Card>
             </motion.div>
           ))}
+        </div>
+
+        {/* //Report Div for Call missing and Call attend and Call pending */}
+        <div>
+          <Card>
+            <CardHeader className='md:max-w-full max-w-md'>
+              <CardTitle>Report</CardTitle>
+            </CardHeader>
+            <CardContent className="">
+              <ResponsiveContainer width="100%" height={isMobile ? 220 : 300}>
+                <PieChart>
+                  <Pie
+                    data={callReport}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={100}
+                    label={({ name, percent }) =>
+                      `${name} ${(percent * 100).toFixed(0)}%`
+                    }
+                  >
+                    {callReport.map((_, index) => (
+                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ backgroundColor: '#2a133b', border: 'none', borderRadius: '8px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

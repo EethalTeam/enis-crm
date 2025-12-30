@@ -498,10 +498,13 @@ function PlotsContent() {
       dispatch({ type: 'text', name: "sitename", value: data.siteId.sitename || '' });
     }
 
+    
+
     dispatch({ type: 'text', name: "plotCode", value: data.plotCode || '' });
     dispatch({ type: 'text', name: "plotNumber", value: data.plotNumber || '' });
     dispatch({ type: 'text', name: "areaInSqFt", value: data.areaInSqFt || '' });
     dispatch({ type: 'text', name: "cents", value: data.cents || '' });
+    dispatch({ type: 'text', name: "SquareFeet", value: data.SquareFeet || '' });
     dispatch({ type: 'text', name: "road", value: data.road || '' });
     dispatch({ type: 'text', name: "landmark", value: data.landmark || '' });
     dispatch({ type: 'text', name: "dimension", value: data.dimension || '' });
@@ -797,14 +800,15 @@ const exportPlotsToExcel = () => {
               <thead>
                 <tr className="border-b border-slate-700">
                   
-                  {
+               
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Plot No</th>
+
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Unit</th>
+                     {
                     role !== 'AGENT' && 
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Site</th>
 
                   }
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Plot No</th>
-
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-white">Unit</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Status</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Area (Sq.ft)</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-white">Facing</th>
@@ -823,15 +827,16 @@ const exportPlotsToExcel = () => {
                       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
                       className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors group"
                     >
-                      {
-                        role !== 'AGENT' && 
-                      <td className="py-3 px-4 text-sm font-medium text-white">{row?.siteId?.sitename || '-'}</td>
-
-                      }
+                     
 
                       <td className="py-3 px-4 text-sm text-slate-300">{row.plotNumber}</td>
 
                       <td className="py-3 px-4 text-sm font-medium text-white">{row.unitId?.UnitName || '-'}</td>
+                       {
+                        role !== 'AGENT' && 
+                      <td className="py-3 px-4 text-sm font-medium text-white">{row?.siteId?.sitename || '-'}</td>
+
+                      }
                       <td className="py-3 px-4">
                         <Badge color={row.statusId?.colorCode || '#64748b'}>
                           {row.statusId?.statusName || 'Unknown'}
