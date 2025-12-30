@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import ScrollToTop from '../../components/ui/scrolltotop';
+import FloatingCallButton from '../../components/ui/FloatingCallButton'
 
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -23,7 +24,7 @@ export default function MainLayout() {
         <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <main  ref={scrollRef} className="md:flex-1 overflow-y-auto  scrollbar-hide ">
           <Outlet />
-          
+          <FloatingCallButton />
           {/* MOBILE SCROLL TO TOP */}
           <ScrollToTop containerRef={scrollRef} />
         </main>
