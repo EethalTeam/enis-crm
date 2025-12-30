@@ -30,6 +30,7 @@ const initialState = {
   dimension: '',
   areaInSqFt: '',
   cents: '',
+  SquareFeet:'',
   road: '',
   landmark: '',
   isActive: '',
@@ -582,6 +583,7 @@ function PlotsContent() {
   dimension: state.dimension,
   areaInSqFt: state.areaInSqFt,
   cents: state.cents,
+  SquareFeet:state.SquareFeet,
   road: state.road,
   landmark: state.landmark,
   remarks: state.remarks,
@@ -595,6 +597,7 @@ function PlotsContent() {
         dimension: state.dimension,
         areaInSqFt: state.areaInSqFt,
         cents: state.cents,
+        SquareFeet:state.SquareFeet,
         road: state.road,
         landmark: state.landmark,
         remarks: state.remarks,
@@ -657,6 +660,7 @@ function PlotsContent() {
       "Area (Sq.ft)":row.areaInSqFt || '-',
       "	Facing":row.facing || '-',
       "Cents":row.cents || '-',
+      "SquareFeet":row.SquareFeet || '-',
       "LandMark ":row.landmark || '-'
 
       
@@ -707,6 +711,7 @@ const exportPlotsToExcel = () => {
     "Plot Number": row.plotNumber || "",
     "Area (Sq.ft)": row.areaInSqFt || "",
     "Cents": row.cents || "",
+    "SquareFeet":row.SquareFeet || '',
     "Facing": row.facing || "",
     "Road": row.road || "",
     "Landmark": row.landmark || "",
@@ -1015,9 +1020,16 @@ const exportPlotsToExcel = () => {
                 <Input type="number" value={state.areaInSqFt} onChange={(e) => storeDispatch(e.target.value, "areaInSqFt", "text")} />
               </div>
 
-              <div>
-                <Label>Cents</Label>
+              <div className='flex w-sm gap-2'>
+                <div>
+                    <Label>Cents</Label>
                 <Input type="number" value={state.cents} onChange={(e) => storeDispatch(e.target.value, "cents", "text")} />
+                </div>
+                <div>
+                   <Label>SquareFeet</Label>
+                <Input type="number" value={state.SquareFeet} onChange={(e) => storeDispatch(e.target.value, "SquareFeet", "text")} />
+                </div>
+              
               </div>
 
               <div>
