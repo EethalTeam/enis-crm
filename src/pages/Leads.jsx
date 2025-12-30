@@ -1,19 +1,19 @@
 import React, { useState, useEffect, createContext, useContext, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PIOPIY from 'piopiyjs'
-import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus, Phone, FileText, Contact, Clock, PhoneOff,ArrowUpFromLine } from 'lucide-react';
+import { Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, X, ChevronDown, MapPin, Briefcase, DollarSign, User, Calendar, PhoneCall, UserMinus, Users, UserPlus, Phone, FileText, Contact, Clock, PhoneOff, ArrowUpFromLine } from 'lucide-react';
 
 // --- CONFIGURATION & IMPORTS ---
 import { config } from '@/components/CustomComponents/config.js';
 import { useAuth } from '@/contexts/AuthContext';
 const decode = (value) => {
-  if (!value) return "";
-  try {
-    return atob(value);
-  } catch (err) {
-    console.error("Decode failed:", err);
-    return "";
-  }
+    if (!value) return "";
+    try {
+        return atob(value);
+    } catch (err) {
+        console.error("Decode failed:", err);
+        return "";
+    }
 };
 
 import { useNavigate } from "react-router-dom";
@@ -140,18 +140,19 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
 
 // --- LEAD DIALOG COMPONENT ---
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create', disablePhone = true }) => {
-    const initialFormState = {leadCreatedById:decode(localStorage.getItem('EmployeeId')), leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '',leadAltPhone:'91',leadUnitId:'' };
+    const role = localStorage.getItem("role");
+    const siteId = decode(localStorage.getItem("SiteId"));
+    const initialFormState = { leadCreatedById: decode(localStorage.getItem('EmployeeId')), leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: role === "AGENT" ? siteId : "", leadNotes: '', leadAltPhone: '91', leadUnitId: '' };
     const [formData, setFormData] = useState(initialFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [] });
+    const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [], unit: [] });
     const [docRows, setDocRows] = useState([{ documentId: "", file: null }]);
     const [activeFormTab, setActiveFormTab] = useState("contact");
     const [previewUrl, setPreviewUrl] = useState(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const { user } = useAuth();
     const { toast } = useToast();
-          const role = localStorage.getItem("role");
-    const siteId = decode(localStorage.getItem("SiteId")); 
+
 
     const isViewMode = mode === 'view';
 
@@ -170,6 +171,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
             fetchData("LeadSource/getAllLeadSource", "source");
             fetchData("Document/getAllDocument", "document");
             fetchData("Site/getAllSites", "site");
+            fetchData("Unit/getAllUnits", "unit");
 
             if (initialData) {
                 setFormData({
@@ -245,43 +247,43 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
     //     const updated = [...docRows]; updated[index].file = file; setDocRows(updated);
     // };
 
-  const handleFileChange = (index, e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const handleFileChange = (index, e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    //  Block audio & video
-    if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
-        toast({
-            title: "Invalid File",
-            description: "Audio and video files are not allowed",
-            variant: "destructive"
-        });
-         e.target.value = ""; //  THIS IS THE KEY LINE
-        return;
-    }
+        //  Block audio & video
+        if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
+            toast({
+                title: "Invalid File",
+                description: "Audio and video files are not allowed",
+                variant: "destructive"
+            });
+            e.target.value = ""; //  THIS IS THE KEY LINE
+            return;
+        }
 
-    //  Allow only images & PDF
-    const allowedTypes = [
-        'image/jpeg',
-        'image/jpg',
-        'image/png',
-        'application/pdf'
-    ];
+        //  Allow only images & PDF
+        const allowedTypes = [
+            'image/jpeg',
+            'image/jpg',
+            'image/png',
+            'application/pdf'
+        ];
 
-    if (!allowedTypes.includes(file.type)) {
-        toast({
-            title: "Invalid File",
-            description: "Only JPG, PNG images and PDF files are allowed",
-            variant: "destructive"
-        });
-        return;
-    }
+        if (!allowedTypes.includes(file.type)) {
+            toast({
+                title: "Invalid File",
+                description: "Only JPG, PNG images and PDF files are allowed",
+                variant: "destructive"
+            });
+            return;
+        }
 
-    //  Update state
-    const updated = [...docRows];
-    updated[index].file = file;
-    setDocRows(updated);
-};
+        //  Update state
+        const updated = [...docRows];
+        updated[index].file = file;
+        setDocRows(updated);
+    };
 
 
     const handleSubmit = async (e) => {
@@ -330,13 +332,13 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
     );
 
     useEffect(() => {
-  if (role === "AGENT" && siteId && open) {
-    setFormData(prev => ({
-      ...prev,
-      leadSiteId: siteId
-    }));
-  }
-}, [role, siteId, open]);
+        if (role === "AGENT" && siteId && open) {
+            setFormData(prev => ({
+                ...prev,
+                leadSiteId: siteId
+            }));
+        }
+    }, [role, siteId, open]);
 
 
 
@@ -348,11 +350,11 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                     <TabButton id="history" label="History" icon={Clock} active={activeFormTab} onClick={setActiveFormTab} />
                 </div>
                     {activeFormTab === "contact" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required  /></div>
-                        <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange}  /></div>
+                        <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required /></div>
+                        <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange} /></div>
                         <div><Label>Email *</Label><Input name="leadEmail" type="email" value={formData.leadEmail} onChange={handleChange} required disabled={isViewMode} /></div>
-                        <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required  /></div>
-                        <div><Label>Alter Phone </Label><Input name="leadAltPhone" value={formData.leadAltPhone} onChange={handleChange}  disabled={isViewMode}/></div>
+                        <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required /></div>
+                        <div><Label>Alter Phone </Label><Input name="leadAltPhone" value={formData.leadAltPhone} onChange={handleChange} disabled={isViewMode} /></div>
 
 
                         {/* <div><Label>Job Title</Label><Input name="leadJobTitle" value={formData.leadJobTitle} onChange={handleChange} disabled={isViewMode} /></div>
@@ -361,14 +363,14 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                         <div><Label>Country</Label><select name="leadCountryId" value={formData.leadCountryId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.country.map(c => <option key={c._id} value={c._id}>{c.CountryName || c.name}</option>)}</select></div>
                         <div><Label>State</Label><select name="leadStateId" value={formData.leadStateId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.state.map(s => <option key={s._id} value={s._id}>{s.StateName || s.name}</option>)}</select></div>
                         <div><Label>City</Label><select name="leadCityId" value={formData.leadCityId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.city.map(c => <option key={c._id} value={c._id}>{c.CityName || c.name}</option>)}</select></div>
-                       {
-                        role !== 'AGENT' && 
-                      <div><Label>Site</Label><select name="leadSiteId" value={formData.leadSiteId} onChange={handleChange}     disabled={isViewMode || role === "AGENT"} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.site.map(s => <option key={s._id} value={s._id}>{s.sitename || s.name}</option>)}</select></div>
+                        {
+                            role !== 'AGENT' &&
+                            <div><Label>Site</Label><select name="leadSiteId" value={formData.leadSiteId} onChange={handleChange} disabled={isViewMode || role === "AGENT"} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.site.map(s => <option key={s._id} value={s._id}>{s.sitename || s.name}</option>)}</select></div>
 
-                       }
-                      <div><Label>Uint</Label><select name="leadUnitId" value={formData.leadUnitId} onChange={handleChange}     disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.site.map(s => <option key={s._id} value={s._id}>{s.UnitName || s.name}</option>)}</select></div>
+                        }
+                        <div><Label>Uint</Label><select name="leadUnitId" value={formData.leadUnitId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.unit.map(s => <option key={s._id} value={s._id}>{s.UnitName || s.name}</option>)}</select></div>
 
-                      
+
                         <div><Label>Zip Code</Label><Input name="leadZipCode" value={formData.leadZipCode} onChange={handleChange} disabled={isViewMode} /></div>
                     </div>)}
                     {activeFormTab === "deal" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -541,9 +543,9 @@ function LeadsContent() {
     const fetchLeads = async (search = '') => {
         setLoading(true);
         try {
-            let payload={ page: 1, limit: 100, search}
-            if(role === 'AGENT'){
-                payload.EmployeeId=decode(localStorage.getItem('EmployeeId'))
+            let payload = { page: 1, limit: 100, search }
+            if (role === 'AGENT') {
+                payload.EmployeeId = decode(localStorage.getItem('EmployeeId'))
             }
             const res = await fetch(config.Api + "Lead/getAllLeads", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const data = await res.json(); if (data.success) setLeads(data.data);
@@ -648,7 +650,7 @@ function LeadsContent() {
                                 onClick={exportLeadsToExcel}
                                 className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
                             >
-                                <ArrowUpFromLine  className="w-4 h-4 mr-2" />
+                                <ArrowUpFromLine className="w-4 h-4 mr-2" />
                                 Export
                             </Button>
                         )}
