@@ -402,7 +402,7 @@ function CallLogsContent() {
                                                 )}
                                             </td>
                                             <td className="py-3 px-4">
-                                                <Button size="sm" variant="outline" onClick={() => { setLeadInitialData({ leadPhone: targetNumber || "" }); setLeadDialogOpen(true); }}>Qualify</Button>
+                                                <Button size="sm" variant="outline" onClick={() => { setLeadInitialData({leadCreatedById:decode(localStorage.getItem('EmployeeId')), leadPhone: targetNumber || "" }); setLeadDialogOpen(true); }}>Qualify</Button>
                                             </td>
                                         </tr>
                                     );
@@ -431,7 +431,7 @@ function CallLogsContent() {
                             <div className="flex items-center gap-2 text-slate-300 text-xs mb-3"><Clock className="w-4 h-4" /> {formatTime(call.callDate)} | <Hourglass className="w-4 h-4" /> {formatDuration(call.answeredsec)}</div>
                             <div className="flex gap-2 border-t border-slate-700 pt-3">
                                 {call.recordingUrl && <Button className="flex-1" variant="outline" size="sm" onClick={() => handlePlayRecording(call.recordingUrl, call._id)}>{playingId === call._id ? 'Pause' : 'Play'}</Button>}
-                                <Button className="flex-1" size="sm" onClick={() => { setLeadInitialData({ leadPhone: targetNumber || "" }); setLeadDialogOpen(true); }}>Qualify</Button>
+                                <Button className="flex-1" size="sm" onClick={() => { setLeadInitialData({leadCreatedById:decode(localStorage.getItem('EmployeeId')), leadPhone: targetNumber || "" }); setLeadDialogOpen(true); }}>Qualify</Button>
                             </div>
                         </div>
                     );

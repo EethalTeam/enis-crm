@@ -257,6 +257,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("EmployeeCode", result.employee.EmployeeCode);
       localStorage.setItem("EmployeeName", result.employee.EmployeeName);
       localStorage.setItem("role", result.employee.role);
+      localStorage.setItem("EmployeeId",encode(result.employee._id))
+      // localStorage.setItem("Employee id",result.employee._id)
       // SITE
 
       if(result.employee.SiteId ){
@@ -325,6 +327,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("TelecmiID");
     localStorage.removeItem("TelecmiPassword");
     localStorage.removeItem("SiteId");
+    localStorage.removeItem("EmployeeId");
     // localStorage.removeItem("sitename");
     setUser(null);
   };

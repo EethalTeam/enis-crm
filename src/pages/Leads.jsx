@@ -140,7 +140,7 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
 
 // --- LEAD DIALOG COMPONENT ---
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create', disablePhone = true }) => {
-    const initialFormState = { leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '',leadAltPhone:'91' };
+    const initialFormState = {leadCreatedById:decode(localStorage.getItem('EmployeeId')), leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: '', leadNotes: '',leadAltPhone:'91' };
     const [formData, setFormData] = useState(initialFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [] });
@@ -350,7 +350,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                         <div><Label>First Name *</Label><Input name="leadFirstName" value={formData.leadFirstName} onChange={handleChange} required  /></div>
                         <div><Label>Last Name</Label><Input name="leadLastName" value={formData.leadLastName} onChange={handleChange}  /></div>
                         <div><Label>Email *</Label><Input name="leadEmail" type="email" value={formData.leadEmail} onChange={handleChange} required disabled={isViewMode} /></div>
-                        <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required disabled /></div>
+                        <div><Label>Phone *</Label><Input name="leadPhone" value={formData.leadPhone} onChange={handleChange} required  /></div>
                         <div><Label>Alter Phone *</Label><Input name="leadAltPhone" value={formData.leadAltPhone} onChange={handleChange} required disabled={isViewMode}/></div>
 
 
@@ -516,6 +516,7 @@ function LeadsContent() {
     const [isDialerLoggedIn, setIsDialerLoggedIn] = useState(false);
     const { toast } = useToast();
     const navigate = useNavigate();
+    const role = localStorage.getItem("role");
     const { getPermissionsByPath, user } = useAuth();
     const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false });
 
@@ -534,7 +535,11 @@ function LeadsContent() {
     const fetchLeads = async (search = '') => {
         setLoading(true);
         try {
-            const res = await fetch(config.Api + "Lead/getAllLeads", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ page: 1, limit: 100, search }) });
+            let payload={ page: 1, limit: 100, search}
+            if(role === 'AGENT'){
+                payload.EmployeeId=decode(localStorage.getItem('EmployeeId'))
+            }
+            const res = await fetch(config.Api + "Lead/getAllLeads", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const data = await res.json(); if (data.success) setLeads(data.data);
         } catch (e) { console.error(e); } finally { setLoading(false); }
     };
