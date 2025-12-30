@@ -40,6 +40,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
 import { apiRequest } from '@/components/CustomComponents/apiRequest'
 import { config } from '@/components/CustomComponents/config.js';
+import logo from '../../Assets/Images/LOGO-final.png'
 const iconMap = {
   LayoutDashboard,
   Users,
@@ -203,7 +204,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       <div className="p-6 border-b border-purple-700/50">
         <div className="flex items-center md:gap-3 gap-10">
           <div className="w-10 h-10 bg-gradient-to-r from-pink-600 to-fuchsia-600 rounded-lg flex items-center justify-center">
-            <Sparkles className="w-6 h-6 text-white" />
+            {/* <Sparkles className="w-6 h-6 text-white" /> */}
+            <img src={logo} />
           </div>
           {isOpen && (
             <motion.div
@@ -211,8 +213,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <h2 className="font-bold text-xl text-white text-glow hidden md:block">ENIS CRM</h2>
-              {/* ✅ MOBILE CLOSE BUTTON */}
+              <h2 className="font-bold text-xl text-white text-glow hidden md:block">Aravt</h2>
+              {/* MOBILE CLOSE BUTTON */}
               <button
                 onClick={() => setIsOpen(false)}
                 className="md:hidden ml-7 p-2 rounded-full
