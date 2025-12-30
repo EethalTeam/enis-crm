@@ -223,11 +223,33 @@ function LeadStatus() {
     const [isEdit, setIsEdit] = useState(false);
     const [viewData, setViewData] = useState({});
 
-    // ------------------- FETCH EMPLOYEES -------------------
-    useEffect(() => {
-        getAllLeadStatus();
+    const { getPermissionsByPath, user } = useAuth();
+    const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false });
 
-    }, []);
+    // ------------------- FETCH EMPLOYEES -------------------
+    // useEffect(() => {
+    //     getAllLeadStatus();
+
+    // }, []);
+
+
+    // --- API FUNCTIONS ---
+    useEffect(() => {
+        getPermissionsByPath(window.location.pathname).then(res => {
+            if (res) {
+                setPermissions(res)
+            } else {
+                navigate('/dashboard')
+            }
+        })
+
+    }, [])
+
+    useEffect(() => {
+        if (Permissions.isView) {
+            getAllLeadStatus()
+        }
+    }, [Permissions])
 
 
 
@@ -466,15 +488,19 @@ function LeadStatus() {
             {/* HEADER */}
             <div className="flex md:flex-row flex-col items-start space-y-3 md:items-center md:justify-between">
                 <h1 className="text-3xl font-bold text-white">Lead Status</h1>
-                <Button
-                    onClick={() => {
-                        clear();
-                        setDialogOpen(true);
-                    }}
-                    className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white"
-                >
-                    <Plus className="w-4 h-4 mr-2" /> Add LeadStatus
-                </Button>
+                {
+                    Permissions.isAdd &&
+                    <Button
+                        onClick={() => {
+                            clear();
+                            setDialogOpen(true);
+                        }}
+                        className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white"
+                    >
+                        <Plus className="w-4 h-4 mr-2" /> Add LeadStatus
+                    </Button>
+                }
+
 
 
             </div>
@@ -551,22 +577,29 @@ function LeadStatus() {
                                                 >
                                                     <Eye className="w-4 h-4 text-blue-400" />
                                                 </Button>
+                                                {
+                                                    Permissions.isEdit &&
+                                                    <Button
+                                                        variant="icon"
+                                                        size="icon"
+                                                        onClick={() => handleEditClick(row)}
+                                                    >
+                                                        <Pencil className="w-4 h-4 text-yellow-400" />
+                                                    </Button>
+                                                }
 
-                                                <Button
-                                                    variant="icon"
-                                                    size="icon"
-                                                    onClick={() => handleEditClick(row)}
-                                                >
-                                                    <Pencil className="w-4 h-4 text-yellow-400" />
-                                                </Button>
 
-                                                <Button
-                                                    variant="icon"
-                                                    size="icon"
-                                                    onClick={() => triggerDeleteConfirm(row)}
-                                                >
-                                                    <Trash2 className="w-4 h-4 text-red-400" />
-                                                </Button>
+                                                {
+                                                    Permissions.isDelete &&
+                                                    <Button
+                                                        variant="icon"
+                                                        size="icon"
+                                                        onClick={() => triggerDeleteConfirm(row)}
+                                                    >
+                                                        <Trash2 className="w-4 h-4 text-red-400" />
+                                                    </Button>
+                                                }
+
                                             </td>
                                         </motion.tr>
                                     ))
@@ -672,23 +705,30 @@ function LeadStatus() {
                                                     <Eye className="w-4 h-4 text-blue-400" />
                                                 </Button>
 
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="hover:bg-yellow-500/20"
-                                                    onClick={() => handleEditClick(row)}
-                                                >
-                                                    <Pencil className="w-4 h-4 text-yellow-400" />
-                                                </Button>
+                                                {
+                                                    Permissions.isEdit &&
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="hover:bg-yellow-500/20"
+                                                        onClick={() => handleEditClick(row)}
+                                                    >
+                                                        <Pencil className="w-4 h-4 text-yellow-400" />
+                                                    </Button>
+                                                }
 
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="hover:bg-red-500/20"
-                                                    onClick={() => triggerDeleteConfirm(row)}
-                                                >
-                                                    <Trash2 className="w-4 h-4 text-red-400" />
-                                                </Button>
+                                                {
+                                                    Permissions.isDelete &&
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="hover:bg-red-500/20"
+                                                        onClick={() => triggerDeleteConfirm(row)}
+                                                    >
+                                                        <Trash2 className="w-4 h-4 text-red-400" />
+                                                    </Button>
+                                                }
+
                                             </div>
 
                                         </CardContent>

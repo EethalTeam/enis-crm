@@ -221,11 +221,33 @@ function Document() {
     const [isEdit, setIsEdit] = useState(false);
     const [viewData, setViewData] = useState({});
 
-    // ------------------- FETCH EMPLOYEES -------------------
-    useEffect(() => {
-        getAllDocument();
+     const { getPermissionsByPath, user } = useAuth();
+        const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false });
 
-    }, []);
+    // ------------------- FETCH EMPLOYEES -------------------
+    // useEffect(() => {
+    //     getAllDocument();
+
+    // }, []);
+
+
+    // --- API FUNCTIONS ---
+        useEffect(() => {
+            getPermissionsByPath(window.location.pathname).then(res => {
+                if (res) {
+                    setPermissions(res)
+                } else {
+                    navigate('/dashboard')
+                }
+            })
+    
+        }, [])
+    
+        useEffect(() => {
+            if (Permissions.isView) {
+                getAllDocument()
+            }
+        }, [Permissions])
 
 
 
@@ -445,7 +467,9 @@ function Document() {
             {/* HEADER */}
             <div className="flex flex-col md:flex-row space-y-3 items-start  md:items-center  md:justify-between">
                 <h1 className="text-3xl font-bold text-white">Document Type</h1>
-                <Button
+                {
+                    Permissions.isAdd && 
+                       <Button
                     onClick={() => {
                         clear();
                         setDialogOpen(true);
@@ -454,6 +478,8 @@ function Document() {
                 >
                     <Plus className="w-4 h-4 mr-2" /> Add Document
                 </Button>
+                }
+             
 
                 {/* <Button
                     onClick={() => {
@@ -535,21 +561,28 @@ function Document() {
                                                     <Eye className="w-4 h-4 text-blue-400" />
                                                 </Button>
 
-                                                <Button
+                                       {
+                                        Permissions.isEdit && 
+                                        <Button
                                                     variant="icon"
                                                     size="icon"
                                                     onClick={() => handleEditClick(row)}
                                                 >
                                                     <Pencil className="w-4 h-4 text-yellow-400" />
                                                 </Button>
-
-                                                <Button
+                                       }
+                                                
+                                          {
+                                            Permissions.isDelete && 
+                                             <Button
                                                     variant="icon"
                                                     size="icon"
                                                     onClick={() => triggerDeleteConfirm(row)}
                                                 >
                                                     <Trash2 className="w-4 h-4 text-red-400" />
                                                 </Button>
+                                          }
+                                               
                                             </td>
                                         </motion.tr>
                                     ))
@@ -628,15 +661,19 @@ function Document() {
                                                 >
                                                     <Eye className="w-4 h-4 text-blue-400" />
                                                 </Button>
-
-                                                <Button
+                                           {
+                                            Permissions.isEdit && 
+                                             <Button
                                                     variant="icon"
                                                     size="icon"
                                                     onClick={() => handleEditClick(row)}
                                                 >
                                                     <Pencil className="w-4 h-4 text-yellow-400" />
                                                 </Button>
-
+                                           }
+                                               
+                                            {
+                                                Permissions.isDelete && 
                                                 <Button
                                                     variant="icon"
                                                     size="icon"
@@ -644,6 +681,8 @@ function Document() {
                                                 >
                                                     <Trash2 className="w-4 h-4 text-red-400" />
                                                 </Button>
+                                            }
+                                                
                                             </div>
 
                                         </CardContent>

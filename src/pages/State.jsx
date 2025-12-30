@@ -223,12 +223,34 @@ function State() {
     const [viewData, setViewData] = useState({});
     const [country, setCountry] = useState([])
 
+      const { getPermissionsByPath, user } = useAuth();
+        const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false });
+
     // ------------------- FETCH EMPLOYEES -------------------
     useEffect(() => {
-        getAllStates();
+        // getAllStates();
         getAllCountry()
 
     }, []);
+
+
+        // --- API FUNCTIONS ---
+        useEffect(() => {
+            getPermissionsByPath(window.location.pathname).then(res => {
+                if (res) {
+                    setPermissions(res)
+                } else {
+                    navigate('/dashboard')
+                }
+            })
+    
+        }, [])
+    
+        useEffect(() => {
+            if (Permissions.isView) {
+                getAllStates()
+            }
+        }, [Permissions])
 
 
     const getAllCountry = async () => {
@@ -475,7 +497,10 @@ function State() {
             {/* HEADER */}
             <div className="flex  md:flex-row flex-col  items-start  md:items-center justify-between space-y-3">
                 <h1 className="text-3xl font-bold text-white">State</h1>
-                <Button
+
+                {
+                    Permissions.isAdd && 
+                      <Button
                     onClick={() => {
                         clear();
                         setDialogOpen(true);
@@ -484,6 +509,8 @@ function State() {
                 >
                     <Plus className="w-4 h-4 mr-2" /> Add State
                 </Button>
+                }
+              
 
 
             </div>
@@ -558,15 +585,22 @@ function State() {
                                                 >
                                                     <Eye className="w-4 h-4 text-blue-400" />
                                                 </Button>
-
-                                                <Button
+                                             
+                                             {
+                                                Permissions.isEdit && 
+                                                 <Button
                                                     variant="icon"
                                                     size="icon"
                                                     onClick={() => handleEditClick(row)}
                                                 >
                                                     <Pencil className="w-4 h-4 text-yellow-400" />
                                                 </Button>
+                                             }
+                                               
+                                              
 
+                                              {
+                                                Permissions.isDelete && 
                                                 <Button
                                                     variant="icon"
                                                     size="icon"
@@ -574,6 +608,8 @@ function State() {
                                                 >
                                                     <Trash2 className="w-4 h-4 text-red-400" />
                                                 </Button>
+                                              }
+                                                
                                             </td>
                                         </motion.tr>
                                     ))
@@ -666,7 +702,9 @@ function State() {
                 <Eye className="w-4 h-4 text-blue-400" />
               </Button>
 
-              <Button
+{
+    Permissions.isEdit && 
+    <Button
                 variant="ghost"
                 size="icon"
                 className="hover:bg-yellow-500/20"
@@ -674,8 +712,12 @@ function State() {
               >
                 <Pencil className="w-4 h-4 text-yellow-400" />
               </Button>
+}
+              
 
-              <Button
+{
+    Permissions.isDelete && 
+     <Button
                 variant="ghost"
                 size="icon"
                 className="hover:bg-red-500/20"
@@ -683,6 +725,8 @@ function State() {
               >
                 <Trash2 className="w-4 h-4 text-red-400" />
               </Button>
+}
+             
             </div>
 
           </CardContent>

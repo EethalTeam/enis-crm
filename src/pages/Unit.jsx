@@ -6,7 +6,8 @@ import {
 } from 'lucide-react';
 
 import { config } from '@/components/CustomComponents/config.js';
-
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from "react-router-dom";
 
 // --- LOCAL REDUCER ---
 const initialState = {
@@ -248,13 +249,37 @@ function UnitsContent() {
   const [state, dispatch] = useReducer(commonReducer, initialState);
   const [isEdit, setIsEdit] = useState(false);
   const [viewData, setViewData] = useState({});
+  const { getPermissionsByPath, user } = useAuth();
+          const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false });
+  
 
   // --- API FUNCTIONS ---
 
   useEffect(() => {
-    getUnit();
+    // getUnit();
     getSites(); // Fetch sites on load
   }, []);
+
+
+     // --- API FUNCTIONS ---
+          useEffect(() => {
+              getPermissionsByPath(window.location.pathname).then(res => {
+                  if (res) {
+                      setPermissions(res)
+                  } else {
+                      navigate('/dashboard')
+                  }
+              })
+      
+          }, [])
+      
+          useEffect(() => {
+              if (Permissions.isView) {
+                  getUnit()
+              }
+          }, [Permissions])
+
+
 
   const getSites = async () => {
     try {
@@ -505,9 +530,13 @@ function UnitsContent() {
           <Button variant="outline" onClick={handleExport} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
             <Download className="w-4 h-4 mr-2" /> Export
           </Button> */}
-          <Button onClick={() => { clear(); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
+          {
+            Permissions.isAdd && 
+             <Button onClick={() => { clear(); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
             <Plus className="w-4 h-4 mr-2" /> Add Unit
           </Button>
+          }
+         
         </div>
       </div>
 
@@ -559,8 +588,16 @@ function UnitsContent() {
                       <td className="py-3 px-4 text-sm text-slate-300">{row.UnitCode}</td>
                       <td className="py-3 px-4 flex items-center gap-2">
                         <Button variant="icon" size="icon" onClick={() => handleViewClick(row)} title="View"><Eye className="w-4 h-4 text-blue-400" /></Button>
+                        {
+                          Permissions.isEdit && 
                         <Button variant="icon" size="icon" onClick={() => handleEditClick(row)} title="Edit"><Pencil className="w-4 h-4 text-yellow-400" /></Button>
+
+                        }
+                        {
+                          Permissions.isDelete && 
                         <Button variant="icon" size="icon" onClick={() => triggerDeleteConfirm(row)} title="Delete"><Trash2 className="w-4 h-4 text-red-400" /></Button>
+
+                        }
                       </td>
                     </motion.tr>
                   ))
