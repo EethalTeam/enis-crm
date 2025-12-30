@@ -201,11 +201,11 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     z-40
   `}
     >
-      <div className="p-6 border-b border-purple-700/50">
-        <div className="flex items-center md:gap-3 gap-10">
-          <div className="w-10 h-10 bg-gradient-to-r from-pink-600 to-fuchsia-600 rounded-lg flex items-center justify-center">
+      <div className="p-2 border-b border-purple-700/50">
+        <div className="flex items-center md:justify-evenly md:gap-5 gap-10">
+          <div className="w-20 h-10  rounded-lg flex items-center justify-center">
             {/* <Sparkles className="w-6 h-6 text-white" /> */}
-            <img src={logo} />
+            <img src={logo}  />
           </div>
           {isOpen && (
             <motion.div

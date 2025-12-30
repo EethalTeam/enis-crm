@@ -92,11 +92,11 @@ export default function Dashboard() {
 
   const getAllDashBoard = async () => {
     try {
-       const role = localStorage.getItem("role");
+      const role = localStorage.getItem("role");
       const TelecmiID = decode(localStorage.getItem("TelecmiID"))
 
       let url = config.Api + "DashBoard/getAllDashBoard";
- const payload = role === "AGENT" ? { TelecmiID, role } : {};
+      const payload = role === "AGENT" ? { TelecmiID, role } : {};
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -117,11 +117,11 @@ export default function Dashboard() {
   const getDayWiseAnsweredCalls = async () => {
     try {
 
-       const role = localStorage.getItem("role");
+      const role = localStorage.getItem("role");
       const TelecmiID = decode(localStorage.getItem("TelecmiID"))
-     
+
       let url = config.Api + "DashBoard/getDayWiseAnsweredCalls";
- const payload = role === "AGENT" ? { TelecmiID, role } : {};
+      const payload = role === "AGENT" ? { TelecmiID, role } : {};
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -224,7 +224,7 @@ export default function Dashboard() {
         {/* //Report Div for Call missing and Call attend and Call pending */}
         <div>
           <Card>
-            <CardHeader className='md:max-w-full max-w-md'>
+            <CardHeader className='md:max-w-full max-w-md p'>
               <CardTitle>Report</CardTitle>
             </CardHeader>
             <CardContent className="">
@@ -234,9 +234,11 @@ export default function Dashboard() {
                     data={callReport}
                     dataKey="value"
                     nameKey="name"
-                    outerRadius={100}
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
+                    outerRadius={isMobile ? 80 : 100}
+                    label={
+                      !isMobile
+                        ? ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`
+                        : false
                     }
                   >
                     {callReport.map((_, index) => (
@@ -245,6 +247,30 @@ export default function Dashboard() {
                   </Pie>
                   <Tooltip contentStyle={{ backgroundColor: '#2a133b', border: 'none', borderRadius: '8px' }} />
                 </PieChart>
+
+                {isMobile && callReport.length > 0 && (
+                  <div className="
+    absolute bottom-3 left-1/2 -translate-x-1/2
+    flex gap-3
+   
+    px-4 py-2
+    
+  ">
+                    {callReport.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 text-xs text-slate-200 font-medium"
+                      >
+                        <span
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                        />
+                        {item.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
               </ResponsiveContainer>
 
             </CardContent>
@@ -342,7 +368,7 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card> */}
-      </div>
+      </div >
     </>
   );
 }
