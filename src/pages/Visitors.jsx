@@ -69,6 +69,7 @@ export default function VisitorMain(props) {
   const [showentry, setShowEntry] = useState(false);
   const [loading, setLoading] = useState(false);
   const [state, dispatch] = useReducer(Reducer, initialState);
+  console.log(state,"state")
   const [Visitor, setVisitor] = useState([]);
   const [PlotDetails, setPlotDetails] = useState([]);
   const [FollowUpDetails, setFollowUpDetails] = useState([]);
@@ -83,6 +84,7 @@ export default function VisitorMain(props) {
   // const [filterValue, setFilterValue] = useState(''); // Unused in new design but kept if needed
   
   const [Data, SetData] = useState([]); // Used for dropdown options
+  console.log(Data,"Data")
   const [OrderTab, setOrderTab] = useState('Follow Up');
   
   const [Status, setStatus] = useState([
@@ -93,8 +95,10 @@ export default function VisitorMain(props) {
   // --- API Functions (Exact logic preserved) ---
   const [siteList, setSiteList] = useState([]); // Stores Sites
   const [unitList, setUnitList] = useState([]); // Stores Sites
+  console.log(unitList,"unitList")
   const [plotList, setPlotList] = useState([]); // Stores Sites
   const [statusList, setStatusList] = useState([]); // Stores Sites
+  const [employeeList, setEmployeeList] = useState([]); // Stores Employees
   
   // --- Logic & Effects (Kept exact) ---
 
@@ -121,7 +125,7 @@ useEffect(() => {
         body: JSON.stringify({ siteId: state.siteId }), // Pass the selected ID
       });
       const result = await response.json();
-      if (Array.isArray(result.data)) setUnitList(result.data);
+      if (Array.isArray(result)) setUnitList(result);
     } catch (err) { console.error(err); }
   };
 
@@ -347,7 +351,7 @@ useEffect(()=>{
         body: JSON.stringify({}),
       });
       const result = await response.json();
-      SetData(result.data);
+      setEmployeeList(result.data);
     } catch (error) { console.error(error); }
   };
 
@@ -971,7 +975,20 @@ const GlassSelect = ({
                                             <Label className="text-white">Follow Up Date <span className="text-red-500">*</span></Label>
                                             <Input type="date" value={state.followUpDate} onChange={(e) => storeDispatch(e.target.value, 'followUpDate', 'text')} className="bg-purple-900/50 border-fuchsia-700 text-white" />
                                         </div>
-                                        <GlassSelect label="Assign Staff" value={state.followedUpByName} displayKey="EmployeeName" valueKey="_Id" options={Data} onChange={(e) => storeDispatch(e, 'followedUpById', 'select')} onFocus={() => getEmployeeList()} />
+                                        <GlassSelect 
+  label="Assign Staff" 
+  value={state.followedUpByName} 
+  displayKey="EmployeeName" 
+  valueKey="_Id" 
+  options={employeeList} 
+  onChange={(e) => storeDispatch(e, 'followedUpById', 'select')} 
+  // Change this: Only fetch if Data is empty to prevent re-render loops
+  onFocus={() => {
+    if (employeeList.length === 0) {
+      getEmployeeList();
+    }
+  }} 
+/>
                                         <GlassSelect label="Status" value={state.followUpStatus} displayKey="StatusName" valueKey="StatusName" options={Status} onChange={(e) => storeDispatch(e, 'FollowedUpStatus', 'select')} />
                                         <div className="col-span-3 grid grid-cols-3 gap-6">
                                             <div className="space-y-2"><Label className="text-white">Description</Label><Input value={state.followUpDescription} onChange={(e) => storeDispatch(e.target.value, 'followUpDescription', 'text')} className="bg-purple-900/50 border-fuchsia-700 text-white" /></div>
@@ -984,7 +1001,7 @@ const GlassSelect = ({
                                          <GlassSelect label="Site" value={state.sitename} displayKey="sitename" valueKey="_Id" options={siteList} onChange={(e) => storeDispatch(e, 'siteId', 'select')} />
                                          <GlassSelect label="Unit" value={state.UnitName} displayKey="UnitName" valueKey="_Id" options={unitList} onChange={(e) => storeDispatch(e, 'unitId', 'select')} />
                                          {!PlotEdit ? (
-                                            <GlassSelect label="Plot Number" value={state.plotNumber} displayKey="plotNumber" valueKey="_id" options={plotList} onChange={(e) => storeDispatch(e, 'plotId', 'select')}  />
+                                            <GlassSelect label="Plot Number" value={state.plotNumber} displayKey="plotNumber" valueKey="_Id" options={plotList} onChange={(e) => storeDispatch(e, 'plotId', 'select')}  />
                                          ) : (
                                              <div className="space-y-2"><Label className="text-white">Plot Number</Label><Input value={state.plotNumber} disabled className="bg-slate-800 border-fuchsia-700 text-gray-400" /></div>
                                          )}
