@@ -192,7 +192,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   return (
     <motion.aside
       initial={false}
-      animate={{ width: isOpen ? (window.innerWidth < 768 ? 200 : 280) : 80 }}
+      animate={{ width: isOpen ? (window.innerWidth < 768 ? 200 : 260) : 80 }}
       transition={{ duration: 0.3 }}
       className={`
     bg-black/20 bg-gradient-to-b from-[#1b0a2c] via-[#2a133b] to-[#3a1b4a]
@@ -213,7 +213,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <h2 className="font-bold text-xl text-white text-glow hidden md:block">Aravt</h2>
+              {/* <h2 className="font-bold text-xl text-white text-glow hidden md:block">Aravt</h2> */}
               {/* MOBILE CLOSE BUTTON */}
               <button
                 onClick={() => setIsOpen(false)}
