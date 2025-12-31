@@ -368,7 +368,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                             <div><Label>Site</Label><select name="leadSiteId" value={formData.leadSiteId} onChange={handleChange} disabled={isViewMode || role === "AGENT"} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.site.map(s => <option key={s._id} value={s._id}>{s.sitename || s.name}</option>)}</select></div>
 
                         }
-                        <div><Label>Uint</Label><select name="leadUnitId" value={formData.leadUnitId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.unit.map(s => <option key={s._id} value={s._id}>{s.UnitName || s.name}</option>)}</select></div>
+                        <div><Label>Unit</Label><select name="leadUnitId" value={formData.leadUnitId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.unit.map(s => <option key={s._id} value={s._id}>{s.UnitName || s.name}</option>)}</select></div>
 
 
                         <div><Label>Zip Code</Label><Input name="leadZipCode" value={formData.leadZipCode} onChange={handleChange} disabled={isViewMode} /></div>
@@ -524,6 +524,7 @@ function LeadsContent() {
     const [isDialerLoggedIn, setIsDialerLoggedIn] = useState(false);
     const { toast } = useToast();
     const navigate = useNavigate();
+    const fileInputRef = useRef(null);
     const role = localStorage.getItem("role");
     const { getPermissionsByPath, user } = useAuth();
     const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false });
@@ -580,12 +581,12 @@ function LeadsContent() {
     // ------------------- VIEW -------------------
     const handleViewClick = (row) => {
         setViewData({
-            "Lead Name": row.leadFirstName,
-            "Lead Site": row.leadSiteId?.sitename || '-',
-            "Lead Unit": row.leadUnitId?.UnitName || '-',
-            "Lead Phone": row.leadPhone,
-            "Lead AlterPhone": row.leadAltPhone,
-            "Lead Status": row.leadStatusId.leadStatustName,
+            "Name": row.leadFirstName,
+            "Site": row.leadSiteId?.sitename || '-',
+            "Unit": row.leadUnitId?.UnitName || '-',
+            "Phone": row.leadPhone,
+            "AlterPhone": row.leadAltPhone,
+            "Status": row.leadStatusId.leadStatustName,
             "Assigned To": row.leadAssignedId ? row.leadAssignedId.EmployeeName : '',
 
         });
@@ -615,12 +616,12 @@ function LeadsContent() {
                 : ""
         }));
 
-        // 👉 Create worksheet & workbook
+        //  Create worksheet & workbook
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
 
-        // 👉 Auto column width
+        //  Auto column width
         const colWidths = Object.keys(excelData[0]).map(key => ({
             wch: Math.max(
                 key.length,
@@ -629,9 +630,53 @@ function LeadsContent() {
         }));
         worksheet["!cols"] = colWidths;
 
-        // 👉 Download file
+        //  Download file
         XLSX.writeFile(workbook, `Leads_${new Date().toISOString().slice(0, 10)}.xlsx`);
     };
+
+
+    const handleExcelImport = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const res = await fetch(config.Api + "importLeadsExcel", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await res.json();
+
+            if (result.success) {
+                toast({
+                    title: "Import Success",
+                    description: result.message
+                });
+                fetchLeads();
+            } else {
+                toast({
+                    title: "Import Failed",
+                    description: result.message,
+                    variant: "destructive"
+                });
+            }
+        } catch (err) {
+            toast({
+                title: "Error",
+                description: "Excel import failed",
+                variant: "destructive"
+            });
+        }
+
+        e.target.value = null;
+    };
+
+     const handleImportClick = () => { fileInputRef.current.click(); };
+
+
 
 
     return (
@@ -640,9 +685,22 @@ function LeadsContent() {
             <div className="sticky top-0 z-30 bg-slate-950 pb-4 space-y-10">
                 <div className="flex md:flex-row flex-col items-start md:justify-between gap-3 sticky ">
                     <h1 className="text-3xl font-bold text-white">Leads</h1>
-                    <div className="grid md:grid-cols-2 grid-cols-2 gap-3">
-                        {/* <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Upload className="w-4 h-4 mr-2" />Import</Button> */}
-                        {/* <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Download className="w-4 h-4 mr-2" />Export</Button> */}
+                    <div className="grid md:grid-cols-3 grid-cols-2 gap-3">
+
+                        <div className="">
+                            {role !== 'AGENT' &&
+                                <Button
+                                    variant="outline"
+                                    onClick={() => fileInputRef.current.click()}
+                                    className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
+                                >
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Import
+                                </Button>
+                            }
+                        </div>
+
+                        <input  type="file"  ref={fileInputRef}  accept=".xlsx,.xls"  className="hidden"  onChange={handleExcelImport}  />
 
                         {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
                             <Button
@@ -694,20 +752,20 @@ function LeadsContent() {
                     </div>
                     <div className="overflow-x-auto"><table className="w-full text-left">
                         <thead><tr className="border-b border-slate-700 text-white"><th className="py-3 px-4">Name</th><th className="py-3 px-4">Site</th><th className="py-3 px-4">Phone</th><th className="py-3 px-4">Status</th><th className="py-3 px-4">Assigned To</th>
-                       {
-                        role !== "AGENT" &&
-                        <th className="py-3 px-4">Actions</th>
-                       } 
+                            {
+                                role !== "AGENT" &&
+                                <th className="py-3 px-4">Actions</th>
+                            }
                         </tr></thead>
                         <tbody>{getFilteredLeads().map(l => (
                             <tr key={l._id} className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors group">
                                 <td className="py-3 px-4 font-medium text-white cursor-pointer" onClick={() => { setNotesLead(l); setNoteText(''); setNotesDialogOpen(true); }}><span className="underline-offset-4 group-hover:underline text-fuchsia-400">{l.leadFirstName} {l.leadLastName}</span></td>
-                               
-                               {
-                                role !== 'AGENT' &&
-                                <td className="py-3 px-4 text-slate-300">{l.leadSiteId?.sitename || 'N/A'}</td>
 
-                               }
+                                {
+                                    role !== 'AGENT' &&
+                                    <td className="py-3 px-4 text-slate-300">{l.leadSiteId?.sitename || 'N/A'}</td>
+
+                                }
                                 <td className="py-3 px-4 text-slate-300 flex gap-2"><button onClick={() => { setCallNumber(l.leadPhone); setCallDialogOpen(true); }}><Phone size={18} className=' hover:text-fuchsia-400' /></button>{l.leadPhone}</td>
                                 <td className="py-3 px-4"><Badge className={statusColors[l.leadStatusId?.leadStatusColor] || 'bg-slate-700'}>{l.leadStatusId?.leadStatustName || 'New'}</Badge></td>
                                 <td className="py-3 px-4 text-slate-300">{l.leadAssignedId?.EmployeeName || 'Unassigned'}</td>

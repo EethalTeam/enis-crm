@@ -173,6 +173,8 @@ function PlotViewContent() {
   const [openViewModal, setOpenViewModal] = useState(false);
   const [openVisitorModal, setOpenVisitorModal] = useState(false);
   const [viewData, setViewData] = useState({});
+
+  const role = localStorage.getItem('role')
     const { getPermissionsByPath } = useAuth();
     const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
   
@@ -446,7 +448,9 @@ function PlotViewContent() {
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Building className="h-4 w-4 text-slate-400" />
                     </div>
-                    <select
+
+                      
+                       <select
                         className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 pl-10 pr-8 py-2 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-600 appearance-none"
                         value={state.siteId}
                         onChange={(e) => {
@@ -461,6 +465,8 @@ function PlotViewContent() {
                             <option key={s._id} value={s._id}>{s.sitename}</option>
                         ))}
                     </select>
+                    
+                   
                     <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
                 </div>
 
