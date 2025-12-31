@@ -454,7 +454,16 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                                                     <button type="button" onClick={() => setDocRows(docRows.filter((_, i) => i !== index))} className="h-8 w-8 rounded-md bg-white text-red-600 font-extrabold">–</button>
                                                 )}
                                                 {index === docRows.length - 1 && (
-                                                    <button type="button" onClick={() => setDocRows([...docRows, { documentId: "", file: null }])} className="h-8 w-8 rounded-md bg-white text-green-600 font-extrabold">+</button>
+                                                    <button type="button" onClick={() => {
+                                                        if (!docRows[index].file) {
+                                                            return false
+                                                        }
+                                                        else {
+                                                            setDocRows([...docRows, { documentId: "", file: null }])
+                                                        }
+                                                    }
+                                                    }
+                                                        className="h-8 w-8 rounded-md bg-white text-green-600 font-extrabold">+</button>
                                                 )}
                                             </>
                                         )}
@@ -464,28 +473,37 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
 
                             {/* --- INTERNAL PREVIEW MODAL --- */}
                             <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-                                <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden">
-                                    <DialogHeader className="flex flex-row items-center justify-between p-4 border-b border-slate-800">
-                                        <DialogTitle className="text-sm">Document Preview</DialogTitle>
+                                <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 overflow-hidden bg-slate-900 border-slate-800">
+                                    <DialogHeader className="flex flex-row items-center justify-between p-4 border-b border-slate-800 shrink-0">
+                                        <DialogTitle className="text-sm text-white">Document Preview</DialogTitle>
                                         <button
-                                            type="button" // <--- Add this!
+                                            type="button"
                                             onClick={(e) => {
                                                 e.preventDefault();
-                                                e.stopPropagation(); // Prevents the click from reaching the form
+                                                e.stopPropagation();
                                                 setIsPreviewOpen(false);
                                             }}
-                                            className="text-slate-400 hover:text-white"
+                                            className="text-slate-400 hover:text-white transition-colors"
                                         >
                                             <X size={18} />
                                         </button>
                                     </DialogHeader>
-                                    <div className="flex-1 bg-slate-900 p-2">
+
+                                    <div className="flex-1 bg-slate-950 flex items-center justify-center overflow-hidden p-2">
                                         {previewUrl && (
-                                            <iframe
-                                                src={previewUrl}
-                                                className="w-full h-full rounded border-0"
-                                                title="File Preview"
-                                            />
+                                            previewUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
+                                                <img
+                                                    src={previewUrl}
+                                                    alt="Preview"
+                                                    className="max-w-full max-h-full object-contain rounded"
+                                                />
+                                            ) : (
+                                                <iframe
+                                                    src={previewUrl}
+                                                    className="w-full h-full rounded border-0"
+                                                    title="File Preview"
+                                                />
+                                            )
                                         )}
                                     </div>
                                 </DialogContent>
@@ -674,7 +692,7 @@ function LeadsContent() {
         e.target.value = null;
     };
 
-     const handleImportClick = () => { fileInputRef.current.click(); };
+    const handleImportClick = () => { fileInputRef.current.click(); };
 
 
 
@@ -700,7 +718,7 @@ function LeadsContent() {
                             }
                         </div>
 
-                        <input  type="file"  ref={fileInputRef}  accept=".xlsx,.xls"  className="hidden"  onChange={handleExcelImport}  />
+                        <input type="file" ref={fileInputRef} accept=".xlsx,.xls" className="hidden" onChange={handleExcelImport} />
 
                         {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
                             <Button

@@ -62,6 +62,7 @@ const initialState = {
   remarks:''
 };
 
+
 export default function VisitorMain(props) {
   const { toast } = useToast();
   
@@ -580,8 +581,9 @@ useEffect(()=>{
        visitorPhone:state.visitorPhone, cityId:state.cityId, visitorAddress:state.visitorAddress,
        feedback:state.feedback, description:state.description, employeeId:state.employeeId
     };
+ 
     // Optional fields logic preserved
-    if(state.followUpDate) updateData.followUpDate = state.followUpDate.split('-').reverse().join('-');
+    if(state.followUpDate) updateData.followUpDate = state.followUpDate;
     if(state.followedUpById) updateData.followedUpById = state.followedUpById;
     if(state.followUpStatus) updateData.followUpStatus = state.followUpStatus;
     if(state.followUpDescription) updateData.followUpDescription = state.followUpDescription;
@@ -593,10 +595,11 @@ useEffect(()=>{
         visitorWhatsApp:state.visitorWhatsApp, visitorPhone:state.visitorPhone, cityId:state.cityId,
         visitorAddress:state.visitorAddress, feedback:state.feedback, description:state.description,
         employeeId:state.employeeId,
-        followUpDate:state.followUpDate ? state.followUpDate.split('-').reverse().join('-') : '',
+        followUpDate:state.followUpDate ? state.followUpDate : '',
         followedUpById:state.followedUpById, followUpStatus:state.followUpStatus,
         followUpDescription:state.followUpDescription, notes:state.notes, remarks:state.remarks
     }
+    
 
     if (isEdit) {
       await updateVisitor(updateData);
@@ -611,17 +614,18 @@ useEffect(()=>{
 
   const FollowUpSubmit = async () => {
     const saveData = {
-        visitorId: state._id, followUpDate:state.followUpDate.split('-').reverse().join('-'),
+        visitorId: state._id, followUpDate:state.followUpDate,
         followedUpById:state.followedUpById, followUpStatus:state.followUpStatus,
         followUpDescription:state.followUpDescription, notes:state.notes, remarks:state.remarks
     };
+    console.log(saveData,"saveData")
     const updateData ={
         visitorId: state._id, followUpId:state.followUpId,
-        followUpDate:state.followUpDate.split('-').reverse().join('-'),
+        followUpDate:state.followUpDate,
         followedUpById:state.followedUpById, followUpStatus:state.followUpStatus,
         followUpDescription:state.followUpDescription, notes:state.notes, remarks:state.remarks
     }
-
+    console.log(updateData,"updateData")
     if (followUpEdit) {
        await updateFollowUp(updateData);
        toast({ title: "Success", description: "Follow up Updated!" });
@@ -634,8 +638,8 @@ useEffect(()=>{
   };
 
   const PlotSubmit = async () => {
-     const saveData = {siteId: state.siteId, visitorId: state._id, statusId: state.statusId, plotIds:state.plotId, unitId:state.unitId };
-     const updateData ={siteId: state.siteId, visitorId: state._id, statusId: state.statusId, plotId:state.plotId, unitId:state.unitId };
+     const saveData = {siteId: state.siteId, visitorId: state._id, statusId: state.statusId, plotIds:[state.plotId], unitId:state.unitId };
+     const updateData ={siteId: state.siteId, visitorId: state._id, statusId: state.statusId, plotId:[state.plotId], unitId:state.unitId };
 
      if (PlotEdit) {
         await updatePlots(updateData);
@@ -1033,7 +1037,7 @@ const GlassSelect = ({
                                             </>
                                         ) : (
                                             <>
-                                            <th className="p-3 text-left text-white text-sm">Site</th>
+                                            {/* <th className="p-3 text-left text-white text-sm">Site</th> */}
                                             <th className="p-3 text-left text-white text-sm">Unit</th>
                                             <th className="p-3 text-left text-white text-sm">Plot No</th>
                                             <th className="p-3 text-left text-white text-sm">Status</th>
@@ -1054,7 +1058,7 @@ const GlassSelect = ({
                                                 </>
                                             ) : (
                                                 <>
-                                                <td className="p-3 text-slate-300 text-sm">{item.plotId?.siteId?.sitename}</td>
+                                                {/* <td className="p-3 text-slate-300 text-sm">{item.plotId?.siteId?.sitename}</td> */}
                                                  <td className="p-3 text-slate-300 text-sm">{item.plotId?.unitId?.UnitName}</td>
                                                  <td className="p-3 text-slate-300 text-sm">{item.plotId?.plotNumber}</td>
                                                  <td className="p-3"><Badge style={{backgroundColor: item.statusId?.colorCode || 'gray'}}>{item.statusId?.statusName}</Badge></td>

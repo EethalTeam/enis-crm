@@ -477,14 +477,36 @@ function PlotsContent() {
     dispatch({ type: 'reset' });
   };
 
-  const handleSearchChange = (value) => {
-    setSearchTerm(value);
-    if (Employee.length === 0) return;
-    const filtered = Employee.filter((row) =>
-      Object.values(row).some((val) => val?.toString().toLowerCase().includes(value.toLowerCase()))
+const handleSearchChange = (value) => {
+  setSearchTerm(value);
+  const searchStr = value.toLowerCase();
+
+  if (Employee.length === 0) {
+    setFilteredData([]);
+    return;
+  }
+
+  const filtered = Employee.filter((row) => {
+
+    const plotNumber = row.plotNumber?.toString() || "";
+    const unitName = row.unitId?.UnitName?.toString() || "";
+    const statusName = row.statusId?.statusName?.toString() || "";
+    const area = row.areaInSqFt?.toString() || "";
+    const facing = row.facing?.toString() || "";
+    const sitename = row.siteId?.sitename?.toString() || ""; // Added site just in case
+
+    return (
+      plotNumber.toLowerCase().includes(searchStr) ||
+      unitName.toLowerCase().includes(searchStr) ||
+      statusName.toLowerCase().includes(searchStr) ||
+      area.toLowerCase().includes(searchStr) ||
+      facing.toLowerCase().includes(searchStr) ||
+      sitename.toLowerCase().includes(searchStr)
     );
-    setFilteredData(filtered);
-  };
+  });
+
+  setFilteredData(filtered);
+};
 
   const editTable = (data) => {
     setIsEdit(true);
@@ -789,7 +811,7 @@ function PlotsContent() {
                 className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white placeholder:text-purple-200 focus-visible:ring-fuchsia-500"
               />
             </div>
-            <Button variant="outline" onClick={() => getPlot()} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20" title="Refresh">
+            <Button variant="outline" onClick={() => {getPlot();setSearchTerm("")}} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20" title="Refresh">
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
           </div>

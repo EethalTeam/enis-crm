@@ -72,12 +72,12 @@ const TeleCMIDialer = () => {
             sdk.on('answered', () => {
                 stopRingtone();
                 setCallStatus('Connected');
-                setPhoneNumber()
+                setPhoneNumber("91")
             });
             sdk.on('ended', () => {
                 stopRingtone();
                 resetCallState();
-                setPhoneNumber()
+                setPhoneNumber("91")
             });
             sdk.on('cancel', () => resetCallState());
             sdk.on('inComingCall', (callObj) => {
@@ -151,6 +151,7 @@ const TeleCMIDialer = () => {
     const handleHangup = () => {
         if (piopiyRef.current) piopiyRef.current.terminate();
         resetCallState();
+        setPhoneNumber("91")
     };
 
     const handleAnswer = () => {
