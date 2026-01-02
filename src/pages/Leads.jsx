@@ -142,7 +142,7 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create', disablePhone = true }) => {
     const role = localStorage.getItem("role");
     const siteId = decode(localStorage.getItem("SiteId"));
-    const initialFormState = { leadCreatedById: decode(localStorage.getItem('EmployeeId')), leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: role === "AGENT" ? siteId : "", leadNotes: '', leadAltPhone: '91', leadUnitId: '',leadDescription:'' };
+    const initialFormState = { leadCreatedById: decode(localStorage.getItem('EmployeeId')), leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: role === "AGENT" ? siteId : "", leadNotes: '', leadAltPhone: '91', leadUnitId: '', leadDescription: '', FollowDate: '', SiteVisitDate: '' };
     const [formData, setFormData] = useState(initialFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [], unit: [] });
@@ -340,6 +340,10 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         }
     }, [role, siteId, open]);
 
+    const selectedStatus = lookups.status.find(
+        s => s._id === formData.leadStatusId
+    );
+
 
 
     return (
@@ -375,6 +379,17 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                     </div>)}
                     {activeFormTab === "deal" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div><Label>Status</Label><select name="leadStatusId" value={formData.leadStatusId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.status.map(s => <option key={s._id} value={s._id}>{s.leadStatustName || s.name}</option>)}</select></div>
+                        {
+                            selectedStatus?.leadStatustName?.toLowerCase() === 'follow up' &&
+                            <div><Label>Follow Date</Label><Input type='Date' name="FollowDate" value={formData.FollowDate} onChange={handleChange} disabled={isViewMode} /></div>
+
+                        }
+
+                        {
+                            selectedStatus?.leadStatustName?.toLowerCase() === 'site visit' &&
+                            <div><Label>Site Visit</Label><Input type='Date' name="SiteVisitDate" value={formData.SiteVisitDate} onChange={handleChange} disabled={isViewMode} /></div>
+                        }
+
                         <div><Label>Source</Label><select name="leadSourceId" value={formData.leadSourceId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.source.map(s => <option key={s._id} value={s._id}>{s.leadSourceName || s.name}</option>)}</select></div>
                         <div><Label>Potential Value</Label><div className="flex gap-2"><Input name="leadPotentialValue" type="number" value={formData.leadPotentialValue} onChange={handleChange} disabled={isViewMode} placeholder='₹' /></div></div>
                         <div>
