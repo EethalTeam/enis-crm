@@ -142,7 +142,7 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create', disablePhone = true }) => {
     const role = localStorage.getItem("role");
     const siteId = decode(localStorage.getItem("SiteId"));
-    const initialFormState = { leadCreatedById: decode(localStorage.getItem('EmployeeId')), leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: role === "AGENT" ? siteId : "", leadNotes: '', leadAltPhone: '91', leadUnitId: '' };
+    const initialFormState = { leadCreatedById: decode(localStorage.getItem('EmployeeId')), leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: role === "AGENT" ? siteId : "", leadNotes: '', leadAltPhone: '91', leadUnitId: '',leadDescription:'' };
     const [formData, setFormData] = useState(initialFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [], unit: [] });
@@ -388,6 +388,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                             </select>
                         </div>
                         <div className="md:col-span-2"><Label>Notes</Label><textarea name="leadNotes" value={formData.leadNotes} onChange={handleChange} disabled={isViewMode} className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-fuchsia-500" /></div>
+                        <div className="md:col-span-2"><Label>Description</Label><textarea name="leadDescription" value={formData.leadDescription} onChange={handleChange} disabled={isViewMode} className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-fuchsia-500" /></div>
                     </div>)}
                     {activeFormTab === "document" && (
                         <div>
@@ -619,7 +620,7 @@ function LeadsContent() {
             return;
         }
 
-        // 👉 Prepare Excel rows
+        //  Prepare Excel rows
         const excelData = getFilteredLeads().map((l, index) => ({
             "S.No": index + 1,
             "First Name": l.leadFirstName || "",
@@ -653,17 +654,25 @@ function LeadsContent() {
     };
 
 
-    const handleExcelImport = async (e) => {
+    const handleFileChange = async (e) => {
+        const siteId = decode(localStorage.getItem("SiteId"));
+
         const file = e.target.files[0];
         if (!file) return;
 
-        const formData = new FormData();
-        formData.append("file", file);
+        setLoading(true);
+
+        const excelData = new FormData();
+        excelData.append('file', file);
+        excelData.append("siteId", siteId);
 
         try {
-            const res = await fetch(config.Api + "importLeadsExcel", {
+            // Use your apiRequest wrapper
+            // NOTE: Make sure your apiRequest can handle FormData and doesn't
+            // automatically set Content-Type to application/json
+            const res = await fetch("http://localhost:8001/api/importLeadsExcel", {
                 method: "POST",
-                body: formData
+                body: excelData
             });
 
             const result = await res.json();
@@ -676,20 +685,25 @@ function LeadsContent() {
                 fetchLeads();
             } else {
                 toast({
+                    variant: "destructive",
                     title: "Import Failed",
-                    description: result.message,
-                    variant: "destructive"
+                    description: result.message
                 });
             }
-        } catch (err) {
-            toast({
-                title: "Error",
-                description: "Excel import failed",
-                variant: "destructive"
-            });
-        }
 
-        e.target.value = null;
+        } catch (error) {
+            console.error('Import Error:', error);
+            toast({
+                variant: "destructive",
+                title: 'Import Error',
+                description: error.message || 'A network error occurred. Please check the console.'
+            });
+        } finally {
+            setLoading(false);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = null; // reset file input
+            }
+        }
     };
 
     const handleImportClick = () => { fileInputRef.current.click(); };
@@ -709,7 +723,7 @@ function LeadsContent() {
                             {role !== 'AGENT' &&
                                 <Button
                                     variant="outline"
-                                    onClick={() => fileInputRef.current.click()}
+                                    onClick={handleImportClick}
                                     className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
                                 >
                                     <Download className="w-4 h-4 mr-2" />
@@ -718,8 +732,7 @@ function LeadsContent() {
                             }
                         </div>
 
-                        <input type="file" ref={fileInputRef} accept=".xlsx,.xls" className="hidden" onChange={handleExcelImport} />
-
+                        <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
                         {["Admin", "superadmin"].includes(localStorage.getItem("role")) && (
                             <Button
                                 variant="outline"
