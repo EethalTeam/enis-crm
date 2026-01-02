@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, Filter, User, Phone, Clock, Hourglass, Download, PhoneCall, ArrowUpFromLine } from 'lucide-react';
+import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, Filter, User, Phone, Clock, Hourglass, Download, PhoneCall, ArrowUpFromLine, Search } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
 import { LeadDialog } from "@/pages/Leads";
 import PIOPIY from 'piopiyjs';
@@ -97,6 +97,8 @@ function CallLogsContent() {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('all');
+    // Added Search State
+    const [searchQuery, setSearchQuery] = useState('');
 
     const piopiyRef = useRef(null);
     const isMountedRef = useRef(true);
@@ -223,12 +225,11 @@ function CallLogsContent() {
             try {
 
                 let url = config.Api + "CallLogs/getAllCallLogs";
-                const payload = role === "AGENT" ? { TelecmiID ,role} : {};
+                const payload = role === "AGENT" ? { TelecmiID, role } : {};
 
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // body: JSON.stringify({ page: 1, limit: 50,  ...(role === "AGENT" && { TelecmiID })}),
                     body: JSON.stringify(payload),
                 });
                 const data = await response.json();
@@ -245,14 +246,30 @@ function CallLogsContent() {
         fetchLogs();
     }, []);
 
+    // --- Updated Filter Logic with Search ---
     const getFilteredLogs = () => {
+        let currentLogs = logs;
+
+        // 1. Filter by Tab
         switch (activeTab) {
-            case 'incoming': return logs.filter(log => log.direction === 'inbound' || log.direction === 'incoming');
-            case 'outgoing': return logs.filter(log => log.direction === 'outbound' || log.direction === 'outgoing');
-            case 'rnr': return logs.filter(log => log.status === 'missed' || log.status === 'busy');
-            default: return logs;
+            case 'incoming': currentLogs = logs.filter(log => log.direction === 'inbound' || log.direction === 'incoming'); break;
+            case 'outgoing': currentLogs = logs.filter(log => log.direction === 'outbound' || log.direction === 'outgoing'); break;
+            case 'rnr': currentLogs = logs.filter(log => log.status === 'missed' || log.status === 'busy'); break;
+            default: break; 
         }
+
+        // 2. Filter by Search Query
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            currentLogs = currentLogs.filter(log => {
+                const targetNumber = (log.direction === 'inbound' || log.direction === 'incoming') ? log.from : log.to;
+                return targetNumber && targetNumber.toString().includes(query);
+            });
+        }
+
+        return currentLogs;
     };
+    
     const filteredLogs = getFilteredLogs();
 
     const handlePlayRecording = (recordingUrl, id) => {
@@ -337,24 +354,48 @@ function CallLogsContent() {
                     </div>
                 </div>
 
-                {/* MOBILE SELECT */}
-                <div className="md:hidden w-full mb-4">
-                    <select
-                        value={activeTab}
-                        onChange={(e) => setActiveTab(e.target.value)}
-                        className="w-full h-11 rounded-md bg-slate-900 border border-slate-700 text-white text-sm px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="all">All Calls</option>
-                        <option value="incoming">Incoming</option>
-                        <option value="outgoing">Outgoing</option>
-                        <option value="rnr">RNR</option>
-                    </select>
-                </div>
+                {/* --- Search and Filters --- */}
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-3">
+                    {/* Filter Tabs */}
+                    <div className="hidden md:flex items-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800">
+                        <TabButton id="all" label="All Calls" />
+                        <TabButton id="incoming" label="Incoming" />
+                        <TabButton id="outgoing" label="Outgoing" />
+                        <TabButton id="rnr" label="RNR" />
+                    </div>
 
-                <div className="hidden md:flex items-center gap-2 p-1 bg-slate-900/50 rounded-lg w-fit border border-slate-800 mt-3">
-                    <TabButton id="all" label="All Calls" />
-                    <TabButton id="incoming" label="Incoming" />
-                    <TabButton id="outgoing" label="Outgoing" />
-                    <TabButton id="rnr" label="RNR" />
+                     {/* Mobile Select */}
+                    <div className="md:hidden w-full">
+                        <select
+                            value={activeTab}
+                            onChange={(e) => setActiveTab(e.target.value)}
+                            className="w-full h-11 rounded-md bg-slate-900 border border-slate-700 text-white text-sm px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="all">All Calls</option>
+                            <option value="incoming">Incoming</option>
+                            <option value="outgoing">Outgoing</option>
+                            <option value="rnr">RNR</option>
+                        </select>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="relative w-full md:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <input 
+                            type="text" 
+                            placeholder="Search number..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-9 pr-8 h-10 bg-slate-900 border border-slate-700 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder:text-slate-500"
+                        />
+                         {searchQuery && (
+                            <button 
+                                onClick={() => setSearchQuery('')}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -376,37 +417,43 @@ function CallLogsContent() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredLogs.map((call, index) => {
-                                    const targetNumber = call.direction === 'inbound' || call.direction === 'incoming' ? call.from : call.to;
-                                    return (
-                                        <tr key={call._id || index} className="border-b border-slate-800 hover:bg-slate-800/50">
-                                            <td className="py-3 px-4">
-                                                {call.status === 'missed' ? <PhoneMissed className="w-5 h-5 text-red-400" /> :
-                                                    (call.direction === 'inbound' || call.direction === 'incoming') ? <PhoneIncoming className="w-5 h-5 text-green-400" /> : <PhoneOutgoing className="w-5 h-5 text-blue-400" />}
-                                            </td>
-                                            <td className="py-3 px-4 font-medium text-white">{targetNumber || "Unknown"}</td>
-                                            <td className="py-3 px-4">
-                                                <div className="flex items-center gap-2 group">
-                                                    <span>{targetNumber}</span>
-                                                    <button onClick={() => handleInitiateCall(targetNumber)} className="p-1.5 rounded-full bg-blue-600/10 text-blue-400 hover:bg-blue-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"><PhoneCall size={12} /></button>
-                                                </div>
-                                            </td>
-                                            <td className="py-3 px-4">{formatTime(call.callDate)}</td>
-                                            <td className="py-3 px-4">{formatDuration(call.answeredsec)}</td>
-                                            <td className="py-3 px-4"><Badge className={statusColors[call.status]}>{call.status}</Badge></td>
-                                            <td className="py-3 px-4">
-                                                {call.recordingUrl && (
-                                                    <Button variant="ghost" size="sm" onClick={() => handlePlayRecording(call.recordingUrl, call._id)} className={playingId === call._id ? 'text-green-400' : 'text-fuchsia-300'}>
-                                                        {playingId === call._id ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                                                    </Button>
-                                                )}
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                <Button size="sm" variant="outline" onClick={() => { setLeadInitialData({leadCreatedById:decode(localStorage.getItem('EmployeeId')), leadPhone: targetNumber || "" }); setLeadDialogOpen(true); }}>Qualify</Button>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
+                                {filteredLogs.length > 0 ? (
+                                    filteredLogs.map((call, index) => {
+                                        const targetNumber = call.direction === 'inbound' || call.direction === 'incoming' ? call.from : call.to;
+                                        return (
+                                            <tr key={call._id || index} className="border-b border-slate-800 hover:bg-slate-800/50">
+                                                <td className="py-3 px-4">
+                                                    {call.status === 'missed' ? <PhoneMissed className="w-5 h-5 text-red-400" /> :
+                                                        (call.direction === 'inbound' || call.direction === 'incoming') ? <PhoneIncoming className="w-5 h-5 text-green-400" /> : <PhoneOutgoing className="w-5 h-5 text-blue-400" />}
+                                                </td>
+                                                <td className="py-3 px-4 font-medium text-white">{targetNumber || "Unknown"}</td>
+                                                <td className="py-3 px-4">
+                                                    <div className="flex items-center gap-2 group">
+                                                        <span>{targetNumber}</span>
+                                                        <button onClick={() => handleInitiateCall(targetNumber)} className="p-1.5 rounded-full bg-blue-600/10 text-blue-400 hover:bg-blue-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"><PhoneCall size={12} /></button>
+                                                    </div>
+                                                </td>
+                                                <td className="py-3 px-4">{formatTime(call.callDate)}</td>
+                                                <td className="py-3 px-4">{formatDuration(call.answeredsec)}</td>
+                                                <td className="py-3 px-4"><Badge className={statusColors[call.status]}>{call.status}</Badge></td>
+                                                <td className="py-3 px-4">
+                                                    {call.recordingUrl && (
+                                                        <Button variant="ghost" size="sm" onClick={() => handlePlayRecording(call.recordingUrl, call._id)} className={playingId === call._id ? 'text-green-400' : 'text-fuchsia-300'}>
+                                                            {playingId === call._id ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                                                        </Button>
+                                                    )}
+                                                </td>
+                                                <td className="py-3 px-4">
+                                                    <Button size="sm" variant="outline" onClick={() => { setLeadInitialData({ leadCreatedById: decode(localStorage.getItem('EmployeeId')), leadPhone: targetNumber || "" }); setLeadDialogOpen(true); }}>Qualify</Button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                ) : (
+                                    <tr>
+                                        <td colSpan="8" className="py-8 text-center text-slate-500">No logs found</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -415,27 +462,31 @@ function CallLogsContent() {
 
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
-                {filteredLogs.map((call, index) => {
-                    const targetNumber = call.direction === 'inbound' || call.direction === 'incoming' ? call.from : call.to;
-                    return (
-                        <div key={call._id || index} className="bg-slate-900 border border-slate-700 rounded-xl p-4 shadow-lg">
-                            <div className="flex justify-between items-center mb-3">
-                                {(call.direction === 'inbound' || call.direction === 'incoming') ? <PhoneIncoming className="w-6 h-6 text-green-400" /> : <PhoneOutgoing className="w-6 h-6 text-blue-400" />}
-                                <Badge className={statusColors[call.status]}>{call.status}</Badge>
+                {filteredLogs.length > 0 ? (
+                    filteredLogs.map((call, index) => {
+                        const targetNumber = call.direction === 'inbound' || call.direction === 'incoming' ? call.from : call.to;
+                        return (
+                            <div key={call._id || index} className="bg-slate-900 border border-slate-700 rounded-xl p-4 shadow-lg">
+                                <div className="flex justify-between items-center mb-3">
+                                    {(call.direction === 'inbound' || call.direction === 'incoming') ? <PhoneIncoming className="w-6 h-6 text-green-400" /> : <PhoneOutgoing className="w-6 h-6 text-blue-400" />}
+                                    <Badge className={statusColors[call.status]}>{call.status}</Badge>
+                                </div>
+                                <div className="flex items-center gap-2 mb-2 text-white"><User className="w-4 h-4" /> {targetNumber}</div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2 text-fuchsia-300 text-sm"><Phone className="w-4 h-4" /> {targetNumber}</div>
+                                    <button onClick={() => handleInitiateCall(targetNumber)} className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold"><PhoneCall size={12} /> Call</button>
+                                </div>
+                                <div className="flex items-center gap-2 text-slate-300 text-xs mb-3"><Clock className="w-4 h-4" /> {formatTime(call.callDate)} | <Hourglass className="w-4 h-4" /> {formatDuration(call.answeredsec)}</div>
+                                <div className="flex gap-2 border-t border-slate-700 pt-3">
+                                    {call.recordingUrl && <Button className="flex-1" variant="outline" size="sm" onClick={() => handlePlayRecording(call.recordingUrl, call._id)}>{playingId === call._id ? 'Pause' : 'Play'}</Button>}
+                                    <Button className="flex-1" size="sm" onClick={() => { setLeadInitialData({ leadCreatedById: decode(localStorage.getItem('EmployeeId')), leadPhone: targetNumber || "" }); setLeadDialogOpen(true); }}>Qualify</Button>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2 mb-2 text-white"><User className="w-4 h-4" /> {targetNumber}</div>
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2 text-fuchsia-300 text-sm"><Phone className="w-4 h-4" /> {targetNumber}</div>
-                                <button onClick={() => handleInitiateCall(targetNumber)} className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold"><PhoneCall size={12} /> Call</button>
-                            </div>
-                            <div className="flex items-center gap-2 text-slate-300 text-xs mb-3"><Clock className="w-4 h-4" /> {formatTime(call.callDate)} | <Hourglass className="w-4 h-4" /> {formatDuration(call.answeredsec)}</div>
-                            <div className="flex gap-2 border-t border-slate-700 pt-3">
-                                {call.recordingUrl && <Button className="flex-1" variant="outline" size="sm" onClick={() => handlePlayRecording(call.recordingUrl, call._id)}>{playingId === call._id ? 'Pause' : 'Play'}</Button>}
-                                <Button className="flex-1" size="sm" onClick={() => { setLeadInitialData({leadCreatedById:decode(localStorage.getItem('EmployeeId')), leadPhone: targetNumber || "" }); setLeadDialogOpen(true); }}>Qualify</Button>
-                            </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })
+                ) : (
+                    <div className="py-8 text-center text-slate-500">No logs found</div>
+                )}
             </div>
 
             <LeadDialog open={leadDialogOpen} onOpenChange={setLeadDialogOpen} mode="create" initialData={leadInitialData} onSuccess={() => { toast({ title: "Lead Created", variant: "success" }); setLeadDialogOpen(false); }} />

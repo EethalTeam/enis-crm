@@ -1,10 +1,9 @@
-import React, { useState, useReducer, useCallback, useEffect, createContext } from 'react';
+import React, { useState, useReducer, useCallback, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  Plus, Search, Filter, Download, Upload, 
-  Trash2, Edit, Eye, ArrowLeft, Save, RefreshCw,
-  Calendar, User, MapPin, Phone, Mail, MessageCircle, FileText
+  Plus, Search, Upload, Trash2, Edit, ArrowLeft, RefreshCw,
+  User, Phone, Mail, MessageCircle
 } from 'lucide-react';
 
 // UI Components
@@ -15,22 +14,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Logic & Utils
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
-import { config } from '@/components/CustomComponents/config'; // Keep your config path
-import Reducer from '@/components/Reducer/commonReducer.js'; // Keep your reducer path
-// import ExportTableToExcel from "../../../Components/CustomComponents/ExportTableToExcel";
+import { config } from '@/components/CustomComponents/config'; 
+import Reducer from '@/components/Reducer/commonReducer.js'; 
 import Loading from '@/components/CustomComponents/Loading';
+import { useAuth } from '@/contexts/AuthContext';
 
-// --- Keep your Initial State ---
+// --- Initial State ---
 const initialState = {
   _id: '',
   visitorCode:'',
-  siteId: '', // Added Site ID
-  sitename: '', // Added Site Name
+  siteId: '', 
+  sitename: '', 
   visitorName:'',
   visitorEmail:'',
   visitorMobile:'',
@@ -62,15 +61,15 @@ const initialState = {
   remarks:''
 };
 
-
-export default function VisitorMain(props) {
+export default function VisitorMain() {
   const { toast } = useToast();
   
-  // --- State Declarations (Kept from your code) ---
+  // --- State Declarations ---
   const [showentry, setShowEntry] = useState(false);
   const [loading, setLoading] = useState(false);
   const [state, dispatch] = useReducer(Reducer, initialState);
-  console.log(state,"state")
+  const { user } = useAuth();
+  
   const [Visitor, setVisitor] = useState([]);
   const [PlotDetails, setPlotDetails] = useState([]);
   const [FollowUpDetails, setFollowUpDetails] = useState([]);
@@ -82,72 +81,70 @@ export default function VisitorMain(props) {
   
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  // const [filterValue, setFilterValue] = useState(''); // Unused in new design but kept if needed
   
-  const [Data, SetData] = useState([]); // Used for dropdown options
-  console.log(Data,"Data")
   const [OrderTab, setOrderTab] = useState('Follow Up');
   
-  const [Status, setStatus] = useState([
-    { StatusIDPK: 1, StatusName: "Pending" },
-    { StatusIDPK: 2, StatusName: "Completed" }
+  // --- SEPARATED LISTS TO PREVENT CONFLICT ---
+  const [siteList, setSiteList] = useState([]); 
+  const [unitList, setUnitList] = useState([]); 
+  const [plotList, setPlotList] = useState([]); 
+  const [statusList, setStatusList] = useState([]); 
+  const [employeeList, setEmployeeList] = useState([]); 
+  const [stateList, setStateList] = useState([]); // Separate State List
+  const [cityList, setCityList] = useState([]);   // Separate City List
+
+  const [Status] = useState([
+    { StatusIDPK: 1, StatusName: "Visit Pending" },
+    { StatusIDPK: 2, StatusName: "Visit Completed" }
   ]);
   
-  // --- API Functions (Exact logic preserved) ---
-  const [siteList, setSiteList] = useState([]); // Stores Sites
-  const [unitList, setUnitList] = useState([]); // Stores Sites
-  console.log(unitList,"unitList")
-  const [plotList, setPlotList] = useState([]); // Stores Sites
-  const [statusList, setStatusList] = useState([]); // Stores Sites
-  const [employeeList, setEmployeeList] = useState([]); // Stores Employees
-  
-  // --- Logic & Effects (Kept exact) ---
-
+  // --- Effects ---
   useEffect(() => {
     getVisitor();
     getSites();
     getStatusList();
+    getStateList(); // Fetch states on mount
+    getEmployeeList(); // Fetch employees on mount
   }, []);
 
-// --- 3. FETCH UNITS AUTOMATICALLY WHEN SITE CHANGES ---
-useEffect(() => {
-  const getUnits = async () => {
-    // Stop if no site is selected
-    if (!state.siteId) {
-        setUnitList([]); // Clear units if site is removed
-        return; 
-    }
+  // Fetch Units when Site Changes
+  useEffect(() => {
+    const getUnits = async () => {
+      if (!state.siteId) {
+          setUnitList([]); 
+          return; 
+      }
+      try {
+        const response = await fetch(config.Api + "Unit/getAllUnits", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ siteId: state.siteId }), 
+        });
+        const result = await response.json();
+        if (Array.isArray(result)) setUnitList(result);
+      } catch (err) { console.error(err); }
+    };
+    getUnits();
+  }, [state.siteId]);
 
-    try {
-      // Optional: You can show a small inline loader here if needed
-      const response = await fetch(config.Api + "Unit/getAllUnits", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ siteId: state.siteId }), // Pass the selected ID
-      });
-      const result = await response.json();
-      if (Array.isArray(result)) setUnitList(result);
-    } catch (err) { console.error(err); }
-  };
-
-  getUnits();
-}, [state.siteId]);
-
-useEffect(()=>{
+  // Fetch Plots when Unit Changes
+  useEffect(()=>{
     const getPlotList = async () => {
-    try {
-      let url = config.Api + "Visitor/getAllPlots/";
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({siteId:state.siteId,unitId: state.unitId}),
-      });
-      const result = await response.json();
-      setPlotList(result.data);
-    } catch (error) { console.error(error); }
-  };
-  getPlotList()
-},[state.siteId,state.unitId])
+      try {
+        let url = config.Api + "Visitor/getAllPlots/";
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({siteId:state.siteId, unitId: state.unitId}),
+        });
+        const result = await response.json();
+        setPlotList(result.data);
+      } catch (error) { console.error(error); }
+    };
+    if(state.unitId) getPlotList();
+  },[state.siteId, state.unitId]);
+
+  // --- Search Logic ---
   const debounce = (func, delay) => {
     let timer;
     return function (...args) {
@@ -179,9 +176,10 @@ useEffect(()=>{
     setFilteredData(filtered);
   };
 
+  // --- Clear Functions ---
   const clear = () => {
     setIsEdit(false);
-    setAddFollow(false); // Ensure sub-forms close
+    setAddFollow(false); 
     dispatch({ type: 'text', name: '_id', value: "" });
     dispatch({ type: 'text', name: "visitorCode", value:'' });
     dispatch({ type: 'text', name: "visitorName", value:'' });
@@ -198,16 +196,12 @@ useEffect(()=>{
     dispatch({ type: 'text', name: "StateName", value: '' });
     dispatch({ type: 'text', name: "employeeId", value:'' });
     dispatch({ type: 'text', name: "employeeName", value: '' });
-    dispatch({ type: 'text', name: "followUpId", value:'' });
-    dispatch({ type: 'text', name: "followUpDate", value:'' });
-    dispatch({ type: 'text', name: "followedUpById", value:'' });
-    dispatch({ type: 'text', name: "followedUpByName", value:'' });
-    dispatch({ type: 'text', name: "followUpStatus", value: "Pending" });
-    dispatch({ type: 'text', name: "followUpDescription", value:'' });
-    dispatch({ type: 'text', name: "notes", value:'' });
-    dispatch({ type: 'text', name: "remarks", value:'' });
+    
+    // Sub forms
+    cleaerFollowUp();
     setPlotDetails([]);
     setFollowUpDetails([]);
+    setCityList([]); // Clear cities when clearing form
   };
 
   const cleaerFollowUp = () => {
@@ -230,6 +224,7 @@ useEffect(()=>{
     dispatch({ type: 'text', name: "statusName", value:''});
   };
 
+  // --- API Fetchers ---
   const getVisitor = async () => {
     try {
       setLoading(true);
@@ -240,17 +235,14 @@ useEffect(()=>{
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({employeeId:employeeId}),
       });
-      if (!response.ok) throw new Error('Failed to get Visitor');
       const result = await response.json();
       setVisitor(result.data);
       setFilteredData(result.data);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { console.error('Error:', error); } 
+    finally { setLoading(false); }
   };
- const getSites = async () => {
+
+  const getSites = async () => {
     try {
       let url = config.Api + "Site/getAllSites"; 
       const response = await fetch(url, {
@@ -260,60 +252,6 @@ useEffect(()=>{
       });
       const result = await response.json();
       setSiteList(result.data);
-      SetData(result.data)
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getVisitorFollowUps = async () => {
-    try {
-      setLoading(true);
-      let url = config.Api + "Visitor/getVisitorFollowUps";
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({visitorId:state._id}),
-      });
-      if (!response.ok) throw new Error('Failed to get Visitor');
-      const result = await response.json();
-      setFollowUpDetails(result.followUps);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getVisitorPlots = async () => {
-    try {
-      setLoading(true);
-      let url = config.Api + "Visitor/getVisitorPlots";
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({visitorId:state._id}),
-      });
-      if (!response.ok) throw new Error('Failed to get Visitor');
-      const result = await response.json();
-      setPlotDetails(result.plots);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getCityList = async () => {
-    try {
-      let url = config.Api + "City/getAllCitys";
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({StateID:state.StateID}),
-      });
-      const result = await response.json();
-      SetData(result);
     } catch (error) { console.error(error); }
   };
 
@@ -326,7 +264,24 @@ useEffect(()=>{
         body: JSON.stringify({}),
       });
       const result = await response.json();
-      SetData(result);
+      setStateList(result); // Using separate state
+    } catch (error) { console.error(error); }
+  };
+
+  // Updated to accept optional ID for Edit scenario
+  const getCityList = async (id) => {
+    const targetStateId = id || state.StateID;
+    if(!targetStateId) return;
+
+    try {
+      let url = config.Api + "City/getAllCitys";
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({StateID: targetStateId}),
+      });
+      const result = await response.json();
+      setCityList(result); // Using separate state
     } catch (error) { console.error(error); }
   };
 
@@ -352,12 +307,37 @@ useEffect(()=>{
         body: JSON.stringify({}),
       });
       const result = await response.json();
-      setEmployeeList(result.data);
+      setEmployeeList(result.data); // Using separate state
     } catch (error) { console.error(error); }
   };
 
-  // --- CRUD Operations ---
+  const getVisitorFollowUps = async () => {
+    try {
+      let url = config.Api + "Visitor/getVisitorFollowUps";
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({visitorId:state._id}),
+      });
+      const result = await response.json();
+      setFollowUpDetails(result.followUps);
+    } catch (error) { console.error('Error:', error); }
+  };
 
+  const getVisitorPlots = async () => {
+    try {
+      let url = config.Api + "Visitor/getVisitorPlots";
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({visitorId:state._id}),
+      });
+      const result = await response.json();
+      setPlotDetails(result.plots);
+    } catch (error) { console.error('Error:', error); }
+  };
+
+  // --- CRUD Operations ---
   const createVisitor = async (data) => {
     setLoading(true);
     let url = config.Api + "Visitor/createVisitor";
@@ -460,7 +440,6 @@ useEffect(()=>{
     if (fieldType === "text") dispatch({ type: fieldType, name: name, value: e });
     else if (fieldType === "number") dispatch({ type: fieldType, name: name, number: Number(e) });
     else if (fieldType === "select") {
-        // Logic to match your original reducer logic for Selects
         if (name === 'FollowedUpStatus') dispatch({ type: 'text', name: "followUpStatus", value: e.StatusName });
         
         if (name === 'statusId') {
@@ -471,18 +450,24 @@ useEffect(()=>{
             dispatch({ type: 'text', name: "followedUpById", value: e._id });
             dispatch({ type: 'text', name: "followedUpByName", value: e.EmployeeName });
         }
+        // Logic for City
         if (name === 'CityID') {
             dispatch({ type: 'text', name: "cityId", value: e.CityIDPK });
             dispatch({ type: 'text', name: "CityName", value: e.CityName });
         }
+        // Logic for State (Triggers City Reset)
         if (name === "StateID") {
             dispatch({ type: 'text', name: 'StateID', value: e.StateIDPK });
             dispatch({ type: 'text', name: "StateName", value: e.StateName });
+            // Reset City
+            dispatch({ type: 'text', name: "cityId", value: '' });
+            dispatch({ type: 'text', name: "CityName", value: '' });
+            // Fetch Cities
+            getCityList(e.StateIDPK);
         }
         if (name === 'siteId') {
           dispatch({ type: 'text', name: "siteId", value: e._id });
           dispatch({ type: 'text', name: "sitename", value: e.sitename });
-          // Reset Unit when Site changes
           dispatch({ type: 'text', name: "unitId", value: '' });
           dispatch({ type: 'text', name: "UnitName", value: '' });
        }
@@ -492,7 +477,7 @@ useEffect(()=>{
         }
         if (name === 'plotId') {
           dispatch({ type: 'text', name: 'plotId', value: e._id })
-        dispatch({ type: 'text', name: 'plotNumber', value: e.plotNumber })
+          dispatch({ type: 'text', name: 'plotNumber', value: e.plotNumber })
         };
         
         if (name === 'employeeId') {
@@ -514,15 +499,11 @@ useEffect(()=>{
     if (!state.followUpDate) { toast({ title: "Error", description: "Enter Follow up date", variant: "destructive" }); return; }
     if (!state.followedUpById) { toast({ title: "Error", description: "Assign a staff", variant: "destructive" }); return; }
     if (!state.followUpStatus) { toast({ title: "Error", description: "Select status", variant: "destructive" }); return; }
-    if (!state.notes) { toast({ title: "Error", description: "Enter notes", variant: "destructive" }); return; }
     showAlert('Follow Up');
   };
 
   const ValidatePlot = () => {
-     if (!state.siteId) {
-      toast({ title: 'Error', description: 'Please select a Site', variant: 'destructive' });
-      return;
-    }
+     if (!state.siteId) { toast({ title: 'Error', description: 'Please select a Site', variant: 'destructive' }); return; }
     if (!state.unitId) { toast({ title: "Error", description: "Select Unit", variant: "destructive" }); return; }
     if (!state.statusName) { toast({ title: "Error", description: "Select Status", variant: "destructive" }); return; }
     showAlert(OrderTab);
@@ -534,16 +515,15 @@ useEffect(()=>{
       text: isEdit ? 'Do you really want to Update this data?' : 'Do you really want to save this data?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#d946ef', // Fuchsia-500
+      confirmButtonColor: '#d946ef', 
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, confirm!',
-      background: '#1e293b', // Slate-800
+      background: '#1e293b', 
       color: '#fff'
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
           val === 'Main' ? await handleSubmit() : val === 'Follow Up' ? await FollowUpSubmit() : await PlotSubmit();
-          // Success Toast handled in submits or here
         } catch (error) {
            toast({ title: "Error", description: error.message, variant: "destructive" });
         }
@@ -582,14 +562,6 @@ useEffect(()=>{
        feedback:state.feedback, description:state.description, employeeId:state.employeeId
     };
  
-    // Optional fields logic preserved
-    if(state.followUpDate) updateData.followUpDate = state.followUpDate;
-    if(state.followedUpById) updateData.followedUpById = state.followedUpById;
-    if(state.followUpStatus) updateData.followUpStatus = state.followUpStatus;
-    if(state.followUpDescription) updateData.followUpDescription = state.followUpDescription;
-    if(state.notes) updateData.notes = state.notes;
-    if(state.remarks) updateData.remarks = state.remarks;
-
     const saveData={
         visitorName:state.visitorName, visitorEmail:state.visitorEmail, visitorMobile:state.visitorMobile,
         visitorWhatsApp:state.visitorWhatsApp, visitorPhone:state.visitorPhone, cityId:state.cityId,
@@ -599,7 +571,6 @@ useEffect(()=>{
         followedUpById:state.followedUpById, followUpStatus:state.followUpStatus,
         followUpDescription:state.followUpDescription, notes:state.notes, remarks:state.remarks
     }
-    
 
     if (isEdit) {
       await updateVisitor(updateData);
@@ -618,14 +589,12 @@ useEffect(()=>{
         followedUpById:state.followedUpById, followUpStatus:state.followUpStatus,
         followUpDescription:state.followUpDescription, notes:state.notes, remarks:state.remarks
     };
-    console.log(saveData,"saveData")
     const updateData ={
         visitorId: state._id, followUpId:state.followUpId,
         followUpDate:state.followUpDate,
         followedUpById:state.followedUpById, followUpStatus:state.followUpStatus,
         followUpDescription:state.followUpDescription, notes:state.notes, remarks:state.remarks
     }
-    console.log(updateData,"updateData")
     if (followUpEdit) {
        await updateFollowUp(updateData);
        toast({ title: "Success", description: "Follow up Updated!" });
@@ -652,6 +621,7 @@ useEffect(()=>{
      getVisitorPlots();
   };
 
+  // --- EDIT LOGIC (Fixed) ---
   const editTable = (data) => {
     setShowEntry(true);
     setIsEdit(true);
@@ -665,16 +635,38 @@ useEffect(()=>{
     dispatch({ type: 'text', name: "visitorAddress", value: data.visitorAddress || '' });
     dispatch({ type: 'text', name: "feedback", value: data.feedback || '' });
     dispatch({ type: 'text', name: "description", value: data.description || '' });
-        if(data.unitId?.siteId) {
+    
+    // Site & Unit
+    if(data.unitId?.siteId) {
         dispatch({ type: 'text', name: "siteId", value: data.unitId.siteId._id || data.unitId.siteId });
         dispatch({ type: 'text', name: "sitename", value: data.unitId.siteId.sitename || '' });
     }
+    
+    // City & State
     if(data.cityId) {
+        // Set City Data
         dispatch({ type: 'text', name: "cityId", value: data.cityId._id });
         dispatch({ type: 'text', name: "CityName", value: data.cityId.CityName });
-        dispatch({ type: 'text', name: "StateID", value: data.cityId.StateID?._id });
-        dispatch({ type: 'text', name: "StateName", value: data.cityId.StateID?.StateName });
+        
+        // Handle State Population
+        const stateData = data.cityId.StateID;
+        let stateIDToFetch = null;
+
+        if (stateData && typeof stateData === 'object') {
+            dispatch({ type: 'text', name: "StateID", value: stateData._id || stateData.StateIDPK });
+            dispatch({ type: 'text', name: "StateName", value: stateData.StateName });
+            stateIDToFetch = stateData._id || stateData.StateIDPK;
+        } else if (stateData) {
+            dispatch({ type: 'text', name: "StateID", value: stateData });
+            stateIDToFetch = stateData;
+        }
+
+        // IMPORTANT: Trigger City List fetch for this State
+        if (stateIDToFetch) {
+            getCityList(stateIDToFetch);
+        }
     }
+
     if(data.employeeId) {
         dispatch({ type: 'text', name: "employeeId", value: data.employeeId._id });
         dispatch({ type: 'text', name: "employeeName", value: data.employeeId.EmployeeName });
@@ -715,54 +707,40 @@ useEffect(()=>{
      setPlotEdit(true);
   };
 
-// --- HELPER FOR STYLED SELECT ---
-const GlassSelect = ({ 
-  label, 
-  value, 
-  onChange, 
-  onFocus,
-  options, 
-  placeholder, 
-  disabled, 
-  displayKey, 
-  valueKey 
-}) => 
- {
-  return (
-  <div className="space-y-2">
-    <Label className="text-white font-semibold">{label} <span className="text-red-500">*</span></Label>
-    <div className="relative">
-      <select
-        value={value}
-        disabled={disabled}
-        onFocus={onFocus} 
-        onChange={(e) => {
-          const selectedObj = options.find(item => String(item[valueKey]) === e.target.value || String(item[displayKey]) === e.target.value);
-          onChange(selectedObj); 
-        }}
-        className="w-full bg-purple-900/50 border border-fuchsia-700 text-white rounded-md p-2 h-10 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 appearance-none"
-      >
-        <option value="" className="bg-slate-900 text-gray-400">{placeholder || "Select..."}</option>
-        {(options||[]).map((item, idx) => (
-          <option key={idx} value={item[valueKey] || item[displayKey]} className="bg-slate-900 text-white">
-            {item[displayKey]}
-          </option>
-        ))}
-      </select>
-      
-      {/* Custom Arrow */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-fuchsia-300">
-        <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-        </svg>
+  // --- Reusable Component ---
+  const GlassSelect = ({ 
+    label, value, onChange, onFocus, options, placeholder, disabled, displayKey, valueKey 
+  }) => (
+    <div className="space-y-2">
+      <Label className="text-white font-semibold">{label} <span className="text-red-500">*</span></Label>
+      <div className="relative">
+        <select
+          value={value}
+          disabled={disabled}
+          onFocus={onFocus} 
+          onChange={(e) => {
+            const selectedObj = options.find(item => String(item[valueKey]) === e.target.value || String(item[displayKey]) === e.target.value);
+            onChange(selectedObj); 
+          }}
+          className="w-full bg-purple-900/50 border border-fuchsia-700 text-white rounded-md p-2 h-10 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 appearance-none"
+        >
+          <option value="" className="bg-slate-900 text-gray-400">{placeholder || "Select..."}</option>
+          {(options||[]).map((item, idx) => (
+            <option key={idx} value={item[valueKey] || item[displayKey]} className="bg-slate-900 text-white">
+              {item[displayKey]}
+            </option>
+          ))}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-fuchsia-300">
+          <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+          </svg>
+        </div>
       </div>
     </div>
-  </div>
-)};
+  );
 
-  // --- RENDER ---
   return (
-    <>
     <Loading loading={loading}>
       <Helmet>
         <title>Visitors - ENIS CRM</title>
@@ -770,8 +748,7 @@ const GlassSelect = ({
       </Helmet>
 
       <div className="space-y-6 p-4 min-h-screen bg-transparent">
-        
-        {/* --- HEADER --- */}
+        {/* HEADER */}
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-white">{showentry ? (isEdit ? 'Edit Visitor' : 'New Visitor') : 'Visitors'}</h1>
           <div className="flex gap-3">
@@ -793,7 +770,7 @@ const GlassSelect = ({
           </div>
         </div>
 
-        {/* --- VIEW: LIST TABLE --- */}
+        {/* LIST TABLE */}
         {!showentry && (
         <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm">
           <CardContent className="p-6">
@@ -853,10 +830,9 @@ const GlassSelect = ({
         </Card>
         )}
 
-        {/* --- VIEW: FORM (ADD/EDIT) --- */}
+        {/* ADD/EDIT FORM */}
         {showentry && (
          <div className="space-y-6">
-            {/* MAIN INFO CARD */}
             <Card className="bg-slate-900/50 border-slate-800">
                 <CardHeader><CardTitle className="text-fuchsia-400 flex items-center gap-2"><User className="w-5 h-5"/> Basic Details</CardTitle></CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -893,38 +869,34 @@ const GlassSelect = ({
                          <Input type="number" value={state.visitorPhone} onChange={(e) => storeDispatch(e.target.value, "visitorPhone", "text")} className="bg-purple-900/50 border-fuchsia-700 text-white" placeholder="Phone" />
                     </div>
                     
-                    {/* DROPDOWNS - Mapped to GlassSelect */}
+                    {/* UPDATED SELECTS WITH SPECIFIC LISTS */}
                     <GlassSelect 
                         label="State" 
                         value={state.StateName} 
                         displayKey="StateName"
                         valueKey="StateIDPK"
-                        options={Data} 
+                        options={stateList} // USE stateList
                         onChange={(e) => storeDispatch(e, 'StateID', 'select')} 
                         placeholder="Select State"
-                        onClick={() => getStateList()} // Note: Select triggers need data loading usually on focus
-                        onFocus={() => getStateList()}
                     />
                     <GlassSelect 
                         label="City" 
                         value={state.CityName}
                         displayKey="CityName"
                         valueKey="CityIDPK"
-                        options={Data} 
+                        options={cityList} // USE cityList
                         onChange={(e) => storeDispatch(e, 'CityID', 'select')} 
                         placeholder="Select City"
                         disabled={!state.StateID}
-                        onFocus={() => getCityList()}
                     />
                     <GlassSelect 
-                         label="Reference" 
+                         label="Referred By" 
                          value={state.employeeName}
                          displayKey="EmployeeName"
                          valueKey="_Id"
-                         options={Data} 
+                         options={employeeList} // USE employeeList
                          onChange={(e) => storeDispatch(e, 'employeeId', 'select')} 
                          placeholder="Select Employee"
-                         onFocus={() => getEmployeeList()}
                     />
 
                     <div className="space-y-2 md:col-span-3">
@@ -947,19 +919,18 @@ const GlassSelect = ({
                 </div>
             </Card>
 
-            {/* SUB-SECTION: TABS for FollowUps & Plots (Only if Editing or New Entry logic allows) */}
+            {/* SUB-SECTIONS (Follow Up / Plots) */}
             {(isEdit || (!state._id && !AddFollow)) && (
                 <div className="space-y-4">
                     {isEdit && (
                         <Tabs value={OrderTab} onValueChange={setOrderTab} className="w-full">
                             <TabsList className="grid w-full grid-cols-2 bg-slate-800">
-                                <TabsTrigger value="Follow Up" className="data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white">Follow Up Details</TabsTrigger>
-                                <TabsTrigger value="Plot Details" className="data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white">Plot Details</TabsTrigger>
+                                <TabsTrigger value="Follow Up" className="data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white">Visitor Follow Up Details</TabsTrigger>
+                                <TabsTrigger value="Plot Details" className="data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white">Visitor Plot Details</TabsTrigger>
                             </TabsList>
                         </Tabs>
                     )}
 
-                    {/* ADD BUTTON FOR SUB-ITEMS */}
                     {isEdit && !AddFollow && (
                         <div className="flex justify-end">
                             <Button onClick={() => { setAddFollow(true); cleaerFollowUp(); clearPlot(); }} className="bg-fuchsia-600 hover:bg-fuchsia-700 text-white">
@@ -968,7 +939,6 @@ const GlassSelect = ({
                         </div>
                     )}
 
-                    {/* SUB-FORM */}
                     {(!state._id || AddFollow) && (
                         <Card className="bg-slate-900/50 border-slate-800 animate-in fade-in zoom-in duration-300">
                             <CardHeader><CardTitle className="text-fuchsia-300 text-lg">{OrderTab === 'Follow Up' ? 'Add Follow Up' : 'Add Plot'}</CardTitle></CardHeader>
@@ -980,19 +950,12 @@ const GlassSelect = ({
                                             <Input type="date" value={state.followUpDate} onChange={(e) => storeDispatch(e.target.value, 'followUpDate', 'text')} className="bg-purple-900/50 border-fuchsia-700 text-white" />
                                         </div>
                                         <GlassSelect 
-  label="Assign Staff" 
-  value={state.followedUpByName} 
-  displayKey="EmployeeName" 
-  valueKey="_Id" 
-  options={employeeList} 
-  onChange={(e) => storeDispatch(e, 'followedUpById', 'select')} 
-  // Change this: Only fetch if Data is empty to prevent re-render loops
-  onFocus={() => {
-    if (employeeList.length === 0) {
-      getEmployeeList();
-    }
-  }} 
-/>
+                                            label="Assign Staff" value={state.followedUpByName || user.role === 'AGENT' ? user.EmployeeName : ''} 
+                                            disabled={user.role !== 'Admin' && user.role !== 'Manager' && user.role !== 'SuperAdmin'}
+                                            displayKey="EmployeeName" valueKey="_Id" 
+                                            options={employeeList} 
+                                            onChange={(e) => storeDispatch(e, 'followedUpById', 'select')} 
+                                        />
                                         <GlassSelect label="Status" value={state.followUpStatus} displayKey="StatusName" valueKey="StatusName" options={Status} onChange={(e) => storeDispatch(e, 'FollowedUpStatus', 'select')} />
                                         <div className="col-span-3 grid grid-cols-3 gap-6">
                                             <div className="space-y-2"><Label className="text-white">Description</Label><Input value={state.followUpDescription} onChange={(e) => storeDispatch(e.target.value, 'followUpDescription', 'text')} className="bg-purple-900/50 border-fuchsia-700 text-white" /></div>
@@ -1022,7 +985,6 @@ const GlassSelect = ({
                         </Card>
                     )}
 
-                    {/* SUB-TABLES */}
                     {state._id && !AddFollow && (
                         <div className="overflow-x-auto rounded-lg border border-slate-700">
                            <table className="w-full bg-slate-900/80">
@@ -1037,7 +999,6 @@ const GlassSelect = ({
                                             </>
                                         ) : (
                                             <>
-                                            {/* <th className="p-3 text-left text-white text-sm">Site</th> */}
                                             <th className="p-3 text-left text-white text-sm">Unit</th>
                                             <th className="p-3 text-left text-white text-sm">Plot No</th>
                                             <th className="p-3 text-left text-white text-sm">Status</th>
@@ -1058,7 +1019,6 @@ const GlassSelect = ({
                                                 </>
                                             ) : (
                                                 <>
-                                                {/* <td className="p-3 text-slate-300 text-sm">{item.plotId?.siteId?.sitename}</td> */}
                                                  <td className="p-3 text-slate-300 text-sm">{item.plotId?.unitId?.UnitName}</td>
                                                  <td className="p-3 text-slate-300 text-sm">{item.plotId?.plotNumber}</td>
                                                  <td className="p-3"><Badge style={{backgroundColor: item.statusId?.colorCode || 'gray'}}>{item.statusId?.statusName}</Badge></td>
@@ -1080,6 +1040,5 @@ const GlassSelect = ({
         )}
       </div>
     </Loading>
-    </>
   );
 }

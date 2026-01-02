@@ -6,8 +6,8 @@ export default function FloatingCallButton() {
 
   return (
     <button
-      onClick={() => navigate("call-logs")}
-      title="Go to Call Logs"
+      onClick={() => navigate("dialer")}
+      title="Go to Dialer"
       className="
         fixed bottom-6 right-6 z-[999]
         w-14 h-14

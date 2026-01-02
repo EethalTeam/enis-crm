@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PIOPIY from 'piopiyjs';
+import { useNavigate } from "react-router-dom";
 
 const decode = (value) => {
     if (!value) return "";
@@ -16,6 +17,7 @@ const TeleCMIDialer = () => {
     const audioRef = useRef(typeof Audio !== "undefined" ? new Audio('') : null);
     const isMountedRef = useRef(true);
     const loginTimerRef = useRef(null);
+        const navigate = useNavigate()
 
     // Get credentials from local storage once
     const [TelecmiID] = useState(() => decode(localStorage.getItem("TelecmiID")));
@@ -78,6 +80,7 @@ const TeleCMIDialer = () => {
                 stopRingtone();
                 resetCallState();
                 setPhoneNumber("91")
+               navigate("/call-logs");
             });
             sdk.on('cancel', () => resetCallState());
             sdk.on('inComingCall', (callObj) => {
@@ -250,7 +253,7 @@ const handleReject = () => {
                 <button onClick={toggleMute} style={styles.btnGrid}>{isMuted ? '🔇 Unmute' : '🎤 Mute'}</button>
                 <button onClick={toggleHold} style={styles.btnGrid}>{isOnHold ? '▶ Resume' : '⏸ Hold'}</button>
                 {/* <button onClick={toggleSpeaker} style={styles.btnGrid}>{isSpeakerOn ? '🔊 Speaker Off' : '🔈 Speaker On'}</button> */}
-                <button onClick={() => alert('Keypad coming soon')} style={styles.btnGrid}>🔢 Keypad</button>
+                {/* <button onClick={() => alert('Keypad coming soon')} style={styles.btnGrid}>🔢 Keypad</button> */}
               </div>
             )}
 

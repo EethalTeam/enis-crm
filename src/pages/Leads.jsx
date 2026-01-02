@@ -56,13 +56,47 @@ const DialogFooter = ({ className, children }) => (<div className={`flex flex-co
 const ToastContext = createContext({});
 const ToastProvider = ({ children }) => {
     const [toasts, setToasts] = useState([]);
+
     const toast = ({ title, description, variant = 'default' }) => {
         const id = Math.random().toString(36).substring(2, 9);
         setToasts((prev) => [...prev, { id, title, description, variant }]);
         setTimeout(() => { setToasts((prev) => prev.filter((t) => t.id !== id)); }, 3000);
     };
+
     const dismiss = (id) => { setToasts((prev) => prev.filter((t) => t.id !== id)); };
-    return (<ToastContext.Provider value={{ toast }}>{children}<div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 w-full max-w-sm pointer-events-none"><AnimatePresence>{toasts.map((t) => (<motion.div key={t.id} initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === 'destructive' ? 'bg-red-900/90 border-red-800 text-white' : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'}`}><div>{t.title && <h4 className="font-semibold text-sm">{t.title}</h4>}{t.description && <p className="text-sm opacity-90 mt-1">{t.description}</p>}</div><button onClick={() => dismiss(t.id)} className="text-slate-400 hover:text-white"><X size={16} /></button></motion.div>))}</AnimatePresence></div></ToastContext.Provider>);
+
+    return (
+        <ToastContext.Provider value={{ toast }}>
+            {children}
+            {/* Position changed: top-4, centered horizontally with left-1/2 and -translate-x-1/2 */}
+            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm pointer-events-none px-8">
+                <AnimatePresence>
+                    {toasts.map((t) => (
+                        <motion.div
+                            key={t.id}
+                            // Animation changed: Slides down from top (y) instead of in from right (x)
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
+                                t.variant === 'destructive' 
+                                    ? 'bg-red-900/90 border-red-800 text-white' 
+                                    : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
+                            }`}
+                        >
+                            <div>
+                                {t.title && <h4 className="font-semibold text-sm">{t.title}</h4>}
+                                {t.description && <p className="text-sm opacity-90 mt-1">{t.description}</p>}
+                            </div>
+                            <button onClick={() => dismiss(t.id)} className="text-slate-400 hover:text-white">
+                                <X size={16} />
+                            </button>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+            </div>
+        </ToastContext.Provider>
+    );
 };
 const useToast = () => useContext(ToastContext);
 
@@ -142,8 +176,9 @@ const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) 
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create', disablePhone = true }) => {
     const role = localStorage.getItem("role");
     const siteId = decode(localStorage.getItem("SiteId"));
-    const initialFormState = { leadCreatedById: decode(localStorage.getItem('EmployeeId')), leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '', leadCountryId: '', leadZipCode: '', leadStatusId: '', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: role === "AGENT" ? siteId : "", leadNotes: '', leadAltPhone: '91', leadUnitId: '', leadDescription: '', FollowDate: '', SiteVisitDate: '' };
+    const initialFormState = { leadCreatedById: decode(localStorage.getItem('EmployeeId')), leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '6896eea2b3754c741311d802', leadCountryId: '694238e0489c3202fab8f279', leadZipCode: '', leadStatusId: '6942789ad9b6dfa5907e0a13',leadStatusName:'New', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: role === "AGENT" ? siteId : "", leadNotes: '', leadAltPhone: '91', leadUnitId: '', leadDescription: '', FollowDate: '', SiteVisitDate: '' };
     const [formData, setFormData] = useState(initialFormState);
+    console.log(formData,"formData")
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [], unit: [] });
     const [docRows, setDocRows] = useState([{ documentId: "", file: null }]);
@@ -168,6 +203,8 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         if (open) {
             fetchData("Country/getAllCountry", "country");
             fetchData("LeadStatus/getAllLeadStatus", "status");
+            fetchData("State/getAllStates", "state");
+            fetchData("City/getAllCitys", "city");
             fetchData("LeadSource/getAllLeadSource", "source");
             fetchData("Document/getAllDocument", "document");
             fetchData("Site/getAllSites", "site");
@@ -180,10 +217,13 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                     leadStateId: initialData.leadStateId?._id || '',
                     leadCityId: initialData.leadCityId?._id || '',
                     leadStatusId: initialData.leadStatusId?._id || '',
+                    leadStatusName: initialData.leadStatusId?.leadStatustName || '',
                     leadSourceId: initialData.leadSourceId?._id || '',
                     leadAssignedId: initialData.leadAssignedId?._id || '',
                     leadSiteId: initialData.leadSiteId?._id || '',
                     leadUnitId: initialData.leadUnitId?._id || '',
+                    SiteVisitDate: initialData.SiteVisitDate ? initialData.SiteVisitDate.split('T')[0] : '',
+                    FollowDate: initialData.FollowDate ? initialData.FollowDate.split('T')[0] : '',
                     leadTags: Array.isArray(initialData.leadTags) ? initialData.leadTags.join(', ') : ''
                 });
 
@@ -233,9 +273,16 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
             }));
             return;
         }
+        if(name === "leadStatusId"){
+            const selectedStatus = lookups.status.find(s => s._id === value);
+            setFormData(prev => ({
+                ...prev, leadStatusId: value, leadStatusName: selectedStatus ? selectedStatus.leadStatustName : ''
+            }));
+            return;
+        }
 
         setFormData(prev => ({ ...prev, [name]: value }));
-        if (name === 'leadCountryId') fetch(config.Api + "State/getAllStates", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ CountryID: value }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, state: data, city: [] })));
+        if (name === 'leadCountryId') fetch(config.Api + "State/getAllStates", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ CountryID: value || formData.leadCountryId }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, state: data, city: [] })));
         if (name === 'leadStateId') fetch(config.Api + "City/getAllCitys", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ StateID: value }) }).then(r => r.json()).then(data => setLookups(p => ({ ...p, city: data })));
     };
 
@@ -288,13 +335,49 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
 
     const handleSubmit = async (e) => {
         e.preventDefault(); setIsSubmitting(true);
+        if(!formData.leadFirstName){
+            setActiveFormTab("contact");
+            toast({ title: "Error", description: "Please enter first name", variant: "destructive" });
+            setIsSubmitting(false);
+            return;
+        }else if(!formData.leadEmail || !/\S+@\S+\.\S+/.test(formData.leadEmail)){
+            setActiveFormTab("contact");
+            toast({ title: "Error", description: "Please enter valid email", variant: "destructive" });
+            setIsSubmitting(false);
+            return; 
+        }else if(!formData.leadPhone || formData.leadPhone.length < 12){
+            setActiveFormTab("contact");
+            toast({ title: "Error", description: "Please enter valid phone number(91 + 10 digits)", variant: "destructive" });
+            setIsSubmitting(false);
+            return;
+        }else if (!formData.leadStatusId){
+            toast({ title: "Error", description: "Please select lead status", variant: "destructive" });
+            setActiveFormTab("deal");
+            setIsSubmitting(false);
+            return;
+        }else if (!formData.leadSourceId){
+            toast({ title: "Error", description: "Please select lead source", variant: "destructive" });
+            setActiveFormTab("deal");
+            setIsSubmitting(false);
+            return;
+        }else if(formData.leadStatusName === "Follow Up" && !formData.FollowDate){
+            setActiveFormTab("deal");
+            toast({ title: "Error", description: "Please select follow up date", variant: "destructive" });
+            setIsSubmitting(false);
+            return;
+        }else if(formData.leadStatusName === "Site Visit" && !formData.SiteVisitDate){
+            setActiveFormTab("deal");
+            toast({ title: "Error", description: "Please select site visit date", variant: "destructive" });
+            setIsSubmitting(false);
+            return;
+        }
         const endpoint = mode === 'edit' ? 'Lead/updateLead' : 'Lead/createLead';
 
         // Use FormData for integrated creation and update
         const payload = new FormData();
         Object.keys(formData).forEach(key => payload.append(key, formData[key] || ''));
         if (mode === 'edit') payload.append('leadId', initialData._id);
-        if (user?.id) payload.append('employeeId', user.id);
+        if (user?.EmployeeName) payload.append('employeeName', user.EmployeeName);
 
         // Filter for documents that are ALREADY on the server (they have an existingUrl)
         const retainedDocs = docRows
@@ -318,7 +401,10 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         try {
             const res = await fetch(config.Api + endpoint, { method: 'POST', body: payload });
             const result = await res.json();
-            if (result.success) { onOpenChange(false); onSuccess(); }
+            if (result.success) { onOpenChange(false); onSuccess();
+
+                toast({ title: mode === 'edit' ? "Lead Updated Successfully" : "Lead Created Successfully", variant: "success" });
+             }
             else { toast({ title: "Error", description: result.message, variant: "destructive" }); }
         } catch (e) { toast({ title: "Error", variant: "destructive" }); }
         finally { setIsSubmitting(false); }
@@ -381,13 +467,13 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                         <div><Label>Status</Label><select name="leadStatusId" value={formData.leadStatusId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.status.map(s => <option key={s._id} value={s._id}>{s.leadStatustName || s.name}</option>)}</select></div>
                         {
                             selectedStatus?.leadStatustName?.toLowerCase() === 'follow up' &&
-                            <div><Label>Follow Date</Label><Input type='Date' name="FollowDate" value={formData.FollowDate} onChange={handleChange} disabled={isViewMode} /></div>
+                            <div><Label>Follow Date *</Label><Input className="text-white" style={{ colorScheme: 'dark' }} type='Date' name="FollowDate" value={formData.FollowDate} onChange={handleChange} disabled={isViewMode} /></div>
 
                         }
 
                         {
                             selectedStatus?.leadStatustName?.toLowerCase() === 'site visit' &&
-                            <div><Label>Site Visit</Label><Input type='Date' name="SiteVisitDate" value={formData.SiteVisitDate} onChange={handleChange} disabled={isViewMode} /></div>
+                            <div><Label>Site Visit Date *</Label><Input className="text-white" style={{ colorScheme: 'dark' }} type='Date' name="SiteVisitDate" value={formData.SiteVisitDate} onChange={handleChange} disabled={isViewMode} /></div>
                         }
 
                         <div><Label>Source</Label><select name="leadSourceId" value={formData.leadSourceId} onChange={handleChange} disabled={isViewMode} className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"><option value="">Select</option>{lookups.source.map(s => <option key={s._id} value={s._id}>{s.leadSourceName || s.name}</option>)}</select></div>
@@ -546,6 +632,7 @@ function LeadsContent() {
     const [callNumber, setCallNumber] = useState('');
     const [activeTab, setActiveTab] = useState('all');
     const [selectedLead, setSelectedLead] = useState(null);
+    console.log(selectedLead,"selectedLead")
     const [dialogMode, setDialogMode] = useState('create');
     const [assignDialogOpen, setAssignDialogOpen] = useState(false);
     const [leadToAssign, setLeadToAssign] = useState(null);
@@ -574,7 +661,20 @@ function LeadsContent() {
         }
         return () => { if (piopiyRef.current) { piopiyRef.current.logout(); piopiyRef.current = null; } };
     }, []);
+    const filterSearch = (e) => {
+        if (!e) {            fetchLeads();
+            return;
+        }
+       const FilteredLeads= getFilteredLeads().filter(l => {
+            const fullName = `${l.leadFirstName} ${l.leadLastName}`.toLowerCase();
+            const phone = l.leadPhone || '';
+            const email = l.leadEmail || '';
+            const status = (l.leadStatusId?.leadStatustName || '').toLowerCase();
+            const assignedTo = l.leadAssignedId ? l.leadAssignedId.EmployeeName.toLowerCase() : '';
 
+            return fullName.includes(e.toLowerCase()) || phone.includes(e) || email.includes(e.toLowerCase()) || status.includes(e.toLowerCase()) || assignedTo.includes(e.toLowerCase());});
+        setLeads(FilteredLeads);
+    }
     const fetchLeads = async (search = '') => {
         setLoading(true);
         try {
@@ -592,7 +692,7 @@ function LeadsContent() {
     }, []);
 
     const handleSaveNote = async () => {
-        const res = await fetch(config.Api + "Lead/addLeadNote", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ leadId: notesLead._id, details: noteText, employeeId: user?.id }) });
+        const res = await fetch(config.Api + "Lead/addLeadNote", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ leadId: notesLead._id, details: noteText, employeeName: user?.EmployeeName }) });
         if ((await res.json()).success) { fetchLeads(); setNotesDialogOpen(false); setNoteText(''); }
     };
 
@@ -793,15 +893,20 @@ function LeadsContent() {
             <Card className='md:block hidden'>
                 <CardContent className="p-6">
                     <div className="flex gap-4 mb-6">
-                        <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" /><Input placeholder="Search leads by name, email or phone..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white" /></div>
+                        <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" /><Input placeholder="Search leads by name, email or phone..." value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value);filterSearch(e.target.value)}} className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white" /></div>
                         <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Filter className="w-4 h-4 mr-2" />Filter</Button>
                     </div>
                     <div className="overflow-x-auto"><table className="w-full text-left">
-                        <thead><tr className="border-b border-slate-700 text-white"><th className="py-3 px-4">Name</th><th className="py-3 px-4">Site</th><th className="py-3 px-4">Phone</th><th className="py-3 px-4">Status</th><th className="py-3 px-4">Assigned To</th>
-                            {
+                        <thead><tr className="border-b border-slate-700 text-white"><th className="py-3 px-4">Name</th>
+                         {
                                 role !== "AGENT" &&
+                                <th className="py-3 px-4">Site</th>}
+                        
+                        <th className="py-3 px-4">Phone</th><th className="py-3 px-4">Status</th><th className="py-3 px-4">Assigned To</th>
+                            {/* {
+                                role !== "AGENT" && */}
                                 <th className="py-3 px-4">Actions</th>
-                            }
+                            {/* } */}
                         </tr></thead>
                         <tbody>{getFilteredLeads().map(l => (
                             <tr key={l._id} className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors group">
@@ -817,7 +922,7 @@ function LeadsContent() {
                                 <td className="py-3 px-4 text-slate-300">{l.leadAssignedId?.EmployeeName || 'Unassigned'}</td>
                                 <td className="py-3 px-4 flex gap-2">
                                     <Button variant="icon" size="icon" onClick={() => { setLeadToAssign({ id: l._id, name: l.leadFirstName, original: l }); setAssignDialogOpen(true); }} className="text-green-400"><UserPlus className="w-4 h-4" /></Button>
-                                    <Button variant="icon" size="icon" onClick={() => handleViewClick(l)} className="text-blue-400"><Eye className="w-4 h-4" /></Button>
+                                    <Button variant="icon" size="icon" onClick={() => handleViewClick(l)} className="text-blue-600"><Eye className="w-5 h-5" /></Button>
                                     {Permissions.isEdit && <Button variant="icon" size="icon" onClick={() => { setSelectedLead(l); setDialogMode('edit'); setDialogOpen(true); }} className="text-yellow-400"><Pencil className="w-4 h-4" /></Button>}
                                 </td>
                             </tr>
