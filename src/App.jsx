@@ -37,6 +37,7 @@ import { DataProvider } from '@/contexts/DataContext';
 import MenuRegistry from '@/pages/MenuRegistry';
 import LeadSource from '@/pages/LeadSource';
 import LeadStatus from '@/pages/LeadStatus'
+import VisitorVerient from '@/pages/VisitorVerient';
 
 function PrivateRoute({ children }) {
    const token = localStorage.getItem('token');
@@ -89,6 +90,7 @@ function App() {
             <Route path="/masters/leadstatus" element={<LeadStatus />} />
             <Route path="/masters/leadsource" element={<LeadSource />} />
             <Route path="/masters/companies" element={<Companies />} />
+            <Route path="/masters/visitorverient" element={<VisitorVerient />} />
 
             
           </Route>

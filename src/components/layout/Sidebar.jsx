@@ -109,7 +109,8 @@ const navItems = [
       { icon: Flag, label: 'Country', path: '/masters/Country' },
       { icon: TrendingUp, label: 'Lead Status', path: '/masters/leadstatus' },
       { icon: SquareCode, label: 'Lead Source', path: '/masters/leadsource' },
-      { icon: Building2, label: 'Company Details', path: '/masters/companies' }
+      { icon: Building2, label: 'Company Details', path: '/masters/companies' },
+      { icon: Landmark, label: 'Visitor Verient', path: '/masters/visitorverient' }
 
 
     ]
