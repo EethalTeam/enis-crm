@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useReducer, useCallback, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2, 
-  X, RefreshCw, AlertTriangle, ToggleLeft, ToggleRight, MapPin 
+import {
+  Plus, Search, Filter, Download, Upload, Loader2, Eye, Pencil, Trash2,
+  X, RefreshCw, AlertTriangle, ToggleLeft, ToggleRight, MapPin
 } from 'lucide-react';
 
 import { config } from '@/components/CustomComponents/config.js';
@@ -25,7 +25,7 @@ const commonReducer = (state, action) => {
     case 'boolean':
       return { ...state, [action.name]: action.value };
     case 'reset':
-        return initialState;
+      return initialState;
     default:
       return state;
   }
@@ -60,13 +60,12 @@ const ToastProvider = ({ children }) => {
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
-                t.variant === 'destructive' 
-                  ? 'bg-red-900/90 border-red-800 text-white' 
+              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === 'destructive'
+                  ? 'bg-red-900/90 border-red-800 text-white'
                   : t.variant === 'success'
-                  ? 'bg-green-900/90 border-green-800 text-white'
-                  : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
-              }`}
+                    ? 'bg-green-900/90 border-green-800 text-white'
+                    : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
+                }`}
             >
               <div>
                 {t.title && <h4 className="font-semibold text-sm">{t.title}</h4>}
@@ -113,9 +112,9 @@ const Button = ({ className, variant = "default", size = "default", onClick, dis
     icon: "h-9 w-9",
     sm: "h-8 rounded-md px-3 text-xs"
   };
-  
+
   return (
-    <button 
+    <button
       type={type}
       className={`${baseStyles} ${variants[variant] || variants.default} ${sizes[size] || sizes.default} ${className}`}
       onClick={onClick}
@@ -142,31 +141,31 @@ const Label = ({ children, htmlFor }) => (
 
 // --- GLASS SELECT (ADDED FOR SITE SELECTION) ---
 const GlassSelect = ({ label, value, onChange, options = [], placeholder, disabled, displayKey, valueKey, onFocus }) => (
-    <div className="space-y-2">
-      {label && <Label>{label} {label && <span className="text-red-500">*</span>}</Label>}
-      <div className="relative">
-        <select
-            value={value} 
-            disabled={disabled}
-            onFocus={onFocus}
-            onChange={(e) => {
-                const selectedObj = options.find(item => String(item[valueKey]) === e.target.value || String(item[displayKey]) === e.target.value);
-                onChange(selectedObj); 
-            }}
-            className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-md p-2 h-10 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 appearance-none"
-        >
-            <option value="" className="bg-slate-900 text-gray-400">{placeholder || "Select..."}</option>
-            {options.map((item, idx) => (
-                <option key={idx} value={item[valueKey] || item[displayKey]} className="bg-slate-900 text-slate-100">
-                    {item[displayKey]}
-                </option>
-            ))}
-        </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
-            <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-        </div>
+  <div className="space-y-2">
+    {label && <Label>{label} {label && <span className="text-red-500">*</span>}</Label>}
+    <div className="relative">
+      <select
+        value={value}
+        disabled={disabled}
+        onFocus={onFocus}
+        onChange={(e) => {
+          const selectedObj = options.find(item => String(item[valueKey]) === e.target.value || String(item[displayKey]) === e.target.value);
+          onChange(selectedObj);
+        }}
+        className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-md p-2 h-10 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 appearance-none"
+      >
+        <option value="" className="bg-slate-900 text-gray-400">{placeholder || "Select..."}</option>
+        {options.map((item, idx) => (
+          <option key={idx} value={item[valueKey] || item[displayKey]} className="bg-slate-900 text-slate-100">
+            {item[displayKey]}
+          </option>
+        ))}
+      </select>
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+        <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
       </div>
     </div>
+  </div>
 );
 
 // --- MODAL / DIALOG COMPONENTS ---
@@ -175,7 +174,7 @@ const Dialog = ({ open, onOpenChange, children }) => (
   <AnimatePresence>
     {open && (
       <div className="fixed inset-0 z-50 flex items-center justify-center">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onClick={() => onOpenChange(false)} className="fixed inset-0 bg-black/80 backdrop-blur-sm"
         />
@@ -186,7 +185,7 @@ const Dialog = ({ open, onOpenChange, children }) => (
 );
 
 const DialogContent = ({ className, children, title, onClose }) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }}
     className={`relative z-50 w-full bg-slate-950 border border-slate-800 rounded-lg shadow-lg flex flex-col ${className}`}
     onClick={(e) => e.stopPropagation()}
@@ -203,7 +202,7 @@ const DialogContent = ({ className, children, title, onClose }) => (
 
 const ConfirmDialog = ({ open, title, description, onConfirm, onCancel, loading }) => (
   <Dialog open={open} onOpenChange={onCancel}>
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
       className="relative z-50 w-full max-w-md bg-slate-950 border border-slate-800 rounded-lg shadow-lg p-6"
     >
@@ -230,7 +229,7 @@ const ConfirmDialog = ({ open, title, description, onConfirm, onCancel, loading 
 
 function UnitsContent() {
   const { toast } = useToast();
-  
+
   // --- STATES ---
   const [unitList, setUnitList] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -238,20 +237,20 @@ function UnitsContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // New: Site List State
   const [siteList, setSiteList] = useState([]);
 
   // Confirmation State
   const [confirmState, setConfirmState] = useState({ open: false, title: '', description: '', action: null });
-  
+
   // Form & Data State
   const [state, dispatch] = useReducer(commonReducer, initialState);
   const [isEdit, setIsEdit] = useState(false);
   const [viewData, setViewData] = useState({});
   const { getPermissionsByPath, user } = useAuth();
-          const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false });
-  
+  const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false });
+
 
   // --- API FUNCTIONS ---
 
@@ -261,30 +260,30 @@ function UnitsContent() {
   }, []);
 
 
-     // --- API FUNCTIONS ---
-          useEffect(() => {
-              getPermissionsByPath(window.location.pathname).then(res => {
-                  if (res) {
-                      setPermissions(res)
-                  } else {
-                      navigate('/dashboard')
-                  }
-              })
-      
-          }, [])
-      
-          useEffect(() => {
-              if (Permissions.isView) {
-                  getUnit()
-              }
-          }, [Permissions])
+  // --- API FUNCTIONS ---
+  useEffect(() => {
+    getPermissionsByPath(window.location.pathname).then(res => {
+      if (res) {
+        setPermissions(res)
+      } else {
+        navigate('/dashboard')
+      }
+    })
+
+  }, [])
+
+  useEffect(() => {
+    if (Permissions.isView) {
+      getUnit()
+    }
+  }, [Permissions])
 
 
 
   const getSites = async () => {
     try {
       // Endpoint as requested
-      let url = config.Api + "Site/getAllSites"; 
+      let url = config.Api + "Site/getAllSites";
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -312,8 +311,8 @@ function UnitsContent() {
 
       if (!response.ok) throw new Error('Failed to get Units');
       const result = await response.json();
-      
-      const data = result.data || result; 
+
+      const data = result.data || result;
       setUnitList(data);
       setFilteredData(data);
     } catch (error) {
@@ -372,18 +371,18 @@ function UnitsContent() {
 
   const storeDispatch = (e, name, fieldType) => {
     if (fieldType === "text") {
-        dispatch({ type: 'text', name, value: e });
+      dispatch({ type: 'text', name, value: e });
     }
     else if (fieldType === "boolean") {
-        dispatch({ type: 'boolean', name, value: e });
+      dispatch({ type: 'boolean', name, value: e });
     }
     else if (fieldType === "select") {
-        if (name === "siteId") {
-            // Save ID for backend
-            dispatch({ type: 'text', name: 'siteId', value: e._id });
-            // Save Name for display
-            dispatch({ type: 'text', name: 'sitename', value: e.sitename });
-        }
+      if (name === "siteId") {
+        // Save ID for backend
+        dispatch({ type: 'text', name: 'siteId', value: e._id });
+        // Save Name for display
+        dispatch({ type: 'text', name: 'sitename', value: e.sitename });
+      }
     }
   };
 
@@ -396,9 +395,9 @@ function UnitsContent() {
     setIsEdit(true);
     dispatch({ type: 'text', name: '_id', value: row._id || '' });
     // Populate Site
-    if(row.siteId) {
-        dispatch({ type: 'text', name: "siteId", value: row.siteId._id || row.siteId });
-        dispatch({ type: 'text', name: "sitename", value: row.siteId.sitename || '' });
+    if (row.siteId) {
+      dispatch({ type: 'text', name: "siteId", value: row.siteId._id || row.siteId });
+      dispatch({ type: 'text', name: "sitename", value: row.siteId.sitename || '' });
     }
     dispatch({ type: 'text', name: "UnitName", value: row.UnitName || '' });
     dispatch({ type: 'text', name: "UnitCode", value: row.UnitCode || '' });
@@ -418,8 +417,8 @@ function UnitsContent() {
 
   const Validate = () => {
     if (!state.siteId) {
-        toast({ title: 'Error', description: 'Please select a Site', variant: 'destructive' });
-        return;
+      toast({ title: 'Error', description: 'Please select a Site', variant: 'destructive' });
+      return;
     }
     if (!state.UnitName) {
       toast({ title: 'Error', description: 'Please enter Unit Name', variant: 'destructive' });
@@ -471,7 +470,7 @@ function UnitsContent() {
         UnitName: state.UnitName,
         UnitCode: state.UnitCode
       };
-      
+
       const saveData = {
         siteId: state.siteId,
         UnitName: state.UnitName,
@@ -519,26 +518,39 @@ function UnitsContent() {
 
   return (
     <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
-      
+
       {/* HEADER */}
-      <div className="flex md:flex-row flex-col items-start md:justify-between space-y-5">
-        <h1 className="text-3xl font-bold text-white">Units</h1>
-        <div className="grid md:grid-cols-1 grid-cols-1 items-start gap-3">
-          {/* <Button variant="outline" onClick={handleImport} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
-            <Upload className="w-4 h-4 mr-2" /> Import
-          </Button>
-          <Button variant="outline" onClick={handleExport} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20">
-            <Download className="w-4 h-4 mr-2" /> Export
-          </Button> */}
-          {
-            Permissions.isAdd && 
-             <Button onClick={() => { clear(); setDialogOpen(true); }} className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold border-0">
-            <Plus className="w-4 h-4 mr-2" /> Add Unit
-          </Button>
-          }
-         
-        </div>
-      </div>
+   <div className="flex flex-col md:flex-row items-start space-y-3 md:items-center md:justify-between">
+  
+  {/* ===== PAGE TITLE ===== */}
+  <h1 className="text-2xl md:text-3xl font-bold text-white">
+    Units
+  </h1>
+
+  {/* ===== ACTION BUTTON ===== */}
+  {Permissions.isAdd && (
+    <Button
+      onClick={() => {
+        clear();
+        setDialogOpen(true);
+      }}
+      className="
+         md:w-auto
+        flex items-center justify-center
+        bg-gradient-to-r from-fuchsia-600 to-pink-600
+        text-white
+        font-semibold
+        shadow-md
+        hover:opacity-90
+      "
+    >
+      <Plus className="w-4 h-4 mr-2" />
+      Add Unit
+    </Button>
+  )}
+</div>
+
+
 
       {/* TABLE CARD */}
       <Card>
@@ -555,12 +567,12 @@ function UnitsContent() {
               />
             </div>
             <Button variant="outline" onClick={() => getUnit()} className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20" title="Refresh">
-               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
           </div>
 
           {/* DATA TABLE */}
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto hidden md:block">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-700">
@@ -572,9 +584,9 @@ function UnitsContent() {
               </thead>
               <tbody>
                 {loading && filteredData.length === 0 ? (
-                  <tr><td colSpan="5" className="text-center py-8 text-fuchsia-400"><Loader2 className="animate-spin inline mr-2"/> Loading...</td></tr>
+                  <tr><td colSpan="5" className="text-center py-8 text-fuchsia-400"><Loader2 className="animate-spin inline mr-2" /> Loading...</td></tr>
                 ) : filteredData.length === 0 ? (
-                   <tr><td colSpan="5" className="text-center py-8 text-slate-400">No units found.</td></tr>
+                  <tr><td colSpan="5" className="text-center py-8 text-slate-400">No units found.</td></tr>
                 ) : (
                   filteredData.map((row, index) => (
                     <motion.tr
@@ -589,13 +601,13 @@ function UnitsContent() {
                       <td className="py-3 px-4 flex items-center gap-2">
                         <Button variant="icon" size="icon" onClick={() => handleViewClick(row)} title="View"><Eye className="w-4 h-4 text-blue-400" /></Button>
                         {
-                          Permissions.isEdit && 
-                        <Button variant="icon" size="icon" onClick={() => handleEditClick(row)} title="Edit"><Pencil className="w-4 h-4 text-yellow-400" /></Button>
+                          Permissions.isEdit &&
+                          <Button variant="icon" size="icon" onClick={() => handleEditClick(row)} title="Edit"><Pencil className="w-4 h-4 text-yellow-400" /></Button>
 
                         }
                         {
-                          Permissions.isDelete && 
-                        <Button variant="icon" size="icon" onClick={() => triggerDeleteConfirm(row)} title="Delete"><Trash2 className="w-4 h-4 text-red-400" /></Button>
+                          Permissions.isDelete &&
+                          <Button variant="icon" size="icon" onClick={() => triggerDeleteConfirm(row)} title="Delete"><Trash2 className="w-4 h-4 text-red-400" /></Button>
 
                         }
                       </td>
@@ -605,64 +617,149 @@ function UnitsContent() {
               </tbody>
             </table>
           </div>
+
+          {/* ================= MOBILE CARD VIEW ================= */}
+        <div className="space-y-6 md:hidden">
+  {loading && filteredData.length === 0 ? (
+    <div className="text-center py-8 text-fuchsia-400">
+      <Loader2 className="animate-spin inline mr-2" />
+      Loading...
+    </div>
+  ) : filteredData.length === 0 ? (
+    <div className="text-center py-8 text-slate-400">
+      No units found.
+    </div>
+  ) : (
+    filteredData.map((row, index) => (
+      <motion.div
+        key={row._id || index}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.04 }}
+        className="
+          rounded-xl
+          border border-slate-700
+          
+          p-4
+          shadow-md
+        "
+      >
+        {/* ===== TOP ROW ===== */}
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-[10px] uppercase tracking-wider text-slate-400">
+              City
+            </div>
+
+            <div className="text-base font-semibold text-white">
+              {row.cityName || row.UnitName}
+            </div>
+
+            <div className="text-sm text-slate-400">
+              {row.stateId?.stateName || row.siteId?.sitename || "-"}
+            </div>
+          </div>
+
+          {/* ID BADGE */}
+          <span className="text-xs px-2 py-0.5 rounded-full bg-fuchsia-600/20 text-fuchsia-400">
+            {row.cityCode || row.UnitCode}
+          </span>
+        </div>
+
+        {/* ===== ACTIONS ===== */}
+        <div className="flex items-center gap-4 mt-3">
+          <button
+            onClick={() => handleViewClick(row)}
+            title="View"
+            className="text-blue-400 hover:text-blue-300 transition"
+          >
+            <Eye className="w-4 h-4" />
+          </button>
+
+          {Permissions.isEdit && (
+            <button
+              onClick={() => handleEditClick(row)}
+              title="Edit"
+              className="text-yellow-400 hover:text-yellow-300 transition"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+          )}
+
+          {Permissions.isDelete && (
+            <button
+              onClick={() => triggerDeleteConfirm(row)}
+              title="Delete"
+              className="text-red-400 hover:text-red-300 transition"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </motion.div>
+    ))
+  )}
+</div>
+
+
         </CardContent>
       </Card>
 
       {/* --- ADD/EDIT DIALOG --- */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-[600px]" title={isEdit ? "Edit Unit" : "Add New Unit"} onClose={() => setDialogOpen(false)}>
-           <div className="p-6 space-y-4">
-              
-              {/* SITE SELECTION */}
-              <div className="space-y-2">
-                <GlassSelect 
-                    label="Site" 
-                    value={state.siteId} 
-                    displayKey="sitename" 
-                    valueKey="_id" 
-                    options={siteList} 
-                    onChange={(e) => storeDispatch(e, 'siteId', 'select')} 
-                    placeholder="Select Site"
-                />
-              </div>
+          <div className="p-6 space-y-4">
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <div>
-                    <Label>Unit Code <span className="text-red-500">*</span></Label>
-                    <Input value={state.UnitCode} onChange={(e) => storeDispatch(e.target.value, "UnitCode", "text")} />
-                 </div>
-                 <div>
-                    <Label>Unit Name <span className="text-red-500">*</span></Label>
-                    <Input value={state.UnitName} onChange={(e) => storeDispatch(e.target.value, "UnitName", "text")} />
-                 </div>
-              </div>
+            {/* SITE SELECTION */}
+            <div className="space-y-2">
+              <GlassSelect
+                label="Site"
+                value={state.siteId}
+                displayKey="sitename"
+                valueKey="_id"
+                options={siteList}
+                onChange={(e) => storeDispatch(e, 'siteId', 'select')}
+                placeholder="Select Site"
+              />
+            </div>
 
-              <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-800">
-                 <Button variant="ghost" onClick={() => setDialogOpen(false)}>Cancel</Button>
-                 <Button onClick={Validate} disabled={loading}>
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : (isEdit ? 'Update' : 'Save')}
-                 </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Unit Code <span className="text-red-500">*</span></Label>
+                <Input value={state.UnitCode} onChange={(e) => storeDispatch(e.target.value, "UnitCode", "text")} />
               </div>
-           </div>
+              <div>
+                <Label>Unit Name <span className="text-red-500">*</span></Label>
+                <Input value={state.UnitName} onChange={(e) => storeDispatch(e.target.value, "UnitName", "text")} />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-800">
+              <Button variant="ghost" onClick={() => setDialogOpen(false)}>Cancel</Button>
+              <Button onClick={Validate} disabled={loading}>
+                {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : (isEdit ? 'Update' : 'Save')}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* --- VIEW DIALOG --- */}
       <Dialog open={viewOpen} onOpenChange={setViewOpen}>
         <DialogContent className="sm:max-w-[400px]" title="Unit Details" onClose={() => setViewOpen(false)}>
-            <div className="p-6 space-y-3">
-               {Object.entries(viewData).map(([key, val]) => (
-                  <div key={key} className="flex justify-between border-b border-slate-800 pb-2 last:border-0">
-                      <span className="text-slate-400 font-medium text-sm">{key}</span>
-                      <span className="text-white font-bold text-sm text-right">{val}</span>
-                  </div>
-               ))}
-            </div>
+          <div className="p-6 space-y-3">
+            {Object.entries(viewData).map(([key, val]) => (
+              <div key={key} className="flex justify-between border-b border-slate-800 pb-2 last:border-0">
+                <span className="text-slate-400 font-medium text-sm">{key}</span>
+                <span className="text-white font-bold text-sm text-right">{val}</span>
+              </div>
+            ))}
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* --- CONFIRM DIALOG --- */}
-      <ConfirmDialog 
+      <ConfirmDialog
         open={confirmState.open}
         title={confirmState.title}
         description={confirmState.description}
