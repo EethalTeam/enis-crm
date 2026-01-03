@@ -1913,7 +1913,7 @@ function LeadsContent() {
               className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20 hidden md:block"
             >
               <Filter className="w-4 h-4 mr-2" />
-              Filter
+            
             </Button>
           </div>
           <div className="overflow-x-auto hidden md:block">
