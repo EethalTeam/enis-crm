@@ -1222,4 +1222,11 @@ function LeadsContent() {
 }
 
 export default function Leads() { return (<ToastProvider><LeadsContent /></ToastProvider>); }
-export { LeadDialog };
+function LeadDialogWrapper({ open, onOpenChange, onSuccess, initialData, mode = 'create', disablePhone = true }) {
+  return (
+    <ToastProvider>
+      <LeadDialog open={open} onOpenChange={onOpenChange} onSuccess={onSuccess} initialData={initialData} mode={mode} disablePhone={disablePhone} />
+    </ToastProvider>
+  );
+}
+export { LeadDialogWrapper };

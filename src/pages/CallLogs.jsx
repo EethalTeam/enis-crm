@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, createContext, useContext } from 'r
 import { motion, AnimatePresence, color } from 'framer-motion';
 import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, Filter, User, Phone, Clock, Hourglass, Download, PhoneCall, ArrowUpFromLine, Search } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
-import { LeadDialog } from "@/pages/Leads";
+import { LeadDialogWrapper } from "@/pages/Leads";
 import PIOPIY from 'piopiyjs';
 import * as XLSX from "xlsx";
 
@@ -489,7 +489,7 @@ function CallLogsContent() {
                 )}
             </div>
 
-            <LeadDialog open={leadDialogOpen} onOpenChange={setLeadDialogOpen} mode="create" initialData={leadInitialData} onSuccess={() => { toast({ title: "Lead Created", variant: "success" }); setLeadDialogOpen(false); }} />
+            <LeadDialogWrapper open={leadDialogOpen} onOpenChange={setLeadDialogOpen} mode="create" initialData={leadInitialData} onSuccess={() => { toast({ title: "Lead Created", variant: "success" }); setLeadDialogOpen(false); }} />
         </div>
     );
 }

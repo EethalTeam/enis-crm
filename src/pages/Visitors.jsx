@@ -24,7 +24,20 @@ import Reducer from '@/components/Reducer/commonReducer.js';
 import Loading from '@/components/CustomComponents/Loading';
 import { useAuth } from '@/contexts/AuthContext';
 
-// --- Initial State ---
+
+
+export default function VisitorMain() {
+  // --- Initial State ---
+  const { user } = useAuth();
+  const decode = (value) => {
+    if (!value) return "";
+    try {
+        return atob(value);
+    } catch (err) {
+        console.error("Decode failed:", err);
+        return "";
+    }
+};
 const initialState = {
   _id: '',
   visitorCode:'',
@@ -53,22 +66,20 @@ const initialState = {
   statusName:'',
   followUpId:'',
   followUpDate:'',
-  followedUpById:'',
-  followedUpByName:'',
+  followedUpById:user.role === 'AGENT' ? decode(localStorage.getItem("EmployeeId")) : '',
+  followedUpByName:user.role === 'AGENT' ? decode(localStorage.getItem("EmployeeName")) : '',
   followUpStatus:'',
   followUpDescription:'',
   notes:'',
   remarks:''
 };
-
-export default function VisitorMain() {
   const { toast } = useToast();
   
   // --- State Declarations ---
   const [showentry, setShowEntry] = useState(false);
   const [loading, setLoading] = useState(false);
   const [state, dispatch] = useReducer(Reducer, initialState);
-  const { user } = useAuth();
+
   
   const [Visitor, setVisitor] = useState([]);
   const [PlotDetails, setPlotDetails] = useState([]);
