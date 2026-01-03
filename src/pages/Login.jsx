@@ -1,24 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
-import { motion } from 'framer-motion';
-import { LogIn, Mail, Lock, Sparkles, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
+import { motion } from "framer-motion";
+import { LogIn, Mail, Lock, Sparkles, Loader2 } from "lucide-react";
+import logo from "../Assets/Images/LOGO-final.png";
 
 // Shadcn UI Components
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from "@/components/ui/use-toast";
 
 // Context
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
   // const [email, setEmail] = useState('');
   // const [password, setPassword] = useState('');
   // const [rememberMe, setRememberMe] = useState(false);
-  
+
   // const navigate = useNavigate();
   // const { login, isLoading } = useAuth();
   // const { toast } = useToast();
@@ -45,7 +46,7 @@ export default function Login() {
 
   // const handleSubmit = async (e) => {
   //   e.preventDefault();
-    
+
   //   if (!email || !password) {
   //     toast({
   //       title: "Error",
@@ -58,13 +59,13 @@ export default function Login() {
   //   try {
   //     // 1. Call the API
   //     const successMessage = await login(email, password, rememberMe);
-      
+
   //     // 2. Show Success Message
   //     toast({
   //       title: "Login Successful",
   //       description: successMessage || "Welcome back!",
   //     });
-      
+
   //     // 3. Navigate (Only happens if login doesn't throw error)
   //     navigate('/dashboard');
 
@@ -78,19 +79,18 @@ export default function Login() {
   //   }
   // };
 
-   const [EmployeeCode, setEmployeeCode] = useState('');
-  const [password, setPassword] = useState('');
+  const [EmployeeCode, setEmployeeCode] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
   const navigate = useNavigate();
   const { login, isLoading } = useAuth();
   const { toast } = useToast();
-  
 
   useEffect(() => {
-    const savedCode = localStorage.getItem('EmployeeCode_saved');
-    const savedPassword = localStorage.getItem('password_saved');
-    const isRemembered = localStorage.getItem('rememberMe') === 'true';
+    const savedCode = localStorage.getItem("EmployeeCode_saved");
+    const savedPassword = localStorage.getItem("password_saved");
+    const isRemembered = localStorage.getItem("rememberMe") === "true";
 
     if (isRemembered && savedCode && savedPassword) {
       try {
@@ -98,13 +98,11 @@ export default function Login() {
         setPassword(atob(savedPassword));
         setRememberMe(true);
       } catch (error) {
-        localStorage.removeItem('EmployeeCode_saved');
-        localStorage.removeItem('password_saved');
+        localStorage.removeItem("EmployeeCode_saved");
+        localStorage.removeItem("password_saved");
       }
     }
   }, []);
-
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -126,8 +124,7 @@ export default function Login() {
         description: successMessage || "Welcome back!",
       });
 
-      navigate('/dashboard');
-
+      navigate("/dashboard");
     } catch (error) {
       toast({
         title: "Login Failed",
@@ -140,8 +137,13 @@ export default function Login() {
   return (
     <>
       <Helmet>
-        <title>Login - ENIS CRM</title>
-        <meta name="description" content="Login to access your ENIS CRM dashboard." />
+        {/* <title>Login - ENIS CRM</title> */}
+        <title>Login - ARVAT</title>
+
+        <meta
+          name="description"
+          content="Login to access your ENIS CRM dashboard."
+        />
       </Helmet>
       <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#1b0a2c] via-[#2a133b] to-[#3a1b4a] p-4 overflow-hidden">
         <motion.div
@@ -153,19 +155,26 @@ export default function Login() {
           {/* Background Glow Blobs */}
           <div className="absolute -top-16 -left-16 w-72 h-72 bg-fuchsia-500 rounded-full mix-blend-soft-light filter blur-2xl opacity-40 animate-blob"></div>
           <div className="absolute -bottom-16 -right-16 w-72 h-72 bg-pink-500 rounded-full mix-blend-soft-light filter blur-2xl opacity-40 animate-blob animation-delay-4000"></div>
-          
+
           <div className="glass-card rounded-2xl shadow-2xl p-8 space-y-6 z-10 relative">
             <div className="text-center space-y-2">
               <div className="flex justify-center items-center gap-2 mb-4">
-                <Sparkles className="w-10 h-10 text-fuchsia-400 text-glow" />
-                <h1 className="text-4xl font-bold text-white text-glow tracking-tight">ENIS CRM</h1>
+                {/* <Sparkles className="w-10 h-10 text-fuchsia-400 text-glow" />
+                <h1 className="text-4xl font-bold text-white text-glow tracking-tight">ENIS CRM</h1> */}
+                <div className="w-20 h-10  rounded-lg flex items-center justify-center">
+                  {/* <Sparkles className="w-6 h-6 text-white" /> */}
+                  <img src={logo} />
+                </div>
+                {/* <h1 className="text-4xl font-bold text-white text-glow tracking-tight">ARAVAT</h1> */}
               </div>
               <p className="text-white">Unlock your business potential</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">User Name</Label>
+                <Label htmlFor="email" className="text-white">
+                  User Name
+                </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-5 w-5 text-fuchsia-400" />
                   <Input
@@ -181,7 +190,9 @@ export default function Login() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-white">Password</Label>
+                <Label htmlFor="password" className="text-white">
+                  Password
+                </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-5 w-5 text-fuchsia-400" />
                   <Input
@@ -212,10 +223,13 @@ export default function Login() {
                 </Label>
               </div>
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold" 
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold"
                   size="lg"
                   disabled={isLoading}
                 >
@@ -226,7 +240,7 @@ export default function Login() {
                     </>
                   ) : (
                     <>
-                      <LogIn className="mr-2 h-5 w-5"/>
+                      <LogIn className="mr-2 h-5 w-5" />
                       Secure Sign In
                     </>
                   )}
