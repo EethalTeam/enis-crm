@@ -19,12 +19,6 @@ const decode = (value) => {
 import { useNavigate } from "react-router-dom";
 //for Export 
 import * as XLSX from "xlsx";
-// TeleCMI Credentials
-const CREDENTIALS = {
-    userId: '5002_33336945',
-    password: 'User@123',
-    sbcUrl: 'sbcind.telecmi.com'
-};
 
 const statusColors = {
     'New': 'bg-blue-600 text-white', 'Contacted': 'bg-indigo-600 text-white', 'Qualified': 'bg-purple-600 text-white',
@@ -81,6 +75,8 @@ const ToastProvider = ({ children }) => {
                             className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
                                 t.variant === 'destructive' 
                                     ? 'bg-red-900/90 border-red-800 text-white' 
+                                    : t.variant === 'success'
+                                    ? 'bg-green-900/90 border-green-800 text-white'
                                     : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
                             }`}
                         >
@@ -98,7 +94,7 @@ const ToastProvider = ({ children }) => {
         </ToastContext.Provider>
     );
 };
-const useToast = () => useContext(ToastContext);
+export const useToast = () => useContext(ToastContext);
 
 // --- ASSIGN DIALOG ---
 const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
@@ -133,44 +129,6 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
         </Dialog>
     );
 };
-
-// --- CALL DIALOG ---
-const CallDialog = ({ open, onOpenChange, number, piopiyInstance, isLoggedIn }) => {
-    const [callStatus, setCallStatus] = useState('Idle');
-    useEffect(() => {
-        if (!piopiyInstance) return;
-        piopiyInstance.on('trying', () => setCallStatus('Calling...'));
-        piopiyInstance.on('ringing', () => setCallStatus('Ringing...'));
-        piopiyInstance.on('answered', () => setCallStatus('Connected'));
-        piopiyInstance.on('ended', () => setCallStatus('Idle'));
-    }, [piopiyInstance]);
-    const handleAction = () => {
-        if (callStatus === 'Idle') {
-            const cleanNumber = number.replace(/\D/g, '');
-            if (piopiyInstance) piopiyInstance.call(cleanNumber);
-        } else { if (piopiyInstance) piopiyInstance.terminate(); }
-    };
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[350px]">
-                <DialogHeader><div className="flex justify-between items-center w-full"><DialogTitle>Call Lead</DialogTitle><button onClick={() => onOpenChange(false)} className="text-slate-400 hover:text-white"><X size={20} /></button></div></DialogHeader>
-                <div className="p-6 text-center">
-                    <p className="text-slate-400 mb-4">Phone Number</p>
-                    <h2 className="text-2xl font-bold text-white mb-6">{number}</h2>
-                    <Button className={`w-full ${callStatus === 'Idle' ? 'bg-green-600' : 'bg-red-600'}`} onClick={handleAction} disabled={!isLoggedIn}>
-                        {callStatus === 'Idle' ? <><Phone className="mr-2 w-4 h-4" /> Call Now</> : <><PhoneOff className="mr-2 w-4 h-4" /> End Call</>}
-                        {(callStatus === 'Calling...' || callStatus === 'Ringing...') && <Loader2 className="ml-2 w-4 h-4 animate-spin" />}
-                    </Button>
-                </div>
-            </DialogContent>
-        </Dialog>
-    );
-};
-
-
-
-
-
 
 // --- LEAD DIALOG COMPONENT ---
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create', disablePhone = true }) => {
@@ -291,7 +249,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
     };
 
     // const handleFileChange = (index, file) => {
-    //     const updated = [...docRows]; updated[index].file = file; setDocRows(updated);
+    //      const updated = [...docRows]; updated[index].file = file; setDocRows(updated);
     // };
 
     const handleFileChange = (index, e) => {
@@ -348,6 +306,21 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         }else if(!formData.leadPhone || formData.leadPhone.length < 12){
             setActiveFormTab("contact");
             toast({ title: "Error", description: "Please enter valid phone number(91 + 10 digits)", variant: "destructive" });
+            setIsSubmitting(false);
+            return;
+        }else if (!formData.leadCountryId){
+            toast({ title: "Error", description: "Please select country", variant: "destructive" });
+            setActiveFormTab("contact");
+            setIsSubmitting(false);
+            return;
+        }else if (!formData.leadStateId){
+            toast({ title: "Error", description: "Please select state", variant: "destructive" });
+            setActiveFormTab("contact");
+            setIsSubmitting(false);
+            return;
+        }else if (!formData.leadCityId){
+            toast({ title: "Error", description: "Please select city", variant: "destructive" });
+            setActiveFormTab("contact");
             setIsSubmitting(false);
             return;
         }else if (!formData.leadStatusId){
@@ -515,7 +488,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                                                     {!isViewMode && (
                                                         <input
                                                             type="file"
-                                                            //   accept=".jpg,.jpeg,.png,.pdf"
+                                                            //    accept=".jpg,.jpeg,.png,.pdf"
                                                             className="flex-1 text-sm text-slate-300"
                                                             onChange={(e) => handleFileChange(index, e)}
                                                         />
@@ -523,7 +496,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
 
                                                     {/* Preview Logic for New File OR Existing File */}
                                                     {(row.file || row.existingUrl) && (
-                                                        <Button type="button" variant="outline" size="sm" className="h-8 w-8 p-0 border-fuchsia-500 text-fuchsia-500 hover:bg-fuchsia-500/10"
+                                                        <Button type="button" name="preview" variant="outline" size="sm" className="h-12 w-12 p-0 border-fuchsia-500 text-fuchsia-500 hover:bg-fuchsia-500/10"
                                                             onClick={() => {
                                                                 let url;
                                                                 if (row.file) {
@@ -542,7 +515,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
                                                                 }
                                                             }}
                                                         >
-                                                            <Eye size={14} />
+                                                            <Eye size={20} />
                                                         </Button>
                                                     )}
                                                 </div>
@@ -628,8 +601,6 @@ function LeadsContent() {
     const [loading, setLoading] = useState(true);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [callDialogOpen, setCallDialogOpen] = useState(false);
-    const [callNumber, setCallNumber] = useState('');
     const [activeTab, setActiveTab] = useState('all');
     const [selectedLead, setSelectedLead] = useState(null);
     console.log(selectedLead,"selectedLead")
@@ -639,10 +610,21 @@ function LeadsContent() {
     const [notesDialogOpen, setNotesDialogOpen] = useState(false);
     const [notesLead, setNotesLead] = useState(null);
     const [noteText, setNoteText] = useState('');
-    const piopiyRef = useRef(null);
     const [viewOpen, setViewOpen] = useState(false);
     const [viewData, setViewData] = useState({});
-    const [isDialerLoggedIn, setIsDialerLoggedIn] = useState(false);
+    
+    // --- DIALER STATE ---
+    const piopiyRef = useRef(null);
+    const isMountedRef = useRef(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const TelecmiID = decode(localStorage.getItem("TelecmiID"));
+    const TelecmiPassword = decode(localStorage.getItem("TelecmiPassword"));
+
+    const [callStatus, setCallStatus] = useState('Idle');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [isMuted, setIsMuted] = useState(false);
+    const [isOnHold, setIsOnHold] = useState(false);
+
     const { toast } = useToast();
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
@@ -650,17 +632,109 @@ function LeadsContent() {
     const { getPermissionsByPath, user } = useAuth();
     const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false });
 
+    // --- DIALER LOGIC ---
+    const resetCallState = () => {
+        setCallStatus('Idle');
+        setPhoneNumber('');
+        setIsMuted(false);
+        setIsOnHold(false);
+    };
+
     useEffect(() => {
-        if (!piopiyRef.current) {
-            piopiyRef.current = new PIOPIY({ name: 'Eethal CRM Agent', debug: true, autoplay: true, ringTime: 60 });
+        isMountedRef.current = true;
+        if (!piopiyRef.current && TelecmiID && TelecmiPassword) {
+            piopiyRef.current = new PIOPIY({
+                name: 'Eethal CRM Agent',
+                debug: false,
+                autoplay: true,
+                ringTime: 60
+            });
+
             const sdk = piopiyRef.current;
-            sdk.on('login', () => setIsDialerLoggedIn(true));
-            sdk.on('loginFailed', (res) => { if (res && (res.code == 200 || res.msg === "User loged in successfully")) setIsDialerLoggedIn(true); });
-            sdk.on('error', (err) => console.error('❌ SDK Error:', err));
-            setTimeout(() => { if (piopiyRef.current && !isDialerLoggedIn) piopiyRef.current.login(CREDENTIALS.userId, CREDENTIALS.password, CREDENTIALS.sbcUrl); }, 800);
+            sdk.on('login', () => setIsLoggedIn(true));
+            sdk.on('loginFailed', (res) => {
+                if (res && (res.code == 200 || res.msg === "User loged in successfully")) {
+                    setIsLoggedIn(true);
+                } else {
+                    setIsLoggedIn(false);
+                }
+            });
+
+            sdk.on('trying', () => setCallStatus('Calling...'));
+            sdk.on('ringing', () => setCallStatus('Ringing...'));
+            sdk.on('answered', () => setCallStatus('Connected'));
+            sdk.on('ended', () => resetCallState());
+            sdk.on('cancel', () => resetCallState());
+
+            setTimeout(async () => {
+                if (isMountedRef.current && piopiyRef.current && !isLoggedIn) {
+                    try {
+                        piopiyRef.current.login(TelecmiID, TelecmiPassword, 'sbcind.telecmi.com');
+                    } catch (err) {
+                        console.error("SDK Login Error:", err);
+                    }
+                }
+            }, 800);
         }
-        return () => { if (piopiyRef.current) { piopiyRef.current.logout(); piopiyRef.current = null; } };
+
+        const performFreshLogin = async () => {
+            if (piopiyRef.current && isMountedRef.current && !isLoggedIn) {
+                try {
+                    await piopiyRef.current.logout();
+                    setTimeout(() => {
+                        if (isMountedRef.current) {
+                            piopiyRef.current.login(TelecmiID, TelecmiPassword, 'sbcind.telecmi.com');
+                        }
+                    }, 500);
+                } catch (err) { console.error(err); }
+            }
+        };
+
+        if (!isLoggedIn) performFreshLogin();
+
+        return () => {
+            isMountedRef.current = false;
+            if (piopiyRef.current) {
+                piopiyRef.current.logout();
+                piopiyRef.current = null;
+            }
+        };
     }, []);
+
+    const handleInitiateCall = (rawNumber) => {
+        if (!isLoggedIn) return toast({ title: "Connecting", description: "Dialer is not ready.", variant: "destructive" });
+        const numStr = String(rawNumber || "");
+        if (!numStr || numStr === "undefined") return toast({ title: "Error", description: "No phone number found", variant: "destructive" });
+
+        let cleanNumber = numStr.replace(/\D/g, '');
+        if (!cleanNumber.startsWith('91')) cleanNumber = '91' + cleanNumber;
+
+        setPhoneNumber(cleanNumber);
+        toast({ title: "Calling...", description: `Dialing ${cleanNumber}`, variant: "success" });
+        if (piopiyRef.current) {
+            try {
+                piopiyRef.current.call(cleanNumber);
+            } catch (err) { console.error(err); }
+        }
+    };
+
+    const handleHangup = () => {
+        if (piopiyRef.current) piopiyRef.current.terminate();
+        resetCallState();
+    };
+
+    const toggleMute = () => {
+        if (!piopiyRef.current) return;
+        isMuted ? piopiyRef.current.unMute() : piopiyRef.current.mute();
+        setIsMuted(!isMuted);
+    };
+
+    const toggleHold = () => {
+        if (!piopiyRef.current) return;
+        isOnHold ? piopiyRef.current.unHold() : piopiyRef.current.hold();
+        setIsOnHold(!isOnHold);
+    };
+
     const filterSearch = (e) => {
         if (!e) {            fetchLeads();
             return;
@@ -823,12 +897,38 @@ function LeadsContent() {
 
     const handleImportClick = () => { fileInputRef.current.click(); };
 
-
+    const popupStyles = {
+        modal: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
+        card: { background: 'white', padding: '30px', borderRadius: '15px', textAlign: 'center', width: '320px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' },
+        status: { color: '#2563EB', fontWeight: 'bold', marginBottom: '10px' },
+        num: { fontSize: '22px', fontWeight: 'bold', color: '#333', marginBottom: '20px' },
+        btnGroup: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' },
+        btn: { background: '#f0f0f0', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', color: 'black' },
+        btnEnd: { background: '#EF4444', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', width: '100%', fontWeight: 'bold' }
+    };
 
 
     return (
 
         <div className="space-y-6 bg-slate-950 min-h-screen p-4 mt-3 text-slate-100">
+
+            {/* OUTGOING CALL POPUP */}
+            {callStatus !== 'Idle' && (
+                <div style={popupStyles.modal}>
+                    <div style={popupStyles.card}>
+                        <div style={popupStyles.status}>{callStatus}</div>
+                        <div style={popupStyles.num}>{phoneNumber}</div>
+                        {callStatus === 'Connected' && (
+                            <div style={popupStyles.btnGroup}>
+                                <button onClick={toggleMute} style={popupStyles.btn}>{isMuted ? '🔇 Unmute' : '🎤 Mute'}</button>
+                                <button onClick={toggleHold} style={popupStyles.btn}>{isOnHold ? '▶ Resume' : '⏸ Hold'}</button>
+                            </div>
+                        )}
+                        <button onClick={handleHangup} style={popupStyles.btnEnd}>End Call</button>
+                    </div>
+                </div>
+            )}
+
             <div className="sticky top-0 z-30 bg-slate-950 pb-4 space-y-10">
                 <div className="flex md:flex-row flex-col items-start md:justify-between gap-3 sticky ">
                     <h1 className="text-3xl font-bold text-white">Leads</h1>
@@ -898,7 +998,7 @@ function LeadsContent() {
                     </div>
                     <div className="overflow-x-auto"><table className="w-full text-left">
                         <thead><tr className="border-b border-slate-700 text-white"><th className="py-3 px-4">Name</th>
-                         {
+                          {
                                 role !== "AGENT" &&
                                 <th className="py-3 px-4">Site</th>}
                         
@@ -917,7 +1017,7 @@ function LeadsContent() {
                                     <td className="py-3 px-4 text-slate-300">{l.leadSiteId?.sitename || 'N/A'}</td>
 
                                 }
-                                <td className="py-3 px-4 text-slate-300 flex gap-2"><button onClick={() => { setCallNumber(l.leadPhone); setCallDialogOpen(true); }}><Phone size={18} className=' hover:text-fuchsia-400' /></button>{l.leadPhone}</td>
+                                <td className="py-3 px-4 text-slate-300 flex gap-2"><button onClick={() => handleInitiateCall(l.leadPhone)}><Phone size={18} className=' hover:text-fuchsia-400' /></button>{l.leadPhone}</td>
                                 <td className="py-3 px-4"><Badge className={statusColors[l.leadStatusId?.leadStatusColor] || 'bg-slate-700'}>{l.leadStatusId?.leadStatustName || 'New'}</Badge></td>
                                 <td className="py-3 px-4 text-slate-300">{l.leadAssignedId?.EmployeeName || 'Unassigned'}</td>
                                 <td className="py-3 px-4 flex gap-2">
@@ -970,10 +1070,7 @@ function LeadsContent() {
                                     {/* PHONE */}
                                     <div className="flex items-center gap-2 text-slate-300">
                                         <button
-                                            onClick={() => {
-                                                setCallNumber(l.leadPhone);
-                                                setCallDialogOpen(true);
-                                            }}
+                                            onClick={() => handleInitiateCall(l.leadPhone)}
                                         >
                                             <Phone size={18} className="hover:text-fuchsia-400" />
                                         </button>
@@ -1072,7 +1169,6 @@ function LeadsContent() {
 
             <LeadDialog open={dialogOpen} onOpenChange={setDialogOpen} onSuccess={fetchLeads} initialData={selectedLead} mode={dialogMode} />
             <AssignDialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen} lead={leadToAssign} onSuccess={fetchLeads} />
-            <CallDialog open={callDialogOpen} onOpenChange={setCallDialogOpen} number={callNumber} piopiyInstance={piopiyRef.current} isLoggedIn={isDialerLoggedIn} />
             <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}><DialogContent className="sm:max-w-[450px]"><DialogHeader><DialogTitle>Add Note</DialogTitle></DialogHeader><div className="p-6"><Label>Notes</Label><textarea className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white" value={noteText} onChange={(e) => setNoteText(e.target.value)} /></div><DialogFooter><Button onClick={handleSaveNote}>Save</Button></DialogFooter></DialogContent></Dialog>
         </div>
     );

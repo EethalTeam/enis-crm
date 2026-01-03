@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, color } from 'framer-motion';
 import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Play, Loader2, Pause, X, UserPlus, Filter, User, Phone, Clock, Hourglass, Download, PhoneCall, ArrowUpFromLine, Search } from 'lucide-react';
 import { config } from '@/components/CustomComponents/config.js';
 import { LeadDialog } from "@/pages/Leads";
@@ -312,7 +312,7 @@ function CallLogsContent() {
         status: { color: '#2563EB', fontWeight: 'bold', marginBottom: '10px' },
         num: { fontSize: '22px', fontWeight: 'bold', color: '#333', marginBottom: '20px' },
         btnGroup: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' },
-        btn: { background: '#f0f0f0', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer' },
+        btn: { background: '#f0f0f0', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', color: 'black' },
         btnEnd: { background: '#EF4444', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', width: '100%', fontWeight: 'bold' }
     };
 
