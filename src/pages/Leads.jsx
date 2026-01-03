@@ -72,13 +72,12 @@ const ToastProvider = ({ children }) => {
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
-                            className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
-                                t.variant === 'destructive' 
-                                    ? 'bg-red-900/90 border-red-800 text-white' 
-                                    : t.variant === 'success'
+                            className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === 'destructive'
+                                ? 'bg-red-900/90 border-red-800 text-white'
+                                : t.variant === 'success'
                                     ? 'bg-green-900/90 border-green-800 text-white'
                                     : 'bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm'
-                            }`}
+                                }`}
                         >
                             <div>
                                 {t.title && <h4 className="font-semibold text-sm">{t.title}</h4>}
@@ -134,9 +133,9 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
 const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create', disablePhone = true }) => {
     const role = localStorage.getItem("role");
     const siteId = decode(localStorage.getItem("SiteId"));
-    const initialFormState = { leadCreatedById: decode(localStorage.getItem('EmployeeId')), leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '6896eea2b3754c741311d802', leadCountryId: '694238e0489c3202fab8f279', leadZipCode: '', leadStatusId: '6942789ad9b6dfa5907e0a13',leadStatusName:'New', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: role === "AGENT" ? siteId : "", leadNotes: '', leadAltPhone: '91', leadUnitId: '', leadDescription: '', FollowDate: '', SiteVisitDate: '' };
+    const initialFormState = { leadCreatedById: decode(localStorage.getItem('EmployeeId')), leadFirstName: '', leadLastName: '', leadEmail: '', leadPhone: '91', leadJobTitle: '', leadLinkedIn: '', leadAddress: '', leadCityId: '', leadStateId: '6896eea2b3754c741311d802', leadCountryId: '694238e0489c3202fab8f279', leadZipCode: '', leadStatusId: '6942789ad9b6dfa5907e0a13', leadStatusName: 'New', leadSourceId: '', leadPotentialValue: 0, leadScore: '', leadTags: '', leadSiteId: role === "AGENT" ? siteId : "", leadNotes: '', leadAltPhone: '91', leadUnitId: '', leadDescription: '', FollowDate: '', SiteVisitDate: '' };
     const [formData, setFormData] = useState(initialFormState);
-    console.log(formData,"formData")
+    console.log(formData, "formData")
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lookups, setLookups] = useState({ status: [], source: [], country: [], state: [], city: [], document: [], site: [], unit: [] });
     const [docRows, setDocRows] = useState([{ documentId: "", file: null }]);
@@ -231,7 +230,7 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
             }));
             return;
         }
-        if(name === "leadStatusId"){
+        if (name === "leadStatusId") {
             const selectedStatus = lookups.status.find(s => s._id === value);
             setFormData(prev => ({
                 ...prev, leadStatusId: value, leadStatusName: selectedStatus ? selectedStatus.leadStatustName : ''
@@ -293,52 +292,52 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
 
     const handleSubmit = async (e) => {
         e.preventDefault(); setIsSubmitting(true);
-        if(!formData.leadFirstName){
+        if (!formData.leadFirstName) {
             setActiveFormTab("contact");
             toast({ title: "Error", description: "Please enter first name", variant: "destructive" });
             setIsSubmitting(false);
             return;
-        }else if(!formData.leadEmail || !/\S+@\S+\.\S+/.test(formData.leadEmail)){
+        } else if (!formData.leadEmail || !/\S+@\S+\.\S+/.test(formData.leadEmail)) {
             setActiveFormTab("contact");
             toast({ title: "Error", description: "Please enter valid email", variant: "destructive" });
             setIsSubmitting(false);
-            return; 
-        }else if(!formData.leadPhone || formData.leadPhone.length < 12){
+            return;
+        } else if (!formData.leadPhone || formData.leadPhone.length < 12) {
             setActiveFormTab("contact");
             toast({ title: "Error", description: "Please enter valid phone number(91 + 10 digits)", variant: "destructive" });
             setIsSubmitting(false);
             return;
-        }else if (!formData.leadCountryId){
+        } else if (!formData.leadCountryId) {
             toast({ title: "Error", description: "Please select country", variant: "destructive" });
             setActiveFormTab("contact");
             setIsSubmitting(false);
             return;
-        }else if (!formData.leadStateId){
+        } else if (!formData.leadStateId) {
             toast({ title: "Error", description: "Please select state", variant: "destructive" });
             setActiveFormTab("contact");
             setIsSubmitting(false);
             return;
-        }else if (!formData.leadCityId){
+        } else if (!formData.leadCityId) {
             toast({ title: "Error", description: "Please select city", variant: "destructive" });
             setActiveFormTab("contact");
             setIsSubmitting(false);
             return;
-        }else if (!formData.leadStatusId){
+        } else if (!formData.leadStatusId) {
             toast({ title: "Error", description: "Please select lead status", variant: "destructive" });
             setActiveFormTab("deal");
             setIsSubmitting(false);
             return;
-        }else if (!formData.leadSourceId){
+        } else if (!formData.leadSourceId) {
             toast({ title: "Error", description: "Please select lead source", variant: "destructive" });
             setActiveFormTab("deal");
             setIsSubmitting(false);
             return;
-        }else if(formData.leadStatusName === "Follow Up" && !formData.FollowDate){
+        } else if (formData.leadStatusName === "Follow Up" && !formData.FollowDate) {
             setActiveFormTab("deal");
             toast({ title: "Error", description: "Please select follow up date", variant: "destructive" });
             setIsSubmitting(false);
             return;
-        }else if(formData.leadStatusName === "Site Visit" && !formData.SiteVisitDate){
+        } else if (formData.leadStatusName === "Site Visit" && !formData.SiteVisitDate) {
             setActiveFormTab("deal");
             toast({ title: "Error", description: "Please select site visit date", variant: "destructive" });
             setIsSubmitting(false);
@@ -374,10 +373,11 @@ const LeadDialog = ({ open, onOpenChange, onSuccess, initialData, mode = 'create
         try {
             const res = await fetch(config.Api + endpoint, { method: 'POST', body: payload });
             const result = await res.json();
-            if (result.success) { onOpenChange(false); onSuccess();
+            if (result.success) {
+                onOpenChange(false); onSuccess();
 
                 toast({ title: mode === 'edit' ? "Lead Updated Successfully" : "Lead Created Successfully", variant: "success" });
-             }
+            }
             else { toast({ title: "Error", description: result.message, variant: "destructive" }); }
         } catch (e) { toast({ title: "Error", variant: "destructive" }); }
         finally { setIsSubmitting(false); }
@@ -603,7 +603,7 @@ function LeadsContent() {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('all');
     const [selectedLead, setSelectedLead] = useState(null);
-    console.log(selectedLead,"selectedLead")
+    console.log(selectedLead, "selectedLead")
     const [dialogMode, setDialogMode] = useState('create');
     const [assignDialogOpen, setAssignDialogOpen] = useState(false);
     const [leadToAssign, setLeadToAssign] = useState(null);
@@ -612,7 +612,7 @@ function LeadsContent() {
     const [noteText, setNoteText] = useState('');
     const [viewOpen, setViewOpen] = useState(false);
     const [viewData, setViewData] = useState({});
-    
+
     // --- DIALER STATE ---
     const piopiyRef = useRef(null);
     const isMountedRef = useRef(true);
@@ -736,17 +736,19 @@ function LeadsContent() {
     };
 
     const filterSearch = (e) => {
-        if (!e) {            fetchLeads();
+        if (!e) {
+            fetchLeads();
             return;
         }
-       const FilteredLeads= getFilteredLeads().filter(l => {
+        const FilteredLeads = getFilteredLeads().filter(l => {
             const fullName = `${l.leadFirstName} ${l.leadLastName}`.toLowerCase();
             const phone = l.leadPhone || '';
             const email = l.leadEmail || '';
             const status = (l.leadStatusId?.leadStatustName || '').toLowerCase();
             const assignedTo = l.leadAssignedId ? l.leadAssignedId.EmployeeName.toLowerCase() : '';
 
-            return fullName.includes(e.toLowerCase()) || phone.includes(e) || email.includes(e.toLowerCase()) || status.includes(e.toLowerCase()) || assignedTo.includes(e.toLowerCase());});
+            return fullName.includes(e.toLowerCase()) || phone.includes(e) || email.includes(e.toLowerCase()) || status.includes(e.toLowerCase()) || assignedTo.includes(e.toLowerCase());
+        });
         setLeads(FilteredLeads);
     }
     const fetchLeads = async (search = '') => {
@@ -990,22 +992,22 @@ function LeadsContent() {
 
 
 
-            <Card className='md:block hidden'>
+            <Card>
                 <CardContent className="p-6">
                     <div className="flex gap-4 mb-6">
-                        <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" /><Input placeholder="Search leads by name, email or phone..." value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value);filterSearch(e.target.value)}} className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white" /></div>
-                        <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"><Filter className="w-4 h-4 mr-2" />Filter</Button>
+                        <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-400" /><Input placeholder="Search leads by name, email or phone..." value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); filterSearch(e.target.value) }} className="pl-10 bg-purple-900/50 border-fuchsia-700 text-white" /></div>
+                        <Button variant="outline" className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20 hidden md:block"><Filter className="w-4 h-4 mr-2" />Filter</Button>
                     </div>
-                    <div className="overflow-x-auto"><table className="w-full text-left">
+                    <div className="overflow-x-auto hidden md:block"><table className="w-full text-left">
                         <thead><tr className="border-b border-slate-700 text-white"><th className="py-3 px-4">Name</th>
-                          {
+                            {
                                 role !== "AGENT" &&
                                 <th className="py-3 px-4">Site</th>}
-                        
-                        <th className="py-3 px-4">Phone</th><th className="py-3 px-4">Status</th><th className="py-3 px-4">Assigned To</th>
+
+                            <th className="py-3 px-4">Phone</th><th className="py-3 px-4">Status</th><th className="py-3 px-4">Assigned To</th>
                             {/* {
                                 role !== "AGENT" && */}
-                                <th className="py-3 px-4">Actions</th>
+                            <th className="py-3 px-4">Actions</th>
                             {/* } */}
                         </tr></thead>
                         <tbody>{getFilteredLeads().map(l => (
@@ -1028,104 +1030,149 @@ function LeadsContent() {
                             </tr>
                         ))}</tbody>
                     </table></div>
-                </CardContent>
-            </Card>
 
-
-            {/* mobile view card for leads */}
-            <Card className='md:hidden block'>
-                <CardContent className="p-6">
                     {/* MOBILE VIEW */}
-                    <div className="md:hidden space-y-4">
-                        {getFilteredLeads().map((l) => (
-                            <Card key={l._id} className="bg-purple-900/40 border border-fuchsia-700">
-                                <CardContent className="p-4 space-y-3">
+{/* MOBILE VIEW */}
+{/* MOBILE VIEW */}
+<div className="p-4 space-y-5 md:hidden">
+  {getFilteredLeads().map((l) => (
+    <div
+      key={l._id}
+      className="
+        rounded-xl
+        border border-slate-700
+        bg-slate-900
+        shadow-md
+        p-5
+        space-y-4
+      "
+    >
+      {/* ================= HEADER ================= */}
+      <div className="flex items-start justify-between">
+        {/* Lead Name */}
+        <div
+          className="text-white text-lg font-semibold leading-tight cursor-pointer"
+          onClick={() => {
+            setNotesLead(l);
+            setNoteText('');
+            setNotesDialogOpen(true);
+          }}
+        >
+          {l.leadFirstName} {l.leadLastName}
+        </div>
 
-                                    {/* NAME + STATUS */}
-                                    <div className="flex justify-between items-center">
-                                        <h3
-                                            className="font-semibold text-fuchsia-400 underline-offset-4 hover:underline cursor-pointer"
-                                            onClick={() => {
-                                                setNotesLead(l);
-                                                setNoteText('');
-                                                setNotesDialogOpen(true);
-                                            }}
-                                        >
-                                            {l.leadFirstName} {l.leadLastName}
-                                        </h3>
+        {/* Status Pill */}
+       
+      </div>
+       <Badge
+          className={`
+            px-3 py-1 text-xs rounded-full
+            ${statusColors[l.leadStatusId?.leadStatusColor] || "bg-slate-600"}
+          `}
+        >
+          {l.leadStatusId?.leadStatustName || "New"}
+        </Badge>
 
-                                        <Badge
-                                            className={statusColors[l.leadStatusId?.name] || 'bg-slate-700'}
-                                        >
-                                            {l.leadStatusId?.leadStatustName || 'New'}
-                                        </Badge>
-                                    </div>
+      {/* ================= DETAILS (LIKE PLOTS) ================= */}
+      <div className="space-y-3 text-sm">
+        {/* Site */}
+        {role !== "AGENT" && (
+          <div>
+            <div className="text-slate-400">Site</div>
+            <div className="text-slate-200 font-medium">
+              {l.leadSiteId?.sitename || "N/A"}
+            </div>
+          </div>
+        )}
 
-                                    {/* SITE */}
-                                    <div className="text-sm text-slate-300">
-                                        <span className="text-slate-400">Site:</span>{' '}
-                                        {l.leadSiteId?.sitename || 'N/A'}
-                                    </div>
+        {/* Phone */}
+        <div>
+          <div className="text-slate-400">Phone</div>
+          <div className="text-slate-200 font-medium tracking-wide">
+            {l.leadPhone}
+          </div>
+        </div>
 
-                                    {/* PHONE */}
-                                    <div className="flex items-center gap-2 text-slate-300">
-                                        <button
-                                            onClick={() => handleInitiateCall(l.leadPhone)}
-                                        >
-                                            <Phone size={18} className="hover:text-fuchsia-400" />
-                                        </button>
-                                        {l.leadPhone}
-                                    </div>
+        {/* Assigned */}
+        <div>
+          <div className="text-slate-400">Assigned</div>
+          <div className="text-slate-200 font-medium">
+            {l.leadAssignedId?.EmployeeName || "Unassigned"}
+          </div>
+        </div>
+      </div>
 
-                                    {/* ASSIGNED */}
-                                    <div className="text-sm text-slate-300">
-                                        <span className="text-slate-400">Assigned:</span>{' '}
-                                        {l.leadAssignedId?.EmployeeName || 'Unassigned'}
-                                    </div>
+      {/* ================= ACTIONS (BOTTOM ICONS) ================= */}
+      <div className="flex justify-between items-center pt-4 border-t border-slate-700">
+        {/* Call */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-green-500 hover:bg-green-500/10"
+          onClick={() => {
+            setCallNumber(l.leadPhone);
+            setCallDialogOpen(true);
+          }}
+        >
+          <Phone className="w-5 h-5" />
+        </Button>
 
-                                    {/* ACTIONS */}
-                                    <div className="flex gap-3 pt-2">
-                                        <Button
-                                            variant="icon"
-                                            size="icon"
-                                            onClick={() => {
-                                                setLeadToAssign({
-                                                    id: l._id,
-                                                    name: l.leadFirstName,
-                                                    original: l,
-                                                });
-                                                setAssignDialogOpen(true);
-                                            }}
-                                            className="text-green-400"
-                                        >
-                                            <UserPlus className="w-4 h-4" />
-                                        </Button>
+        {/* View */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-blue-500 hover:bg-blue-500/10"
+          onClick={() => handleViewClick(l)}
+        >
+          <Eye className="w-5 h-5" />
+        </Button>
 
-                                        <Button variant="icon" size="icon" onClick={() => handleViewClick(l)} className="text-blue-400"><Eye className="w-4 h-4" /></Button>
+        {/* Assign */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-fuchsia-500 hover:bg-fuchsia-500/10"
+          onClick={() => {
+            setLeadToAssign({
+              id: l._id,
+              name: l.leadFirstName,
+              original: l
+            });
+            setAssignDialogOpen(true);
+          }}
+        >
+          <UserPlus className="w-5 h-5" />
+        </Button>
+
+        {/* Edit */}
+        {Permissions.isEdit && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-yellow-500 hover:bg-yellow-500/10"
+            onClick={() => {
+              setSelectedLead(l);
+              setDialogMode("edit");
+              setDialogOpen(true);
+            }}
+          >
+            <Pencil className="w-5 h-5" />
+          </Button>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
 
 
-                                        {Permissions.isEdit && (
-                                            <Button
-                                                variant="icon"
-                                                size="icon"
-                                                onClick={() => {
-                                                    setSelectedLead(l);
-                                                    setDialogMode('edit');
-                                                    setDialogOpen(true);
-                                                }}
-                                                className="text-yellow-400"
-                                            >
-                                                <Pencil className="w-4 h-4" />
-                                            </Button>
-                                        )}
-                                    </div>
 
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
+
+
                 </CardContent>
             </Card>
+
+
+
 
 
             {/* View icon popup */}
