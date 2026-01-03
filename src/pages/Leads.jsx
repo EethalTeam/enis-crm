@@ -2098,8 +2098,7 @@ function LeadsContent() {
                     size="icon"
                     className="text-green-500 hover:bg-green-500/10"
                     onClick={() => {
-                      setCallNumber(l.leadPhone);
-                      setCallDialogOpen(true);
+                     handleInitiateCall(l.leadPhone);
                     }}
                   >
                     <Phone className="w-5 h-5" />
