@@ -2,6 +2,7 @@ import React, { useState,useRef } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import Footer from './Footer'
 import ScrollToTop from '../../components/ui/scrolltotop';
 import FloatingCallButton from '../../components/ui/FloatingCallButton'
 
@@ -28,6 +29,8 @@ export default function MainLayout() {
           {/* MOBILE SCROLL TO TOP */}
           <ScrollToTop containerRef={scrollRef} />
         </main>
+        <Footer/>
+        
       </div>
     </div>
   );

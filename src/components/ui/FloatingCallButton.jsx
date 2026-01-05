@@ -9,15 +9,20 @@ export default function FloatingCallButton() {
       onClick={() => navigate("dialer")}
       title="Go to Dialer"
       className="
-        fixed bottom-6 right-6 z-[999]
-        w-14 h-14
+        fixed
+        bottom-20
+        right-2
+        
+ z-[999] 
+        md:w-14 md:h-14
+        w-11 h-11
         rounded-full
         bg-gradient-to-r from-emerald-500 to-green-600
         text-white
         shadow-xl
          items-center justify-center
         hover:scale-110
-        transition-transform   hidden md:flex 
+        transition-transform  flex 
       "
     >
       <Phone className="w-6 h-6" />

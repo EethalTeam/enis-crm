@@ -30,7 +30,7 @@ export default function ScrollToTop({ containerRef }) {
     <button
       onClick={scrollToTop}
       className="
-        fixed bottom-4 right-4 z-50
+        fixed bottom-10 right-2 z-50
         w-10 h-10 rounded-full
         flex items-center justify-center
         

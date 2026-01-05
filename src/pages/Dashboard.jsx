@@ -279,21 +279,58 @@ export default function Dashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Calls This Week</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={callDays}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#4a235a" /> {/* Darker grid */}
-                  <XAxis dataKey="day" stroke="#a78bfa" />
-                  <YAxis stroke="#a78bfa" />
-                  <Tooltip cursor={{ fill: 'rgba(255,255,255,0.1)' }} contentStyle={{ backgroundColor: '#2a133b', border: 'none', borderRadius: '8px' }} />
-                  <Bar dataKey="calls" fill="#f472b6" /> {/* Pink bar */}
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+  <CardHeader className="pb-2">
+    <CardTitle className="text-base md:text-lg">
+      Calls This Week
+    </CardTitle>
+  </CardHeader>
+
+  <CardContent className="px-2 md:px-6">
+    {/* Mobile height: 220px | Desktop height: 300px */}
+    <div className="w-full h-[220px] md:h-[300px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={callDays}
+          margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
+        >
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="#4a235a"
+          />
+
+          <XAxis
+            dataKey="day"
+            stroke="#a78bfa"
+            tick={{ fontSize: 10 }}
+          />
+
+          <YAxis
+            stroke="#a78bfa"
+            tick={{ fontSize: 10 }}
+          />
+
+          <Tooltip
+            cursor={{ fill: "rgba(255,255,255,0.1)" }}
+            contentStyle={{
+              backgroundColor: "#2a133b",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "12px",
+            }}
+          />
+
+          <Bar
+            dataKey="calls"
+            fill="#f472b6"
+            radius={[6, 6, 0, 0]}
+            barSize={20}   // good for mobile
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </CardContent>
+</Card>
+
 
           <Card>
             <CardHeader className='md:max-w-full max-w-md'>

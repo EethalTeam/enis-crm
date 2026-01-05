@@ -2040,7 +2040,7 @@ function LeadsContent() {
                 <div className="flex items-start justify-between">
                   {/* Lead Name */}
                   <div
-                    className="text-white text-lg font-semibold leading-tight cursor-pointer"
+                    className=" text-lg font-semibold leading-tight cursor-pointer underline-offset-4 group-hover:underline text-fuchsia-400"
                     onClick={() => {
                       setNotesLead(l);
                       setNoteText("");

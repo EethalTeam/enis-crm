@@ -227,7 +227,7 @@ const handleReject = () => {
   };
 
   return (
-    <div className='p-6'>
+    <div className='p-6 mt-20 md:mt-0'>
     <div style={styles.container}>
       <div style={styles.header}>
         <h3 style={styles.headerTitle}>Dialer</h3>
