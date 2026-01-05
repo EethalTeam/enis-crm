@@ -1586,6 +1586,16 @@ function LeadsContent() {
       return;
     }
 
+     //  Notes validation (MANDATORY)
+  if (!noteText || noteText.trim().length === 0) {
+    toast({
+      title: "Error",
+      description: "Please enter notes before saving",
+      variant: "destructive",
+    });
+    return;
+  }
+
     const selectedStatus = leadStatuses.find(
     (s) => s._id === selectedStatusId
   );
