@@ -114,9 +114,8 @@ const Button = ({
   return (
     <button
       type={type}
-      className={`${baseStyles} ${variants[variant] || variants.default} ${
-        sizes[size] || sizes.default
-      } ${className}`}
+      className={`${baseStyles} ${variants[variant] || variants.default} ${sizes[size] || sizes.default
+        } ${className}`}
       onClick={onClick}
       disabled={disabled}
       title={title}
@@ -226,13 +225,12 @@ const ToastProvider = ({ children }) => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
-                t.variant === "destructive"
-                  ? "bg-red-900/90 border-red-800 text-white"
-                  : t.variant === "success"
+              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === "destructive"
+                ? "bg-red-900/90 border-red-800 text-white"
+                : t.variant === "success"
                   ? "bg-green-900/90 border-green-800 text-white"
                   : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
-              }`}
+                }`}
             >
               <div>
                 {t.title && (
@@ -755,11 +753,10 @@ const LeadDialog = ({
     <button
       type="button"
       onClick={() => onClick(id)}
-      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${
-        active === id
-          ? "bg-fuchsia-600 text-white shadow-md"
-          : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-      }`}
+      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${active === id
+        ? "bg-fuchsia-600 text-white shadow-md"
+        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+        }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
       <span className="hidden md:inline"> {label}</span>
@@ -794,8 +791,8 @@ const LeadDialog = ({
               {mode === "create"
                 ? "Add New Lead"
                 : mode === "edit"
-                ? "Edit Lead"
-                : "Lead Details"}
+                  ? "Edit Lead"
+                  : "Lead Details"}
             </DialogTitle>
             <button
               onClick={() => onOpenChange(false)}
@@ -1017,35 +1014,35 @@ const LeadDialog = ({
                 </div>
                 {selectedStatus?.leadStatustName?.toLowerCase() ===
                   "follow up" && (
-                  <div>
-                    <Label>Follow Date *</Label>
-                    <Input
-                      className="text-white"
-                      style={{ colorScheme: "dark" }}
-                      type="Date"
-                      name="FollowDate"
-                      value={formData.FollowDate}
-                      onChange={handleChange}
-                      disabled={isViewMode}
-                    />
-                  </div>
-                )}
+                    <div>
+                      <Label>Follow Date *</Label>
+                      <Input
+                        className="text-white"
+                        style={{ colorScheme: "dark" }}
+                        type="Date"
+                        name="FollowDate"
+                        value={formData.FollowDate}
+                        onChange={handleChange}
+                        disabled={isViewMode}
+                      />
+                    </div>
+                  )}
 
                 {selectedStatus?.leadStatustName?.toLowerCase() ===
                   "site visit" && (
-                  <div>
-                    <Label>Site Visit Date *</Label>
-                    <Input
-                      className="text-white"
-                      style={{ colorScheme: "dark" }}
-                      type="Date"
-                      name="SiteVisitDate"
-                      value={formData.SiteVisitDate}
-                      onChange={handleChange}
-                      disabled={isViewMode}
-                    />
-                  </div>
-                )}
+                    <div>
+                      <Label>Site Visit Date *</Label>
+                      <Input
+                        className="text-white"
+                        style={{ colorScheme: "dark" }}
+                        type="Date"
+                        name="SiteVisitDate"
+                        value={formData.SiteVisitDate}
+                        onChange={handleChange}
+                        disabled={isViewMode}
+                      />
+                    </div>
+                  )}
 
                 <div>
                   <Label>Source</Label>
@@ -1342,6 +1339,9 @@ function LeadsContent() {
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
   const [notesLead, setNotesLead] = useState(null);
   const [noteText, setNoteText] = useState("");
+  const [leadStatuses, setLeadStatuses] = useState([]);
+  const [selectedStatusId, setSelectedStatusId] = useState("");
+
   const [viewOpen, setViewOpen] = useState(false);
   const [viewData, setViewData] = useState({});
 
@@ -1368,6 +1368,22 @@ function LeadsContent() {
     isEdit: false,
     isDelete: false,
   });
+
+
+
+  // Fetch lead status ONLY for Status + Notes popup
+  useEffect(() => {
+    fetch(config.Api + "LeadStatus/getAllLeadStatus", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLeadStatuses(data);
+      })
+      .catch(console.error);
+  }, []);
 
   // --- DIALER LOGIC ---
   const resetCallState = () => {
@@ -1546,6 +1562,10 @@ function LeadsContent() {
     }
   };
 
+
+
+
+
   useEffect(() => {
     getPermissionsByPath(window.location.pathname).then((res) => {
       if (res) {
@@ -1556,19 +1576,38 @@ function LeadsContent() {
   }, []);
 
   const handleSaveNote = async () => {
+
+    if (!selectedStatusId) {
+      toast({
+        title: "Error",
+        description: "Please select lead status",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const selectedStatus = leadStatuses.find(
+    (s) => s._id === selectedStatusId
+  );
+
     const res = await fetch(config.Api + "Lead/addLeadNote", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         leadId: notesLead._id,
-        details: noteText,
+        leadStatusId: selectedStatusId,
+          details: `Status changed to "${selectedStatus?.leadStatustName}" - ${noteText}`,
         employeeName: user?.EmployeeName,
       }),
     });
     if ((await res.json()).success) {
       fetchLeads();
       setNotesDialogOpen(false);
+      setSelectedStatusId("");
       setNoteText("");
+    }
+    else {
+      toast({ title: "Update failed", variant: "destructive" });
     }
   };
 
@@ -1590,11 +1629,10 @@ function LeadsContent() {
   const TabButton = ({ id, label, icon: Icon }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-md ${
-        activeTab === id
-          ? "bg-fuchsia-600 text-white shadow-md"
-          : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-      }`}
+      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-md ${activeTab === id
+        ? "bg-fuchsia-600 text-white shadow-md"
+        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+        }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
       {label}
@@ -1913,7 +1951,7 @@ function LeadsContent() {
               className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20 hidden md:block"
             >
               <Filter className="w-4 h-4 mr-2" />
-            
+
             </Button>
           </div>
           <div className="overflow-x-auto hidden md:block">
@@ -1942,6 +1980,7 @@ function LeadsContent() {
                       className="py-3 px-4 font-medium text-white cursor-pointer"
                       onClick={() => {
                         setNotesLead(l);
+                        setSelectedStatusId(l.leadStatusId?._id || "");
                         setNoteText("");
                         setNotesDialogOpen(true);
                       }}
@@ -2044,6 +2083,7 @@ function LeadsContent() {
                     onClick={() => {
                       setNotesLead(l);
                       setNoteText("");
+                      setSelectedStatusId(l.leadStatusId?._id || "");
                       setNotesDialogOpen(true);
                     }}
                   >
@@ -2098,7 +2138,7 @@ function LeadsContent() {
                     size="icon"
                     className="text-green-500 hover:bg-green-500/10"
                     onClick={() => {
-                     handleInitiateCall(l.leadPhone);
+                      handleInitiateCall(l.leadPhone);
                     }}
                   >
                     <Phone className="w-5 h-5" />
@@ -2200,7 +2240,7 @@ function LeadsContent() {
         lead={leadToAssign}
         onSuccess={fetchLeads}
       />
-      <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}>
+      {/* <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}>
         <DialogContent className="sm:max-w-[450px]">
           <DialogHeader>
             <DialogTitle>Add Note</DialogTitle>
@@ -2217,7 +2257,76 @@ function LeadsContent() {
             <Button onClick={handleSaveNote}>Save</Button>
           </DialogFooter>
         </DialogContent>
+      </Dialog> */}
+
+      <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}>
+        <DialogContent className="sm:max-w-[420px] p-0">
+
+          {/* Header */}
+          <DialogHeader className="flex flex-row items-center justify-between p-6 border-b border-slate-800">
+            <div className="flex gap-3 ">
+              <div>
+                <DialogTitle>Update Status & Notes</DialogTitle>
+              </div>
+              <div>
+                <button
+                  onClick={() => setNotesDialogOpen(false)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+
+          </DialogHeader>
+
+          {/* Body */}
+          <div className="p-6 space-y-5">
+
+            {/* STATUS DROPDOWN */}
+            <div>
+              <Label>Lead Status</Label>
+              <select
+                value={selectedStatusId}
+                onChange={(e) => setSelectedStatusId(e.target.value)}
+                className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"
+              >
+                <option value="">Select Status</option>
+                {leadStatuses.map((s) => (
+                  <option key={s._id} value={s._id}>
+                    {s.leadStatustName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* NOTES */}
+            <div>
+              <Label>Notes</Label>
+              <textarea
+                className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white"
+                placeholder="Enter your note..."
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+              />
+            </div>
+
+          </div>
+
+          {/* Footer */}
+          <DialogFooter>
+            <Button
+              onClick={handleSaveNote}
+              className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white"
+            >
+              Save
+            </Button>
+          </DialogFooter>
+
+        </DialogContent>
       </Dialog>
+
     </div>
   );
 }
