@@ -1101,7 +1101,7 @@ const LeadDialog = ({
                     name="leadNotes"
                     value={formData.leadNotes}
                     onChange={handleChange}
-                    disabled={isViewMode}
+                    readOnly={mode === "edit"}
                     className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-fuchsia-500"
                   />
                 </div>

@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
-
+import Footer from "../components/layout/Footer";
 // Context
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -229,7 +229,7 @@ export default function Login() {
               >
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold"
+                  className="w-full mb-6 bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white font-bold"
                   size="lg"
                   disabled={isLoading}
                 >
@@ -246,6 +246,7 @@ export default function Login() {
                   )}
                 </Button>
               </motion.div>
+              <Footer />
             </form>
           </div>
         </motion.div>
