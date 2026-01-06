@@ -114,8 +114,9 @@ const Button = ({
   return (
     <button
       type={type}
-      className={`${baseStyles} ${variants[variant] || variants.default} ${sizes[size] || sizes.default
-        } ${className}`}
+      className={`${baseStyles} ${variants[variant] || variants.default} ${
+        sizes[size] || sizes.default
+      } ${className}`}
       onClick={onClick}
       disabled={disabled}
       title={title}
@@ -146,6 +147,7 @@ const SectionHeader = ({ icon: Icon, title }) => (
     </h3>
   </div>
 );
+
 const Dialog = ({ open, onOpenChange, children }) => (
   <AnimatePresence>
     {open && (
@@ -225,12 +227,13 @@ const ToastProvider = ({ children }) => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === "destructive"
-                ? "bg-red-900/90 border-red-800 text-white"
-                : t.variant === "success"
+              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
+                t.variant === "destructive"
+                  ? "bg-red-900/90 border-red-800 text-white"
+                  : t.variant === "success"
                   ? "bg-green-900/90 border-green-800 text-white"
                   : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
-                }`}
+              }`}
             >
               <div>
                 {t.title && (
@@ -295,7 +298,7 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
         onOpenChange(false);
       }
     } catch (e) {
-      toast({ title: "Error", variant: "destructive" });
+      toast({ title: "Alert", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -592,7 +595,7 @@ const LeadDialog = ({
     if (!formData.leadFirstName) {
       setActiveFormTab("contact");
       toast({
-        title: "Error",
+        title: "Alert",
         description: "Please enter first name",
         variant: "destructive",
       });
@@ -604,7 +607,7 @@ const LeadDialog = ({
     ) {
       setActiveFormTab("contact");
       toast({
-        title: "Error",
+        title: "Alert",
         description: "Please enter valid email",
         variant: "destructive",
       });
@@ -613,7 +616,7 @@ const LeadDialog = ({
     } else if (!formData.leadPhone || formData.leadPhone.length < 12) {
       setActiveFormTab("contact");
       toast({
-        title: "Error",
+        title: "Alert",
         description: "Please enter valid phone number(91 + 10 digits)",
         variant: "destructive",
       });
@@ -621,7 +624,7 @@ const LeadDialog = ({
       return;
     } else if (!formData.leadCountryId) {
       toast({
-        title: "Error",
+        title: "Alert",
         description: "Please select country",
         variant: "destructive",
       });
@@ -630,7 +633,7 @@ const LeadDialog = ({
       return;
     } else if (!formData.leadStateId) {
       toast({
-        title: "Error",
+        title: "Alert",
         description: "Please select state",
         variant: "destructive",
       });
@@ -639,7 +642,7 @@ const LeadDialog = ({
       return;
     } else if (!formData.leadCityId) {
       toast({
-        title: "Error",
+        title: "Alert",
         description: "Please select city",
         variant: "destructive",
       });
@@ -648,7 +651,7 @@ const LeadDialog = ({
       return;
     } else if (!formData.leadStatusId) {
       toast({
-        title: "Error",
+        title: "Alert",
         description: "Please select lead status",
         variant: "destructive",
       });
@@ -657,7 +660,7 @@ const LeadDialog = ({
       return;
     } else if (!formData.leadSourceId) {
       toast({
-        title: "Error",
+        title: "Alert",
         description: "Please select lead source",
         variant: "destructive",
       });
@@ -670,7 +673,7 @@ const LeadDialog = ({
     ) {
       setActiveFormTab("deal");
       toast({
-        title: "Error",
+        title: "Alert",
         description: "Please select follow up date",
         variant: "destructive",
       });
@@ -682,7 +685,7 @@ const LeadDialog = ({
     ) {
       setActiveFormTab("deal");
       toast({
-        title: "Error",
+        title: "Alert",
         description: "Please select site visit date",
         variant: "destructive",
       });
@@ -737,13 +740,13 @@ const LeadDialog = ({
         });
       } else {
         toast({
-          title: "Error",
+          title: "Alert",
           description: result.message,
           variant: "destructive",
         });
       }
     } catch (e) {
-      toast({ title: "Error", variant: "destructive" });
+      toast({ title: "Alert", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -753,10 +756,11 @@ const LeadDialog = ({
     <button
       type="button"
       onClick={() => onClick(id)}
-      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${active === id
-        ? "bg-fuchsia-600 text-white shadow-md"
-        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-        }`}
+      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${
+        active === id
+          ? "bg-fuchsia-600 text-white shadow-md"
+          : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+      }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
       <span className="hidden md:inline"> {label}</span>
@@ -791,8 +795,8 @@ const LeadDialog = ({
               {mode === "create"
                 ? "Add New Lead"
                 : mode === "edit"
-                  ? "Edit Lead"
-                  : "Lead Details"}
+                ? "Edit Lead"
+                : "Lead Details"}
             </DialogTitle>
             <button
               onClick={() => onOpenChange(false)}
@@ -1014,35 +1018,35 @@ const LeadDialog = ({
                 </div>
                 {selectedStatus?.leadStatustName?.toLowerCase() ===
                   "follow up" && (
-                    <div>
-                      <Label>Follow Date *</Label>
-                      <Input
-                        className="text-white"
-                        style={{ colorScheme: "dark" }}
-                        type="Date"
-                        name="FollowDate"
-                        value={formData.FollowDate}
-                        onChange={handleChange}
-                        disabled={isViewMode}
-                      />
-                    </div>
-                  )}
+                  <div>
+                    <Label>Follow Date *</Label>
+                    <Input
+                      className="text-white"
+                      style={{ colorScheme: "dark" }}
+                      type="Date"
+                      name="FollowDate"
+                      value={formData.FollowDate}
+                      onChange={handleChange}
+                      disabled={isViewMode}
+                    />
+                  </div>
+                )}
 
                 {selectedStatus?.leadStatustName?.toLowerCase() ===
                   "site visit" && (
-                    <div>
-                      <Label>Site Visit Date *</Label>
-                      <Input
-                        className="text-white"
-                        style={{ colorScheme: "dark" }}
-                        type="Date"
-                        name="SiteVisitDate"
-                        value={formData.SiteVisitDate}
-                        onChange={handleChange}
-                        disabled={isViewMode}
-                      />
-                    </div>
-                  )}
+                  <div>
+                    <Label>Site Visit Date *</Label>
+                    <Input
+                      className="text-white"
+                      style={{ colorScheme: "dark" }}
+                      type="Date"
+                      name="SiteVisitDate"
+                      value={formData.SiteVisitDate}
+                      onChange={handleChange}
+                      disabled={isViewMode}
+                    />
+                  </div>
+                )}
 
                 <div>
                   <Label>Source</Label>
@@ -1332,6 +1336,9 @@ function LeadsContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [selectedLead, setSelectedLead] = useState(null);
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [initialData, setInitialData] = useState(null);
+  const [activeFormTab, setActiveFormTab] = useState("history");
   console.log(selectedLead, "selectedLead");
   const [dialogMode, setDialogMode] = useState("create");
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
@@ -1368,8 +1375,6 @@ function LeadsContent() {
     isEdit: false,
     isDelete: false,
   });
-
-
 
   // Fetch lead status ONLY for Status + Notes popup
   useEffect(() => {
@@ -1477,7 +1482,7 @@ function LeadsContent() {
     const numStr = String(rawNumber || "");
     if (!numStr || numStr === "undefined")
       return toast({
-        title: "Error",
+        title: "Alert",
         description: "No phone number found",
         variant: "destructive",
       });
@@ -1562,10 +1567,6 @@ function LeadsContent() {
     }
   };
 
-
-
-
-
   useEffect(() => {
     getPermissionsByPath(window.location.pathname).then((res) => {
       if (res) {
@@ -1576,29 +1577,26 @@ function LeadsContent() {
   }, []);
 
   const handleSaveNote = async () => {
-
     if (!selectedStatusId) {
       toast({
-        title: "Error",
+        title: "Alert",
         description: "Please select lead status",
         variant: "destructive",
       });
       return;
     }
 
-     //  Notes validation (MANDATORY)
-  if (!noteText || noteText.trim().length === 0) {
-    toast({
-      title: "Error",
-      description: "Please enter notes before saving",
-      variant: "destructive",
-    });
-    return;
-  }
+    //  Notes validation (MANDATORY)
+    if (!noteText || noteText.trim().length === 0) {
+      toast({
+        title: "Alert",
+        description: "Please enter notes before saving",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    const selectedStatus = leadStatuses.find(
-    (s) => s._id === selectedStatusId
-  );
+    const selectedStatus = leadStatuses.find((s) => s._id === selectedStatusId);
 
     const res = await fetch(config.Api + "Lead/addLeadNote", {
       method: "POST",
@@ -1606,7 +1604,7 @@ function LeadsContent() {
       body: JSON.stringify({
         leadId: notesLead._id,
         leadStatusId: selectedStatusId,
-          details: `Status changed to "${selectedStatus?.leadStatustName}" - ${noteText}`,
+        details: `Status changed to "${selectedStatus?.leadStatustName}" - ${noteText}`,
         employeeName: user?.EmployeeName,
       }),
     });
@@ -1615,8 +1613,7 @@ function LeadsContent() {
       setNotesDialogOpen(false);
       setSelectedStatusId("");
       setNoteText("");
-    }
-    else {
+    } else {
       toast({ title: "Update failed", variant: "destructive" });
     }
   };
@@ -1639,10 +1636,11 @@ function LeadsContent() {
   const TabButton = ({ id, label, icon: Icon }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-md ${activeTab === id
-        ? "bg-fuchsia-600 text-white shadow-md"
-        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-        }`}
+      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-md ${
+        activeTab === id
+          ? "bg-fuchsia-600 text-white shadow-md"
+          : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+      }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
       {label}
@@ -1961,7 +1959,6 @@ function LeadsContent() {
               className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20 hidden md:block"
             >
               <Filter className="w-4 h-4 mr-2" />
-
             </Button>
           </div>
           <div className="overflow-x-auto hidden md:block">
@@ -2025,21 +2022,23 @@ function LeadsContent() {
                       {l.leadAssignedId?.EmployeeName || "Unassigned"}
                     </td>
                     <td className="py-3 px-4 flex gap-2">
-                      <Button
-                        variant="icon"
-                        size="icon"
-                        onClick={() => {
-                          setLeadToAssign({
-                            id: l._id,
-                            name: l.leadFirstName,
-                            original: l,
-                          });
-                          setAssignDialogOpen(true);
-                        }}
-                        className="text-green-400"
-                      >
-                        <UserPlus className="w-4 h-4" />
-                      </Button>
+                      {role !== "AGENT" && (
+                        <Button
+                          variant="icon"
+                          size="icon"
+                          onClick={() => {
+                            setLeadToAssign({
+                              id: l._id,
+                              name: l.leadFirstName,
+                              original: l,
+                            });
+                            setAssignDialogOpen(true);
+                          }}
+                          className="text-green-400"
+                        >
+                          <UserPlus className="w-4 h-4" />
+                        </Button>
+                      )}
                       <Button
                         variant="icon"
                         size="icon"
@@ -2062,11 +2061,84 @@ function LeadsContent() {
                           <Pencil className="w-4 h-4" />
                         </Button>
                       )}
+                      {role !== "AGENT" && (
+                        <Button
+                          variant="icon"
+                          size="icon"
+                          onClick={() => {
+                            setSelectedLead(l);
+                            setInitialData(l);
+                            setActiveFormTab("history");
+                            setHistoryDialogOpen(true);
+                          }}
+                          className="text-purple-400"
+                          title="View History"
+                        >
+                          <Clock className="w-4 h-4" />
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+
+            <Dialog
+              open={historyDialogOpen}
+              onOpenChange={setHistoryDialogOpen}
+            >
+              <DialogContent className="sm:max-w-[700px] h-[60vh] flex flex-col p-0 overflow-hidden bg-slate-900 border-slate-800">
+                <DialogHeader className="flex flex-row items-center justify-between p-4 border-b border-slate-800 shrink-0">
+                  <DialogTitle className="text-sm text-white">
+                    Lead History – {initialData?.leadFirstName}
+                  </DialogTitle>
+                  {activeFormTab === "history" && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setHistoryDialogOpen(false);
+                      }}
+                      className="text-slate-400 hover:text-white transition-colors"
+                    >
+                      <X size={18} />
+                    </button>
+                  )}
+                </DialogHeader>
+
+                <div className="flex-1 overflow-y-auto  bg-slate-950 p-2">
+                  {activeFormTab === "history" && (
+                    <>
+                      {!initialData?.leadHistory?.length ? (
+                        <p className="text-sm text-slate-400">
+                          No history Available
+                        </p>
+                      ) : (
+                        <div className="space-y-4">
+                          {[...initialData.leadHistory].reverse().map((h) => (
+                            <div
+                              key={h._id || h.timestamp}
+                              className="border-l-2 border-fuchsia-600 pl-4 py-2 bg-slate-900/40 rounded-md"
+                            >
+                              <p className="text-xs uppercase text-fuchsia-400 font-bold">
+                                {h.eventType}
+                              </p>
+                              <p className="text-sm text-slate-200 mt-1">
+                                {h.details}
+                              </p>
+                              <p className="text-[11px] text-slate-500 mt-1">
+                                {new Date(h.timestamp).toLocaleString()}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* MOBILE VIEW */}
@@ -2271,7 +2343,6 @@ function LeadsContent() {
 
       <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}>
         <DialogContent className="sm:max-w-[420px] p-0">
-
           {/* Header */}
           <DialogHeader className="flex flex-row items-center justify-between p-6 border-b border-slate-800">
             <div className="flex gap-3 ">
@@ -2287,13 +2358,10 @@ function LeadsContent() {
                 </button>
               </div>
             </div>
-
-
           </DialogHeader>
 
           {/* Body */}
           <div className="p-6 space-y-5">
-
             {/* STATUS DROPDOWN */}
             <div>
               <Label>Lead Status</Label>
@@ -2321,7 +2389,6 @@ function LeadsContent() {
                 onChange={(e) => setNoteText(e.target.value)}
               />
             </div>
-
           </div>
 
           {/* Footer */}
@@ -2333,10 +2400,8 @@ function LeadsContent() {
               Save
             </Button>
           </DialogFooter>
-
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }
