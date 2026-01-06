@@ -122,6 +122,8 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
     description: "",
     employeeId: "",
     employeeName: "",
+    visitorVariantId: "",
+    visitorVariantName: "",
     cityId: "",
     CityName: "",
     StateID: "",
@@ -158,7 +160,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
   const [employeeList, setEmployeeList] = useState([]);
   const [stateList, setStateList] = useState([]);
   const [cityList, setCityList] = useState([]);
-
+  const [variantList, setVariantList] = useState([]);
   // Existing Data (History)
   const [plotDetails, setPlotDetails] = useState([]);
   const [followUpDetails, setFollowUpDetails] = useState([]);
@@ -196,7 +198,10 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
       fetchAPI("Visitor/getAllStatus", { unitId: state.unitId }).then((res) =>
         setStatusList(res?.data || [])
       );
-
+      fetchAPI("VisitorVerient/getAllVisitorVariant").then((res) => {
+        console.log("VARIANT API ", res);
+        setVariantList(res || []);
+      });
       // 2. Populate Data if Edit
       if (initialData) {
         populateData(initialData);
@@ -339,6 +344,15 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
           value: e.EmployeeName,
         });
       }
+      if (name === "visitorVariantId") {
+        dispatch({ type: "text", name: "visitorVariantId", value: e._id });
+        dispatch({
+          type: "text",
+          name: "visitorVariantName",
+          value: e.visitorVerientName,
+        });
+      }
+
       if (name === "CityID") {
         dispatch({ type: "text", name: "cityId", value: e.CityIDPK });
         dispatch({ type: "text", name: "CityName", value: e.CityName });
@@ -506,7 +520,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
       }
     } catch (e) {
       toast({
-        title: "Error",
+        title: "Alert",
         description: e.message || "Failed",
         variant: "destructive",
       });
@@ -694,6 +708,27 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
                   {employeeList.map((e) => (
                     <option key={e._id} value={e._id}>
                       {e.EmployeeName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Visitor Variant</Label>
+                <select
+                  value={state.visitorVariantId || ""}
+                  onChange={(e) => {
+                    const selected = variantList.find(
+                      (v) => String(v._id) === e.target.value
+                    );
+                    storeDispatch(selected, "visitorVariantId", "select");
+                  }}
+                  className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"
+                >
+                  <option value="">Select Variant</option>
+                  {variantList.map((v) => (
+                    <option key={v._id} value={v._id}>
+                      {v.visitorVerientName}
                     </option>
                   ))}
                 </select>
