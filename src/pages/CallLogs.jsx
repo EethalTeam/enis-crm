@@ -819,21 +819,28 @@ function CallLogsContent() {
                       {playingId === call._id ? "Pause" : "Play"}
                     </Button>
                   )}
-                  <Button
-                    className="flex-1"
-                    size="sm"
-                    onClick={() => {
-                      setLeadInitialData({
-                        leadCreatedById: decode(
-                          localStorage.getItem("EmployeeId")
-                        ),
-                        leadPhone: targetNumber || "",
-                      });
-                      setLeadDialogOpen(true);
-                    }}
-                  >
-                    Qualify
-                  </Button>
+                  <td className="py-3 px-4">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={!!call.leadName}
+                      className={
+                        call.leadName ? "opacity-50 cursor-not-allowed" : " "
+                      }
+                      onClick={() => {
+                        if (call.leadName)
+                          return setLeadInitialData({
+                            leadCreatedById: decode(
+                              localStorage.getItem("EmployeeId")
+                            ),
+                            leadPhone: targetNumber || "",
+                          });
+                        setLeadDialogOpen(true);
+                      }}
+                    >
+                      Qualify
+                    </Button>
+                  </td>
                 </div>
               </div>
             );
