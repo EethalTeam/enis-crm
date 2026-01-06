@@ -975,6 +975,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
                   <table className="w-full text-left bg-slate-900/40 rounded-md overflow-hidden text-sm">
                     <thead className="bg-slate-800 text-slate-300">
                       <tr>
+                        {role !== "AGENT" && <th className="p-3">Site</th>}
                         <th className="p-3">Unit</th>
                         <th className="p-3">Plot No</th>
                         <th className="p-3">Status</th>
@@ -983,8 +984,13 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
                     <tbody className="text-slate-200">
                       {plotDetails.map((item, i) => (
                         <tr key={i} className="border-t border-slate-800">
+                          {role !== "AGENT" && (
+                            <td className="p-3">
+                              {item.plotId.siteId?.sitename}
+                            </td>
+                          )}
                           <td className="p-3">
-                            {item.plotId?.unitId?.UnitName}
+                            {item.plotId?.unitId.UnitName}
                           </td>
                           <td className="p-3">{item.plotId?.plotNumber}</td>
                           <td className="p-3">
