@@ -16,6 +16,7 @@ import {
   Upload,
   Loader2,
   Eye,
+  CandlestickChart,
   Pencil,
   Trash2,
   X,
@@ -267,7 +268,7 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
   const { user } = useAuth();
   useEffect(() => {
     if (open) {
-      fetch(config.Api + "Employee/getAllEmployees", {
+      fetch(config.Api + "Employee/getAllAgent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
@@ -279,6 +280,7 @@ const AssignDialog = ({ open, onOpenChange, lead, onSuccess }) => {
       if (lead) setSelectedAgent(lead.original?.leadAssignedId?._id || "");
     }
   }, [open, lead]);
+
   const handleSubmit = async () => {
     if (!selectedAgent) return;
     setIsSubmitting(true);
@@ -601,19 +603,22 @@ const LeadDialog = ({
       });
       setIsSubmitting(false);
       return;
-    } else if (
-      !formData.leadEmail ||
-      !/\S+@\S+\.\S+/.test(formData.leadEmail)
-    ) {
-      setActiveFormTab("contact");
-      toast({
-        title: "Alert",
-        description: "Please enter valid email",
-        variant: "destructive",
-      });
-      setIsSubmitting(false);
-      return;
-    } else if (!formData.leadPhone || formData.leadPhone.length < 12) {
+    }
+    // else if (
+    //   !formData.leadEmail ||
+    //   !/\S+@\S+\.\S+/.test(formData.leadEmail)
+    // )
+    // {
+    //   setActiveFormTab("contact");
+    //   toast({
+    //     title: "Alert",
+    //     description: "Please enter valid email",
+    //     variant: "destructive",
+    //   });
+    //   setIsSubmitting(false);
+    //   return;
+    // }
+    else if (!formData.leadPhone || formData.leadPhone.length < 12) {
       setActiveFormTab("contact");
       toast({
         title: "Alert",
@@ -786,6 +791,9 @@ const LeadDialog = ({
     (s) => s._id === formData.leadStatusId
   );
 
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const min = tomorrow.toISOString().split("T")[0];
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0">
@@ -858,7 +866,7 @@ const LeadDialog = ({
                   />
                 </div>
                 <div>
-                  <Label>Email *</Label>
+                  <Label>Email </Label>
                   <Input
                     name="leadEmail"
                     type="email"
@@ -1005,7 +1013,7 @@ const LeadDialog = ({
                     name="leadStatusId"
                     value={formData.leadStatusId}
                     onChange={handleChange}
-                    disabled={isViewMode}
+                    disabled={true}
                     className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"
                   >
                     <option value="">Select</option>
@@ -1027,7 +1035,8 @@ const LeadDialog = ({
                       name="FollowDate"
                       value={formData.FollowDate}
                       onChange={handleChange}
-                      disabled={isViewMode}
+                      // disabled={isViewMode}
+                      min={min}
                     />
                   </div>
                 )}
@@ -1657,14 +1666,23 @@ function LeadsContent() {
   const handleViewClick = (row) => {
     setViewData({
       Name: row.leadFirstName,
-      Site: row.leadSiteId?.sitename || "-",
-      Unit: row.leadUnitId?.UnitName || "-",
       Phone: row.leadPhone,
       AlterPhone: row.leadAltPhone,
+      State: row.leadStateId.StateName,
+      City: row.leadCityId.CityName,
+      Unit: row.leadUnitId?.UnitName || "-",
+      Site: row.leadSiteId?.sitename || "-",
       Status: row.leadStatusId.leadStatustName,
       "Assigned To": row.leadAssignedId ? row.leadAssignedId.EmployeeName : "",
     });
     setViewOpen(true);
+  };
+
+  const handleViewNotes = (l) => {
+    setNotesLead(l);
+    setSelectedStatusId(l.leadStatusId?._id || "");
+    setNoteText("");
+    setNotesDialogOpen(true);
   };
 
   const exportLeadsToExcel = () => {
@@ -1985,12 +2003,10 @@ function LeadsContent() {
                   >
                     <td
                       className="py-3 px-4 font-medium text-white cursor-pointer"
-                      onClick={() => {
-                        setNotesLead(l);
-                        setSelectedStatusId(l.leadStatusId?._id || "");
-                        setNoteText("");
-                        setNotesDialogOpen(true);
-                      }}
+                      onClick={() =>
+                        // handleViewNotes()
+                        handleViewClick(l)
+                      }
                     >
                       <span className="underline-offset-4 group-hover:underline text-fuchsia-400">
                         {l.leadFirstName} {l.leadLastName}
@@ -2042,10 +2058,13 @@ function LeadsContent() {
                       <Button
                         variant="icon"
                         size="icon"
-                        onClick={() => handleViewClick(l)}
+                        onClick={() =>
+                          //  handleViewClick(l)
+                          handleViewNotes(l)
+                        }
                         className="text-blue-600"
                       >
-                        <Eye className="w-5 h-5" />
+                        <CandlestickChart className="w-5 h-5" />
                       </Button>
                       {Permissions.isEdit && (
                         <Button
