@@ -819,14 +819,12 @@ function CallLogsContent() {
                       {playingId === call._id ? "Pause" : "Play"}
                     </Button>
                   )}
-                  <td className="py-3 px-4">
+                  <div className="flex-1 ">
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant=""
                       disabled={!!call.leadName}
-                      className={
-                        call.leadName ? "opacity-50 cursor-not-allowed" : " "
-                      }
+                      className="w-full"
                       onClick={() => {
                         if (call.leadName)
                           return setLeadInitialData({
@@ -840,7 +838,7 @@ function CallLogsContent() {
                     >
                       Qualify
                     </Button>
-                  </td>
+                  </div>
                 </div>
               </div>
             );
