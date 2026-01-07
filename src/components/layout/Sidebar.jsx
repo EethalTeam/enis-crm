@@ -33,7 +33,8 @@ import {
   TrendingUp,
   SquareCode,
   Activity,
-  X
+  X,
+  PhoneOutgoing
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -72,13 +73,14 @@ const iconMap = {
   Flag,
   TrendingUp,
   SquareCode,
-  Activity
+  Activity,
+  PhoneOutgoing
 };
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
   //  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
   { icon: PhoneCall, label: 'Dialer', path: '/dialer' },
-  { icon: Phone, label: 'Call Logs', path: '/call-logs' },
+  { icon: PhoneOutgoing, label: 'Call Logs', path: '/call-logs' },
   { icon: Users, label: 'Leads', path: '/leads' },
   // { icon: UserCircle, label: 'Contacts', path: '/contacts' },
   // { icon: Building2, label: 'Companies', path: '/companies' },
