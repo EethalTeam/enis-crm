@@ -386,7 +386,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
   const handleMainSubmit = async () => {
     if (!state.visitorName || !state.visitorMobile || !state.visitorAddress) {
       toast({
-        title: "Validation Error",
+        title: "Alert",
         description: "Name, Mobile and Address are required",
         variant: "destructive",
       });
@@ -1197,7 +1197,7 @@ function VisitorContent() {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-slate-700 text-white">
-                  <th className="py-3 px-4">Code</th>
+                  {/* <th className="py-3 px-4">Code</th> */}
                   <th className="py-3 px-4">Name</th>
                   <th className="py-3 px-4">Mobile</th>
                   <th className="py-3 px-4">Email</th>
@@ -1210,9 +1210,9 @@ function VisitorContent() {
                     key={row._id}
                     className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors group"
                   >
-                    <td className="py-3 px-4 text-slate-300 text-sm">
+                    {/* <td className="py-3 px-4 text-slate-300 text-sm">
                       {row.visitorCode || "N/A"}
-                    </td>
+                    </td> */}
                     <td className="py-3 px-4 font-medium text-white">
                       <span
                         onClick={() => {
