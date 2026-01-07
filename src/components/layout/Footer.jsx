@@ -1,4 +1,4 @@
- import React from "react";
+import React from "react";
 import ENISImg from "../../Assets/Images/ENIS_Logo1.png";
 
 const Footer = () => {
@@ -29,11 +29,11 @@ const Footer = () => {
           rel="noopener noreferrer"
           className="flex items-center gap-1 text-fuchsia-400 hover:text-fuchsia-300 font-semibold"
         >
-          <img
+          {/* <img
             src={ENISImg}
             alt="ENIS"
             className="w-5 h-5 md:w-6 md:h-6 object-contain"
-          />
+          /> */}
           ENIS
         </a>
       </span>
