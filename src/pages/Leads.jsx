@@ -115,9 +115,8 @@ const Button = ({
   return (
     <button
       type={type}
-      className={`${baseStyles} ${variants[variant] || variants.default} ${
-        sizes[size] || sizes.default
-      } ${className}`}
+      className={`${baseStyles} ${variants[variant] || variants.default} ${sizes[size] || sizes.default
+        } ${className}`}
       onClick={onClick}
       disabled={disabled}
       title={title}
@@ -228,13 +227,12 @@ const ToastProvider = ({ children }) => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
-                t.variant === "destructive"
+              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === "destructive"
                   ? "bg-red-900/90 border-red-800 text-white"
                   : t.variant === "success"
-                  ? "bg-green-900/90 border-green-800 text-white"
-                  : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
-              }`}
+                    ? "bg-green-900/90 border-green-800 text-white"
+                    : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
+                }`}
             >
               <div>
                 {t.title && (
@@ -761,11 +759,10 @@ const LeadDialog = ({
     <button
       type="button"
       onClick={() => onClick(id)}
-      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${
-        active === id
+      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${active === id
           ? "bg-fuchsia-600 text-white shadow-md"
           : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-      }`}
+        }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
       <span className="hidden md:inline"> {label}</span>
@@ -803,8 +800,8 @@ const LeadDialog = ({
               {mode === "create"
                 ? "Add New Lead"
                 : mode === "edit"
-                ? "Edit Lead"
-                : "Lead Details"}
+                  ? "Edit Lead"
+                  : "Lead Details"}
             </DialogTitle>
             <button
               onClick={() => onOpenChange(false)}
@@ -1026,36 +1023,36 @@ const LeadDialog = ({
                 </div>
                 {selectedStatus?.leadStatustName?.toLowerCase() ===
                   "follow up" && (
-                  <div>
-                    <Label>Follow Date *</Label>
-                    <Input
-                      className="text-white"
-                      style={{ colorScheme: "dark" }}
-                      type="Date"
-                      name="FollowDate"
-                      value={formData.FollowDate}
-                      onChange={handleChange}
-                      // disabled={isViewMode}
-                      min={min}
-                    />
-                  </div>
-                )}
+                    <div>
+                      <Label>Follow Date *</Label>
+                      <Input
+                        className="text-white"
+                        style={{ colorScheme: "dark" }}
+                        type="Date"
+                        name="FollowDate"
+                        value={formData.FollowDate}
+                        onChange={handleChange}
+                        // disabled={isViewMode}
+                        min={min}
+                      />
+                    </div>
+                  )}
 
                 {selectedStatus?.leadStatustName?.toLowerCase() ===
                   "site visit" && (
-                  <div>
-                    <Label>Site Visit Date *</Label>
-                    <Input
-                      className="text-white"
-                      style={{ colorScheme: "dark" }}
-                      type="Date"
-                      name="SiteVisitDate"
-                      value={formData.SiteVisitDate}
-                      onChange={handleChange}
-                      disabled={isViewMode}
-                    />
-                  </div>
-                )}
+                    <div>
+                      <Label>Site Visit Date *</Label>
+                      <Input
+                        className="text-white"
+                        style={{ colorScheme: "dark" }}
+                        type="Date"
+                        name="SiteVisitDate"
+                        value={formData.SiteVisitDate}
+                        onChange={handleChange}
+                        disabled={isViewMode}
+                      />
+                    </div>
+                  )}
 
                 <div>
                   <Label>Source</Label>
@@ -1397,7 +1394,11 @@ function LeadsContent() {
         setLeadStatuses(data);
       })
       .catch(console.error);
+      
   }, []);
+  useEffect(()=>{
+console.log(getfilteredfollow(),"getfilteredfollow")
+  },[leads.length])
 
   // --- DIALER LOGIC ---
   const resetCallState = () => {
@@ -1642,14 +1643,29 @@ function LeadsContent() {
       return true;
     });
 
+    const getfilteredfollow=()=>{
+        const start = new Date();
+    start.setUTCHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setUTCDate(start.getUTCDate() + 3);
+    end.setUTCHours(23, 59, 59, 999); 
+
+     return  leads.filter((l) => {
+      if(!l.FollowDate) return false
+      const foldate=new Date(l.FollowDate)
+     return foldate >=start && foldate <=end
+     }
+    );
+    }
+
   const TabButton = ({ id, label, icon: Icon }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-md ${
-        activeTab === id
+      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-md ${activeTab === id
           ? "bg-fuchsia-600 text-white shadow-md"
           : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-      }`}
+        }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
       {label}
@@ -1840,7 +1856,7 @@ function LeadsContent() {
   };
 
   return (
-    <div className="space-y-6 bg-slate-950 min-h-screen p-4 mt-3 text-slate-100">
+    <div className="space-y-6 bg-slate-950 min-h-screen p-4  text-slate-100">
       {/* OUTGOING CALL POPUP */}
       {callStatus !== "Idle" && (
         <div style={popupStyles.modal}>
@@ -2102,7 +2118,139 @@ function LeadsContent() {
               </tbody>
             </table>
 
-            <Dialog
+          
+          </div>
+
+        
+          {/* ================= MOBILE CARD VIEW ================= */}
+          <div className="md:hidden p-4 space-y-4">
+            {getFilteredLeads().map((l) => (
+              <div
+                key={l._id}
+                className="
+        rounded-xl
+        border border-slate-700
+        bg-slate-900
+        shadow-md
+        p-4
+        space-y-3
+      "
+              >
+                {/* ===== HEADER ===== */}
+                <div className="flex justify-between items-start">
+                  <div
+                    className="text-base font-semibold text-fuchsia-400 cursor-pointer"
+                    onClick={() => handleViewClick(l)}
+                  >
+                    {l.leadFirstName} {l.leadLastName}
+                  </div>
+
+                  <Badge
+                    className={
+                      statusColors[l.leadStatusId?.leadStatusColor] ||
+                      "bg-slate-700"
+                    }
+                  >
+                    {l.leadStatusId?.leadStatustName || "New"}
+                  </Badge>
+                </div>
+
+                {/* ===== SITE ===== */}
+                {role !== "AGENT" && (
+                  <p className="text-sm text-slate-400">
+                    <span className="text-slate-500">Site:</span>{" "}
+                    {l.leadSiteId?.sitename || "N/A"}
+                  </p>
+                )}
+
+                {/* ===== PHONE ===== */}
+                <div className="flex items-center gap-2 text-slate-300">
+                  <button onClick={() => handleInitiateCall(l.leadPhone)}>
+                    <Phone size={18} className="text-green-400" />
+                  </button>
+                  <span>{l.leadPhone}</span>
+                </div>
+
+                {/* ===== ASSIGNED TO ===== */}
+                <p className="text-sm text-slate-400">
+                  <span className="text-slate-500">Assigned:</span>{" "}
+                  {l.leadAssignedId?.EmployeeName || "Unassigned"}
+                </p>
+
+                {/* ===== ACTIONS ===== */}
+                <div className="flex justify-between pt-3 border-t border-slate-800">
+                  {role !== "AGENT" && (
+                    <Button
+                      variant="icon"
+                      size="icon"
+                      className="text-green-400"
+                      onClick={() => {
+                        setLeadToAssign({
+                          id: l._id,
+                          name: l.leadFirstName,
+                          original: l,
+                        });
+                        setAssignDialogOpen(true);
+                      }}
+                    >
+                      <UserPlus className="w-4 h-4" />
+                    </Button>
+                  )}
+
+                  <Button
+                    variant="icon"
+                    size="icon"
+                    className="text-blue-500"
+                    onClick={() => handleViewNotes(l)}
+                  >
+                    <CandlestickChart className="w-5 h-5" />
+                  </Button>
+
+                  {Permissions.isEdit && (
+                    <Button
+                      variant="icon"
+                      size="icon"
+                      className="text-yellow-400"
+                      onClick={() => {
+                        setSelectedLead(l);
+                        setDialogMode("edit");
+                        setDialogOpen(true);
+                      }}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                  )}
+
+                  {role !== "AGENT" && (
+                    <Button
+                      variant="icon"
+                      size="icon"
+                      className="text-purple-400"
+                      onClick={() => {
+                        setSelectedLead(l);
+                        setInitialData(l);
+                        setActiveFormTab("history");
+                        setHistoryDialogOpen(true);
+                      }}
+                    >
+                      <Clock className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+
+
+
+
+
+        </CardContent>
+      </Card>
+
+
+        <Dialog
               open={historyDialogOpen}
               onOpenChange={setHistoryDialogOpen}
             >
@@ -2158,141 +2306,6 @@ function LeadsContent() {
                 </div>
               </DialogContent>
             </Dialog>
-          </div>
-
-          {/* MOBILE VIEW */}
-          {/* MOBILE VIEW */}
-          {/* MOBILE VIEW */}
-          <div className="p-4 space-y-5 md:hidden">
-            {getFilteredLeads().map((l) => (
-              <div
-                key={l._id}
-                className="
-        rounded-xl
-        border border-slate-700
-        bg-slate-900
-        shadow-md
-        p-5
-        space-y-4
-      "
-              >
-                {/* ================= HEADER ================= */}
-                <div className="flex items-start justify-between">
-                  {/* Lead Name */}
-                  <div
-                    className=" text-lg font-semibold leading-tight cursor-pointer underline-offset-4 group-hover:underline text-fuchsia-400"
-                    onClick={() => {
-                      setNotesLead(l);
-                      setNoteText("");
-                      setSelectedStatusId(l.leadStatusId?._id || "");
-                      setNotesDialogOpen(true);
-                    }}
-                  >
-                    {l.leadFirstName} {l.leadLastName}
-                  </div>
-
-                  {/* Status Pill */}
-                </div>
-                <Badge
-                  className={`
-            px-3 py-1 text-xs rounded-full
-            ${statusColors[l.leadStatusId?.leadStatusColor] || "bg-slate-600"}
-          `}
-                >
-                  {l.leadStatusId?.leadStatustName || "New"}
-                </Badge>
-
-                {/* ================= DETAILS (LIKE PLOTS) ================= */}
-                <div className="space-y-3 text-sm">
-                  {/* Site */}
-                  {role !== "AGENT" && (
-                    <div>
-                      <div className="text-slate-400">Site</div>
-                      <div className="text-slate-200 font-medium">
-                        {l.leadSiteId?.sitename || "N/A"}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Phone */}
-                  <div>
-                    <div className="text-slate-400">Phone</div>
-                    <div className="text-slate-200 font-medium tracking-wide">
-                      {l.leadPhone}
-                    </div>
-                  </div>
-
-                  {/* Assigned */}
-                  <div>
-                    <div className="text-slate-400">Assigned</div>
-                    <div className="text-slate-200 font-medium">
-                      {l.leadAssignedId?.EmployeeName || "Unassigned"}
-                    </div>
-                  </div>
-                </div>
-
-                {/* ================= ACTIONS (BOTTOM ICONS) ================= */}
-                <div className="flex justify-between items-center pt-4 border-t border-slate-700">
-                  {/* Call */}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-green-500 hover:bg-green-500/10"
-                    onClick={() => {
-                      handleInitiateCall(l.leadPhone);
-                    }}
-                  >
-                    <Phone className="w-5 h-5" />
-                  </Button>
-
-                  {/* View */}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-blue-500 hover:bg-blue-500/10"
-                    onClick={() => handleViewClick(l)}
-                  >
-                    <Eye className="w-5 h-5" />
-                  </Button>
-
-                  {/* Assign */}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-fuchsia-500 hover:bg-fuchsia-500/10"
-                    onClick={() => {
-                      setLeadToAssign({
-                        id: l._id,
-                        name: l.leadFirstName,
-                        original: l,
-                      });
-                      setAssignDialogOpen(true);
-                    }}
-                  >
-                    <UserPlus className="w-5 h-5" />
-                  </Button>
-
-                  {/* Edit */}
-                  {Permissions.isEdit && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-yellow-500 hover:bg-yellow-500/10"
-                      onClick={() => {
-                        setSelectedLead(l);
-                        setDialogMode("edit");
-                        setDialogOpen(true);
-                      }}
-                    >
-                      <Pencil className="w-5 h-5" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* View icon popup */}
       <Dialog open={viewOpen} onOpenChange={setViewOpen}>

@@ -13,6 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { config } from "@/components/CustomComponents/config.js";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 const decode = (value) => {
   if (!value) return "";
@@ -58,6 +59,14 @@ export default function Dashboard() {
   const [dashboard, setDashBoard] = useState([])
   const [leadSource, setLeadSource] = useState([]);
   const [callReport, setCallReport] = useState([]);
+  const [leadFollowups, setLeadFollowups] = useState([]);
+  const [followupTab, setFollowupTab] = useState("lead");
+  const [visitorFollowups, setVisitorFollowups] = useState([]);
+  const [leads, setLeads] = useState([]);
+
+  const navigate = useNavigate()
+
+
   const isMobile = window.innerWidth < 768
 
 
@@ -88,7 +97,14 @@ export default function Dashboard() {
     getDayWiseAnsweredCalls()
     getLeadsBySource()
     getCallReport()
+    getLeadFollowup()
+    fetchLeads()
+    getVisitorFollowup()
   }, [])
+
+  //   useEffect(()=>{
+  // console.log(getfilteredfollow(),"getfilteredfollow")
+  //   },[leads.length])
 
   const getAllDashBoard = async () => {
     try {
@@ -113,6 +129,28 @@ export default function Dashboard() {
       console.log(err, "err")
     }
   };
+
+    const fetchLeads = async (search = "") => {
+      // setLoading(true);
+      try {
+         const role = localStorage.getItem("role");
+        let payload = { page: 1, limit: 100, search };
+        if (role === "AGENT") {
+          payload.EmployeeId = decode(localStorage.getItem("EmployeeId"));
+        }
+        const res = await fetch(config.Api + "Lead/getAllLeads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (data.success) setLeads(data.data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        // setLoading(false);
+      }
+    };
 
   const getDayWiseAnsweredCalls = async () => {
     try {
@@ -183,6 +221,69 @@ export default function Dashboard() {
     }
   };
 
+    const getfilteredfollow=()=>{
+        const start = new Date();
+    start.setUTCHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setUTCDate(start.getUTCDate() + 3);
+    end.setUTCHours(23, 59, 59, 999); 
+
+     return  leads.filter((l) => {
+      if(!l.FollowDate) return false
+      const foldate=new Date(l.FollowDate)
+     return foldate >=start && foldate <=end
+     }
+    );
+    }
+
+  const getLeadFollowup = async () => {
+    try {
+      const role = localStorage.getItem("role");
+      const EmployeeId = decode(localStorage.getItem("EmployeeId"));
+
+      const res = await fetch(
+        config.Api + "DashBoard/getLeadFollowup",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role, EmployeeId }),
+        }
+      );
+
+      const data = await res.json();
+      setLeadFollowups(data || []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+
+  const getVisitorFollowup = async () => {
+  try {
+    const role = localStorage.getItem("role");
+    const EmployeeId = decode(localStorage.getItem("EmployeeId"));
+
+    const res = await fetch(
+      config.Api + "DashBoard/getVisitorFollowup",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role, EmployeeId }),
+      }
+    );
+
+    const data = await res.json();
+    setVisitorFollowups(data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+  
+
+
 
   return (
     <>
@@ -220,6 +321,93 @@ export default function Dashboard() {
             </motion.div>
           ))}
         </div>
+
+
+
+ <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<Card>
+  <CardHeader className="pb-2">
+    <CardTitle className="text-base">
+      Lead Follow-ups (Next 3 Days)
+    </CardTitle>
+  </CardHeader>
+
+  <CardContent>
+    {getfilteredfollow().length === 0 ? (
+      <p className="text-sm text-slate-400">
+        You have no lead follow-ups scheduled.
+      </p>
+    ) : (
+      <div className="space-y-3">
+        {getfilteredfollow().slice(0, 3).map((l) => (
+          <div key={l._id}>
+            <p className="text-white font-medium">
+              {l.leadFirstName} {l.leadLastName}
+            </p>
+            <p className="text-xs text-slate-400">
+              {l.leadPhone} •{" "}
+              {new Date(l.FollowDate).toLocaleDateString()}
+            </p>
+          </div>
+        ))}
+      </div>
+    )}
+
+    <button
+      className="mt-4 text-sm text-fuchsia-400 hover:underline"
+      onClick={() => navigate("/leads")}
+    >
+      View all leads →
+    </button>
+  </CardContent>
+</Card>
+
+
+<Card>
+  <CardHeader className="pb-2">
+    <CardTitle className="text-base">
+      Visitor Follow-ups (Next 3 Days)
+    </CardTitle>
+  </CardHeader>
+
+  <CardContent>
+    {visitorFollowups.length === 0 ? (
+      <p className="text-sm text-slate-400">
+        You have no visitor follow-ups scheduled.
+      </p>
+    ) : (
+      <div className="space-y-3">
+        {visitorFollowups.slice(0, 3).map((v, i) => (
+          <div key={i}>
+            <p className="text-white font-medium">
+              {v.visitorName}
+            </p>
+            <p className="text-xs text-slate-400">
+              {v.visitorMobile} •{" "}
+              {new Date(v.followUpDate).toLocaleDateString()}
+            </p>
+          </div>
+        ))}
+      </div>
+    )}
+
+    <button
+      className="mt-4 text-sm text-fuchsia-400 hover:underline"
+      onClick={() => navigate("/visitors")}
+    >
+      View all visitors →
+    </button>
+  </CardContent>
+</Card>
+
+
+</div>
+
+
+
+
+       
+
 
         {/* //Report Div for Call missing and Call attend and Call pending */}
         <div>
@@ -279,57 +467,57 @@ export default function Dashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
-  <CardHeader className="pb-2">
-    <CardTitle className="text-base md:text-lg">
-      Calls This Week
-    </CardTitle>
-  </CardHeader>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base md:text-lg">
+                Calls This Week
+              </CardTitle>
+            </CardHeader>
 
-  <CardContent className="px-2 md:px-6">
-    {/* Mobile height: 220px | Desktop height: 300px */}
-    <div className="w-full h-[220px] md:h-[300px]">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={callDays}
-          margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
-        >
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="#4a235a"
-          />
+            <CardContent className="px-2 md:px-6">
+              {/* Mobile height: 220px | Desktop height: 300px */}
+              <div className="w-full h-[220px] md:h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={callDays}
+                    margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#4a235a"
+                    />
 
-          <XAxis
-            dataKey="day"
-            stroke="#a78bfa"
-            tick={{ fontSize: 10 }}
-          />
+                    <XAxis
+                      dataKey="day"
+                      stroke="#a78bfa"
+                      tick={{ fontSize: 10 }}
+                    />
 
-          <YAxis
-            stroke="#a78bfa"
-            tick={{ fontSize: 10 }}
-          />
+                    <YAxis
+                      stroke="#a78bfa"
+                      tick={{ fontSize: 10 }}
+                    />
 
-          <Tooltip
-            cursor={{ fill: "rgba(255,255,255,0.1)" }}
-            contentStyle={{
-              backgroundColor: "#2a133b",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "12px",
-            }}
-          />
+                    <Tooltip
+                      cursor={{ fill: "rgba(255,255,255,0.1)" }}
+                      contentStyle={{
+                        backgroundColor: "#2a133b",
+                        border: "none",
+                        borderRadius: "8px",
+                        fontSize: "12px",
+                      }}
+                    />
 
-          <Bar
-            dataKey="calls"
-            fill="#f472b6"
-            radius={[6, 6, 0, 0]}
-            barSize={20}   // good for mobile
-          />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
-  </CardContent>
-</Card>
+                    <Bar
+                      dataKey="calls"
+                      fill="#f472b6"
+                      radius={[6, 6, 0, 0]}
+                      barSize={20}   // good for mobile
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
 
           <Card>

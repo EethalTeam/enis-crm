@@ -25,27 +25,27 @@ export default function Header({ toggleSidebar }) {
   return (
     <header className="relative z-30  bg-transparent px-6 py-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4 flex-1">
+        <div className="flex items-center  flex-1">
           <Button variant="ghost" size="icon" onClick={toggleSidebar}>
             <Menu className="w-5 h-5 text-slate-300" />
           </Button>
 
-          {/* <div className="relative max-w-md w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-400" />
+          <div className="relative max-w-md w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-400 invisible" />
             <Input
               placeholder="Search anything..."
-              className="pl-10 glass-card bg-slate-900/50 border-purple-700/50 text-white placeholder:text-slate-500"
+              className=" glass-card bg-slate-900/50 border-purple-700/50 text-white placeholder:text-slate-500 invisible"
             />
-          </div>*/}
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center ">
           {/* <Button variant="ghost" size="icon">
-            <Sun className="w-5 h-5 text-purple-300" />
+            <Sun className="w-5 h-5 text-purple-300 invisible" />
           </Button> */}
 
           {/* <Button variant="ghost" size="icon" className="relative ">
-            <Bell className="w-5 h-5 text-purple-300" />
+            <Bell className="w-5 h-5 text-purple-300 invisible" />
             <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-gradient-to-r from-pink-500 to-yellow-500 rounded-full animate-pulse"></span>
           </Button> */}
 
@@ -55,7 +55,7 @@ export default function Header({ toggleSidebar }) {
                 <LogOut className="w-5 h-5 text-purple-300" />
               </Button>
             </motion.div>
-            <div className="hidden md:block">
+            <div className=" ">
               <p className="text-sm font-medium text-white">
                 {user?.EmployeeName}
               </p>

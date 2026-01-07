@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useCallback, useEffect } from "react";
+import React, { useState, useReducer, useCallback, useEffect ,createContext,useContext} from "react";
 import { Helmet } from "react-helmet";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/use-toast";
+// import { useToast } from "@/components/ui/use-toast";
 import { Label } from "@/components/ui/label";
 
 // Logic & Utils
@@ -91,10 +91,72 @@ const DialogFooter = ({ className, children }) => (
   </div>
 );
 
+
+// --- TOAST SYSTEM ---
+const ToastContext = createContext({});
+const ToastProvider = ({ children }) => {
+  const [toasts, setToasts] = useState([]);
+
+  const toast = ({ title, description, variant = "default" }) => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id, title, description, variant }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3000);
+  };
+
+  const dismiss = (id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  return (
+    <ToastContext.Provider value={{ toast }}>
+      {children}
+      {/* Position changed: top-4, centered horizontally with left-1/2 and -translate-x-1/2 */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm pointer-events-none px-8">
+        <AnimatePresence>
+          {toasts.map((t) => (
+            <motion.div
+              key={t.id}
+              // Animation changed: Slides down from top (y) instead of in from right (x)
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === "destructive"
+                  ? "bg-red-900/90 border-red-800 text-white"
+                  : t.variant === "success"
+                    ? "bg-green-900/90 border-green-800 text-white"
+                    : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
+                }`}
+            >
+              <div>
+                {t.title && (
+                  <h4 className="font-semibold text-sm">{t.title}</h4>
+                )}
+                {t.description && (
+                  <p className="text-sm opacity-90 mt-1">{t.description}</p>
+                )}
+              </div>
+              <button
+                onClick={() => dismiss(t.id)}
+                className="text-slate-400 hover:text-white"
+              >
+                <X size={16} />
+              </button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </ToastContext.Provider>
+  );
+};
+export const useToast = () => useContext(ToastContext);
+
 // --- VISITOR DIALOG FORM ---
 const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const { toast } = useToast(); 
+ 
   const decode = (value) => {
     if (!value) return "";
     try {
@@ -1150,7 +1212,7 @@ function VisitorContent() {
 
       {/* HEADER */}
       <div className="flex md:flex-row flex-col items-start md:justify-between gap-3">
-        <h1 className="text-3xl font-bold text-white">Visitors</h1>
+        <h1 className="md:text-3xl text-xl font-bold text-white">Visitors</h1>
         <div className="flex gap-3">
           <Button
             variant="outline"
@@ -1288,7 +1350,7 @@ function VisitorContent() {
                     <Mail className="w-4 h-4" /> {row.visitorEmail}
                   </div>
                 </div>
-                <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                <div className="flex justify-start gap-3 pt-3 border-t border-slate-800">
                   <Button
                     size="icon"
                     variant="ghost"
@@ -1326,5 +1388,11 @@ function VisitorContent() {
 }
 
 export default function VisitorMain() {
-  return <VisitorContent />;
+  return(
+ <ToastProvider>
+     <VisitorContent />
+   </ToastProvider>
+  )
+  
+  
 }

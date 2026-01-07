@@ -11,7 +11,7 @@ export default function MainLayout() {
   const scrollRef = useRef(null);
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-[#1b0a2c] via-[#2a133b] to-[#3a1b4a] text-white mb-10">
+    <div className="flex h-screen bg-gradient-to-br from-[#1b0a2c] via-[#2a133b] to-[#3a1b4a] text-white mb-7">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
       {/* MOBILE OVERLAY */}
