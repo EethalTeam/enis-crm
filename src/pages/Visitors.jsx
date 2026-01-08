@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useCallback, useEffect ,createContext,useContext} from "react";
+import React, { useState, useReducer, useCallback, useEffect, createContext, useContext } from "react";
 import { Helmet } from "react-helmet";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -36,6 +36,16 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import { config } from "@/components/CustomComponents/config";
 import Reducer from "@/components/Reducer/commonReducer.js";
 import { useAuth } from "@/contexts/AuthContext";
+
+const decode = (value) => {
+  if (!value) return "";
+  try {
+    return atob(value);
+  } catch (err) {
+    console.error("Decode failed:", err);
+    return "";
+  }
+};
 
 // --- REUSABLE DIALOG COMPONENTS (Matches Leads Design) ---
 const Dialog = ({ open, onOpenChange, children }) => (
@@ -123,10 +133,10 @@ const ToastProvider = ({ children }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === "destructive"
-                  ? "bg-red-900/90 border-red-800 text-white"
-                  : t.variant === "success"
-                    ? "bg-green-900/90 border-green-800 text-white"
-                    : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
+                ? "bg-red-900/90 border-red-800 text-white"
+                : t.variant === "success"
+                  ? "bg-green-900/90 border-green-800 text-white"
+                  : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
                 }`}
             >
               <div>
@@ -155,8 +165,8 @@ export const useToast = () => useContext(ToastContext);
 // --- VISITOR DIALOG FORM ---
 const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
   const { user } = useAuth();
-  const { toast } = useToast(); 
- 
+  const { toast } = useToast();
+
   const decode = (value) => {
     if (!value) return "";
     try {
@@ -627,11 +637,10 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
     <button
       type="button"
       onClick={() => setActiveTab(id)}
-      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${
-        activeTab === id
+      className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${activeTab === id
           ? "bg-fuchsia-600 text-white shadow-md"
           : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-      }`}
+        }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
       <span className="hidden md:inline">{label}</span>
@@ -644,7 +653,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
     </button>
   );
 
-   const tomorrow = new Date();
+  const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const min = tomorrow.toISOString().split("T")[0];
 
@@ -837,12 +846,12 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
                     <Input
                       type="date"
                       className="text-white bg-slate-900 border-slate-700"
-                       style={{ colorScheme: "dark" }}
+                      style={{ colorScheme: "dark" }}
                       value={state.followUpDate}
                       onChange={(e) =>
                         storeDispatch(e.target.value, "followUpDate", "text")
                       }
-                       min={min}
+                      min={min}
                     />
                   </div>
                   <div className="space-y-2">
@@ -1145,14 +1154,17 @@ function VisitorContent() {
   const [selectedVisitor, setSelectedVisitor] = useState(null);
   const { toast } = useToast();
 
+
   const fetchVisitors = useCallback(async () => {
     setLoading(true);
-    const employeeId = localStorage.getItem("EmployeeID");
+    const role = localStorage.getItem("role");
+    const employeeId = decode(localStorage.getItem("EmployeeId"));
+     const payload = role === "AGENT"   ? { employeeId,role } : {}; 
     try {
       const res = await fetch(config.Api + "Visitor/getAllVisitor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employeeId }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       setVisitors(data.data || []);
@@ -1394,11 +1406,11 @@ function VisitorContent() {
 }
 
 export default function VisitorMain() {
-  return(
- <ToastProvider>
-     <VisitorContent />
-   </ToastProvider>
+  return (
+    <ToastProvider>
+      <VisitorContent />
+    </ToastProvider>
   )
-  
-  
+
+
 }
