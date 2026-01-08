@@ -63,6 +63,7 @@ export default function Dashboard() {
   const [followupTab, setFollowupTab] = useState("lead");
   const [visitorFollowups, setVisitorFollowups] = useState([]);
   const [leads, setLeads] = useState([]);
+  const [visitor, setVisitor] = useState([]);
 
   const navigate = useNavigate()
 
@@ -100,6 +101,7 @@ export default function Dashboard() {
     getLeadFollowup()
     fetchLeads()
     getVisitorFollowup()
+    fetchVisitors()
   }, [])
 
   //   useEffect(()=>{
@@ -130,27 +132,49 @@ export default function Dashboard() {
     }
   };
 
-    const fetchLeads = async (search = "") => {
-      // setLoading(true);
-      try {
-         const role = localStorage.getItem("role");
-        let payload = { page: 1, limit: 100, search };
-        if (role === "AGENT") {
-          payload.EmployeeId = decode(localStorage.getItem("EmployeeId"));
-        }
-        const res = await fetch(config.Api + "Lead/getAllLeads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (data.success) setLeads(data.data);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        // setLoading(false);
+  const fetchLeads = async (search = "") => {
+    // setLoading(true);
+    try {
+      const role = localStorage.getItem("role");
+      let payload = { page: 1, limit: 100, search };
+      if (role === "AGENT") {
+        payload.EmployeeId = decode(localStorage.getItem("EmployeeId"));
       }
-    };
+      const res = await fetch(config.Api + "Lead/getAllLeads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) setLeads(data.data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  const fetchVisitors = async (search = "") => {
+    // setLoading(true);
+    try {
+      const role = localStorage.getItem("role");
+      let payload = { page: 1, limit: 100, search };
+      if (role === "AGENT") {
+        payload.EmployeeId = decode(localStorage.getItem("EmployeeId"));
+      }
+      const res = await fetch(config.Api + "Visitor/getAllVisitor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) setVisitor(data.data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      // setLoading(false);
+    }
+  };
 
   const getDayWiseAnsweredCalls = async () => {
     try {
@@ -221,21 +245,38 @@ export default function Dashboard() {
     }
   };
 
-    const getfilteredfollow=()=>{
-        const start = new Date();
+  const getfilteredfollow = () => {
+    const start = new Date();
     start.setUTCHours(0, 0, 0, 0);
 
     const end = new Date(start);
     end.setUTCDate(start.getUTCDate() + 3);
-    end.setUTCHours(23, 59, 59, 999); 
+    end.setUTCHours(23, 59, 59, 999);
 
-     return  leads.filter((l) => {
-      if(!l.FollowDate) return false
-      const foldate=new Date(l.FollowDate)
-     return foldate >=start && foldate <=end
-     }
-    );
+    return leads.filter((l) => {
+      if (!l.FollowDate) return false
+      const foldate = new Date(l.FollowDate)
+      return foldate >= start && foldate <= end
     }
+    );
+  }
+
+
+  const getfilteredVisitorfollow = () => {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(start.getDate() + 3);
+    end.setHours(23, 59, 59, 999);
+
+    return visitorFollowups.filter((v) => {
+      if (!v.followUpDate) return false;
+      const date = new Date(v.followUpDate);
+      return date >= start && date <= end;
+    });
+  };
+
 
   const getLeadFollowup = async () => {
     try {
@@ -260,28 +301,28 @@ export default function Dashboard() {
 
 
   const getVisitorFollowup = async () => {
-  try {
-    const role = localStorage.getItem("role");
-    const EmployeeId = decode(localStorage.getItem("EmployeeId"));
+    try {
+      const role = localStorage.getItem("role");
+      const EmployeeId = decode(localStorage.getItem("EmployeeId"));
 
-    const res = await fetch(
-      config.Api + "DashBoard/getVisitorFollowup",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role, EmployeeId }),
-      }
-    );
+      const res = await fetch(
+        config.Api + "DashBoard/getVisitorFollowup",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role, EmployeeId }),
+        }
+      );
 
-    const data = await res.json();
-    setVisitorFollowups(data || []);
-  } catch (err) {
-    console.log(err);
-  }
-};
+      const data = await res.json();
+      setVisitorFollowups(data || []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
 
-  
+
 
 
 
@@ -324,89 +365,128 @@ export default function Dashboard() {
 
 
 
- <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-<Card>
-  <CardHeader className="pb-2">
-    <CardTitle className="text-base">
-      Lead Follow-ups (Next 3 Days)
-    </CardTitle>
-  </CardHeader>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">
+                Lead Follow-ups (Next 3 Days)
+              </CardTitle>
+            </CardHeader>
 
-  <CardContent>
-    {getfilteredfollow().length === 0 ? (
-      <p className="text-sm text-slate-400">
-        You have no lead follow-ups scheduled.
-      </p>
-    ) : (
-      <div className="space-y-3">
-        {getfilteredfollow().slice(0, 3).map((l) => (
-          <div key={l._id}>
-            <p className="text-white font-medium">
-              {l.leadFirstName} {l.leadLastName}
-            </p>
-            <p className="text-xs text-slate-400">
-              {l.leadPhone} •{" "}
-              {new Date(l.FollowDate).toLocaleDateString()}
-            </p>
-          </div>
-        ))}
-      </div>
-    )}
-
-    <button
-      className="mt-4 text-sm text-fuchsia-400 hover:underline"
-      onClick={() => navigate("/leads")}
-    >
-      View all leads →
-    </button>
-  </CardContent>
-</Card>
-
-
-<Card>
-  <CardHeader className="pb-2">
-    <CardTitle className="text-base">
-      Visitor Follow-ups (Next 3 Days)
-    </CardTitle>
-  </CardHeader>
-
-  <CardContent>
-    {visitorFollowups.length === 0 ? (
-      <p className="text-sm text-slate-400">
-        You have no visitor follow-ups scheduled.
-      </p>
-    ) : (
-      <div className="space-y-3">
-        {visitorFollowups.slice(0, 3).map((v, i) => (
-          <div key={i}>
-            <p className="text-white font-medium">
-              {v.visitorName}
-            </p>
-            <p className="text-xs text-slate-400">
-              {v.visitorMobile} •{" "}
-              {new Date(v.followUpDate).toLocaleDateString()}
-            </p>
-          </div>
-        ))}
-      </div>
-    )}
-
-    <button
-      className="mt-4 text-sm text-fuchsia-400 hover:underline"
-      onClick={() => navigate("/visitors")}
-    >
-      View all visitors →
-    </button>
-  </CardContent>
-</Card>
-
-
-</div>
+            <CardContent>
+              {getfilteredfollow().length === 0 ? (
+                <p className="text-sm text-slate-400">
+                  You have no lead follow-ups scheduled.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {getfilteredfollow().slice(0, 3).map((l) => (
+                    <div
+                      key={l._id}
+                      className="flex justify-between items-start gap-3"
+                    >
+                      {/* LEFT SIDE */}
+                      <div>
+                        <p className="text-white font-medium">
+                          {l.leadFirstName} {l.leadLastName} <span className="text-xs text-slate-400 ps-1"> ({l.leadPhone})</span>
+                        </p>
 
 
 
+                        {l.leadNotes && (
+                          <p className="text-sm text-slate-300 mt-1">
+                            {l.leadNotes}
+                          </p>
+                        )}
+                      </div>
 
-       
+                      {/* RIGHT SIDE – DATE (BLUE MARKED AREA) */}
+                      <div className="text-xs text-fuchsia-300 bg-fuchsia-900/30  px-2  py-1  rounded-md  whitespace-nowrap ">
+                        {new Date(l.FollowDate).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                        })}
+                      </div>
+                    </div>
+
+                  ))}
+                </div>
+              )}
+
+              <button
+                className="mt-4 text-sm text-fuchsia-400 hover:underline"
+                onClick={() => navigate("/leads")}
+              >
+                View all leads →
+              </button>
+            </CardContent>
+          </Card>
+
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">
+                Visitor Follow-ups (Next 3 Days)
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent>
+              {getfilteredVisitorfollow().length === 0 ? (
+                <p className="text-sm text-slate-400">
+                  You have no visitor follow-ups scheduled.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {getfilteredVisitorfollow().slice(0, 3).map((v, i) => (
+                    <div
+                      key={i}
+                      className="flex justify-between items-start gap-3"
+                    >
+                      {/* LEFT */}
+                      <div>
+                        <p className="text-white font-medium">
+                          {v.visitorName}
+                          <span className="text-xs text-slate-400 ps-1">
+                            ({v.visitorMobile})
+                          </span>
+                        </p>
+
+                        {v.notes && (
+                          <p className="text-sm text-slate-300 mt-1">
+                            {v.notes}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* RIGHT – DATE */}
+                      <div className=" text-xs text-amber-300 bg-amber-900/30 px-2 py-1 rounded-md whitespace-nowrap ">
+                        {new Date(v.followUpDate).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                        })}
+                      </div>
+                    </div>
+
+                  ))}
+                </div>
+              )}
+
+              <button
+                className="mt-4 text-sm text-fuchsia-400 hover:underline"
+                onClick={() => navigate("/visitors")}
+              >
+                View all visitors →
+              </button>
+            </CardContent>
+          </Card>
+
+
+        </div>
+
+
+
+
+
 
 
         {/* //Report Div for Call missing and Call attend and Call pending */}

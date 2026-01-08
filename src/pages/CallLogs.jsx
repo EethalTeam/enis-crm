@@ -725,8 +725,9 @@ function CallLogsContent() {
                                 : " "
                             }
                             onClick={() => {
-                              if (call.leadName)
-                                return setLeadInitialData({
+                              // if (call.leadName)
+                              //   return
+                               setLeadInitialData({
                                   leadCreatedById: decode(
                                     localStorage.getItem("EmployeeId")
                                   ),
@@ -826,8 +827,9 @@ function CallLogsContent() {
                       disabled={!!call.leadName}
                       className="w-full"
                       onClick={() => {
-                        if (call.leadName)
-                          return setLeadInitialData({
+                        // if (call.leadName)
+                        //   return 
+                        setLeadInitialData({
                             leadCreatedById: decode(
                               localStorage.getItem("EmployeeId")
                             ),

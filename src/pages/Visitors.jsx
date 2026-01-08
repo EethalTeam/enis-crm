@@ -203,7 +203,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
       role === "AGENT" ? decode(localStorage.getItem("EmployeeId")) : "",
     followedUpByName:
       role === "AGENT" ? decode(localStorage.getItem("EmployeeName")) : "",
-    followUpStatus: "Pending",
+    followUpStatus: "Visit Pending",
     followUpDescription: "",
     notes: "",
     remarks: "",
@@ -644,6 +644,10 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
     </button>
   );
 
+   const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const min = tomorrow.toISOString().split("T")[0];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[850px] max-h-[90vh] flex flex-col p-0">
@@ -833,10 +837,12 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
                     <Input
                       type="date"
                       className="text-white bg-slate-900 border-slate-700"
+                       style={{ colorScheme: "dark" }}
                       value={state.followUpDate}
                       onChange={(e) =>
                         storeDispatch(e.target.value, "followUpDate", "text")
                       }
+                       min={min}
                     />
                   </div>
                   <div className="space-y-2">
@@ -922,12 +928,12 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
                           <div className="flex items-center gap-2 mb-1">
                             <Badge
                               variant={
-                                item.followUpStatus === "Pending"
+                                item.followUpStatus === "Visit Pending"
                                   ? "destructive"
                                   : "default"
                               }
                               className={
-                                item.followUpStatus === "Completed"
+                                item.followUpStatus === "Visit Completed"
                                   ? "bg-green-600"
                                   : ""
                               }

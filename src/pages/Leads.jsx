@@ -228,10 +228,10 @@ const ToastProvider = ({ children }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === "destructive"
-                  ? "bg-red-900/90 border-red-800 text-white"
-                  : t.variant === "success"
-                    ? "bg-green-900/90 border-green-800 text-white"
-                    : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
+                ? "bg-red-900/90 border-red-800 text-white"
+                : t.variant === "success"
+                  ? "bg-green-900/90 border-green-800 text-white"
+                  : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
                 }`}
             >
               <div>
@@ -516,6 +516,7 @@ const LeadDialog = ({
       setFormData((prev) => ({
         ...prev,
         leadStatusId: value,
+        leadNotes:'',
         leadStatusName: selectedStatus ? selectedStatus.leadStatustName : "",
       }));
       return;
@@ -694,6 +695,15 @@ const LeadDialog = ({
       });
       setIsSubmitting(false);
       return;
+    }else if(!formData.leadNotes || formData.leadNotes == ""){
+        setActiveFormTab("deal");
+      toast({
+        title: "Alert",
+        description: "Please enter notes",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
     }
     const endpoint = mode === "edit" ? "Lead/updateLead" : "Lead/createLead";
 
@@ -760,8 +770,8 @@ const LeadDialog = ({
       type="button"
       onClick={() => onClick(id)}
       className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${active === id
-          ? "bg-fuchsia-600 text-white shadow-md"
-          : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+        ? "bg-fuchsia-600 text-white shadow-md"
+        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
         }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
@@ -879,7 +889,7 @@ const LeadDialog = ({
                     name="leadPhone"
                     value={formData.leadPhone}
                     onChange={handleChange}
-                    required
+                    disabled={initialData?.leadPhone ? true : false}
                   />
                 </div>
                 <div>
@@ -1010,7 +1020,7 @@ const LeadDialog = ({
                     name="leadStatusId"
                     value={formData.leadStatusId}
                     onChange={handleChange}
-                    disabled={true}
+                    // disabled={true}
                     className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"
                   >
                     <option value="">Select</option>
@@ -1354,6 +1364,8 @@ function LeadsContent() {
   const [noteText, setNoteText] = useState("");
   const [leadStatuses, setLeadStatuses] = useState([]);
   const [selectedStatusId, setSelectedStatusId] = useState("");
+  const [followDate, setFollowDate] = useState("");
+  const [siteVisitDate, setSiteVisitDate] = useState("");
 
   const [viewOpen, setViewOpen] = useState(false);
   const [viewData, setViewData] = useState({});
@@ -1394,11 +1406,11 @@ function LeadsContent() {
         setLeadStatuses(data);
       })
       .catch(console.error);
-      
+
   }, []);
-  useEffect(()=>{
-console.log(getfilteredfollow(),"getfilteredfollow")
-  },[leads.length])
+  useEffect(() => {
+    console.log(getfilteredfollow(), "getfilteredfollow")
+  }, [leads.length])
 
   // --- DIALER LOGIC ---
   const resetCallState = () => {
@@ -1596,6 +1608,28 @@ console.log(getfilteredfollow(),"getfilteredfollow")
       return;
     }
 
+    if (
+      selectedStatus?.leadStatustName === "Follow Up" &&
+      !followDate
+    ) {
+      return toast({
+        title: "Alert",
+        description: "Please select follow up date",
+        variant: "destructive",
+      });
+    }
+
+    if (
+      selectedStatus?.leadStatustName === "Site Visit" &&
+      !siteVisitDate
+    ) {
+      return toast({
+        title: "Alert",
+        description: "Please select site visit date",
+        variant: "destructive",
+      });
+    }
+
     //  Notes validation (MANDATORY)
     if (!noteText || noteText.trim().length === 0) {
       toast({
@@ -1606,7 +1640,7 @@ console.log(getfilteredfollow(),"getfilteredfollow")
       return;
     }
 
-    const selectedStatus = leadStatuses.find((s) => s._id === selectedStatusId);
+    // const selectedStatus = leadStatuses.find((s) => s._id === selectedStatusId);
 
     const res = await fetch(config.Api + "Lead/addLeadNote", {
       method: "POST",
@@ -1614,7 +1648,10 @@ console.log(getfilteredfollow(),"getfilteredfollow")
       body: JSON.stringify({
         leadId: notesLead._id,
         leadStatusId: selectedStatusId,
+        leadNotes:noteText,
         details: `Status changed to "${selectedStatus?.leadStatustName}" - ${noteText}`,
+        FollowDate:followDate,
+        SiteVisitDate:siteVisitDate,
         employeeName: user?.EmployeeName,
       }),
     });
@@ -1623,6 +1660,8 @@ console.log(getfilteredfollow(),"getfilteredfollow")
       setNotesDialogOpen(false);
       setSelectedStatusId("");
       setNoteText("");
+      setFollowDate("");
+      setSiteVisitDate("");
     } else {
       toast({ title: "Update failed", variant: "destructive" });
     }
@@ -1643,28 +1682,28 @@ console.log(getfilteredfollow(),"getfilteredfollow")
       return true;
     });
 
-    const getfilteredfollow=()=>{
-        const start = new Date();
+  const getfilteredfollow = () => {
+    const start = new Date();
     start.setUTCHours(0, 0, 0, 0);
 
     const end = new Date(start);
     end.setUTCDate(start.getUTCDate() + 3);
-    end.setUTCHours(23, 59, 59, 999); 
+    end.setUTCHours(23, 59, 59, 999);
 
-     return  leads.filter((l) => {
-      if(!l.FollowDate) return false
-      const foldate=new Date(l.FollowDate)
-     return foldate >=start && foldate <=end
-     }
-    );
+    return leads.filter((l) => {
+      if (!l.FollowDate) return false
+      const foldate = new Date(l.FollowDate)
+      return foldate >= start && foldate <= end
     }
+    );
+  }
 
   const TabButton = ({ id, label, icon: Icon }) => (
     <button
       onClick={() => setActiveTab(id)}
       className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-md ${activeTab === id
-          ? "bg-fuchsia-600 text-white shadow-md"
-          : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+        ? "bg-fuchsia-600 text-white shadow-md"
+        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
         }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
@@ -1697,6 +1736,8 @@ console.log(getfilteredfollow(),"getfilteredfollow")
   const handleViewNotes = (l) => {
     setNotesLead(l);
     setSelectedStatusId(l.leadStatusId?._id || "");
+     setFollowDate( l.FollowDate ? l.FollowDate.split("T")[0] : "" );
+    setSiteVisitDate(  l.SiteVisitDate ? l.SiteVisitDate.split("T")[0] : "");
     setNoteText("");
     setNotesDialogOpen(true);
   };
@@ -1854,6 +1895,9 @@ console.log(getfilteredfollow(),"getfilteredfollow")
       fontWeight: "bold",
     },
   };
+  const selectedStatus = leadStatuses.find(
+    (s) => s._id === selectedStatusId
+  );
 
   return (
     <div className="space-y-6 bg-slate-950 min-h-screen p-4  text-slate-100">
@@ -2118,10 +2162,10 @@ console.log(getfilteredfollow(),"getfilteredfollow")
               </tbody>
             </table>
 
-          
+
           </div>
 
-        
+
           {/* ================= MOBILE CARD VIEW ================= */}
           <div className="md:hidden p-4 space-y-4">
             {getFilteredLeads().map((l) => (
@@ -2250,62 +2294,62 @@ console.log(getfilteredfollow(),"getfilteredfollow")
       </Card>
 
 
-        <Dialog
-              open={historyDialogOpen}
-              onOpenChange={setHistoryDialogOpen}
-            >
-              <DialogContent className="sm:max-w-[700px] h-[60vh] flex flex-col p-0 overflow-hidden bg-slate-900 border-slate-800">
-                <DialogHeader className="flex flex-row items-center justify-between p-4 border-b border-slate-800 shrink-0">
-                  <DialogTitle className="text-sm text-white">
-                    Lead History – {initialData?.leadFirstName}
-                  </DialogTitle>
-                  {activeFormTab === "history" && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setHistoryDialogOpen(false);
-                      }}
-                      className="text-slate-400 hover:text-white transition-colors"
-                    >
-                      <X size={18} />
-                    </button>
-                  )}
-                </DialogHeader>
+      <Dialog
+        open={historyDialogOpen}
+        onOpenChange={setHistoryDialogOpen}
+      >
+        <DialogContent className="sm:max-w-[700px] h-[60vh] flex flex-col p-0 overflow-hidden bg-slate-900 border-slate-800">
+          <DialogHeader className="flex flex-row items-center justify-between p-4 border-b border-slate-800 shrink-0">
+            <DialogTitle className="text-sm text-white">
+              Lead History – {initialData?.leadFirstName}
+            </DialogTitle>
+            {activeFormTab === "history" && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setHistoryDialogOpen(false);
+                }}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <X size={18} />
+              </button>
+            )}
+          </DialogHeader>
 
-                <div className="flex-1 overflow-y-auto  bg-slate-950 p-2">
-                  {activeFormTab === "history" && (
-                    <>
-                      {!initialData?.leadHistory?.length ? (
-                        <p className="text-sm text-slate-400">
-                          No history Available
+          <div className="flex-1 overflow-y-auto  bg-slate-950 p-2">
+            {activeFormTab === "history" && (
+              <>
+                {!initialData?.leadHistory?.length ? (
+                  <p className="text-sm text-slate-400">
+                    No history Available
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {[...initialData.leadHistory].reverse().map((h) => (
+                      <div
+                        key={h._id || h.timestamp}
+                        className="border-l-2 border-fuchsia-600 pl-4 py-2 bg-slate-900/40 rounded-md"
+                      >
+                        <p className="text-xs uppercase text-fuchsia-400 font-bold">
+                          {h.eventType}
                         </p>
-                      ) : (
-                        <div className="space-y-4">
-                          {[...initialData.leadHistory].reverse().map((h) => (
-                            <div
-                              key={h._id || h.timestamp}
-                              className="border-l-2 border-fuchsia-600 pl-4 py-2 bg-slate-900/40 rounded-md"
-                            >
-                              <p className="text-xs uppercase text-fuchsia-400 font-bold">
-                                {h.eventType}
-                              </p>
-                              <p className="text-sm text-slate-200 mt-1">
-                                {h.details}
-                              </p>
-                              <p className="text-[11px] text-slate-500 mt-1">
-                                {new Date(h.timestamp).toLocaleString()}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
+                        <p className="text-sm text-slate-200 mt-1">
+                          {h.details}
+                        </p>
+                        <p className="text-[11px] text-slate-500 mt-1">
+                          {new Date(h.timestamp).toLocaleString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* View icon popup */}
       <Dialog open={viewOpen} onOpenChange={setViewOpen}>
@@ -2410,6 +2454,40 @@ console.log(getfilteredfollow(),"getfilteredfollow")
                 ))}
               </select>
             </div>
+
+
+            {/* FOLLOW UP DATE */}
+            {selectedStatus?.leadStatustName === "Follow Up" && (
+              <div>
+                <Label>Follow Up Date *</Label>
+                <Input
+                  type="date"
+                  
+                  value={followDate}
+                  onChange={(e) => setFollowDate(e.target.value)}
+                  className="text-white"
+        
+                        style={{ colorScheme: "dark" }}
+                />
+              </div>
+            )}
+
+
+
+            {/* SITE VISIT DATE */}
+            {selectedStatus?.leadStatustName === "Site Visit" && (
+              <div>
+                <Label>Site Visit Date *</Label>
+                <Input
+                  type="date"
+                  value={siteVisitDate}
+                  onChange={(e) => setSiteVisitDate(e.target.value)}
+                  className="text-white"
+                  style={{ colorScheme: "dark" }}
+                />
+              </div>
+            )}
+
 
             {/* NOTES */}
             <div>
