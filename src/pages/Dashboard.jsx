@@ -112,9 +112,10 @@ export default function Dashboard() {
     try {
       const role = localStorage.getItem("role");
       const TelecmiID = decode(localStorage.getItem("TelecmiID"))
+      const EmployeeID =  decode(localStorage.getItem("EmployeeId"))
 
       let url = config.Api + "DashBoard/getAllDashBoard";
-      const payload = role === "AGENT" ? { TelecmiID, role } : {};
+      const payload = role === "AGENT" ? { TelecmiID, role,EmployeeID } : {};
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

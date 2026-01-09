@@ -1060,6 +1060,7 @@ const LeadDialog = ({
                         value={formData.SiteVisitDate}
                         onChange={handleChange}
                         disabled={isViewMode}
+                         min={min}
                       />
                     </div>
                   )}
@@ -1899,6 +1900,10 @@ function LeadsContent() {
     (s) => s._id === selectedStatusId
   );
 
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const min = tomorrow.toISOString().split("T")[0];
+
   return (
     <div className="space-y-6 bg-slate-950 min-h-screen p-4  text-slate-100">
       {/* OUTGOING CALL POPUP */}
@@ -2462,7 +2467,7 @@ function LeadsContent() {
                 <Label>Follow Up Date *</Label>
                 <Input
                   type="date"
-                  
+                   min={min}
                   value={followDate}
                   onChange={(e) => setFollowDate(e.target.value)}
                   className="text-white"
@@ -2481,6 +2486,7 @@ function LeadsContent() {
                 <Input
                   type="date"
                   value={siteVisitDate}
+                   min={min}
                   onChange={(e) => setSiteVisitDate(e.target.value)}
                   className="text-white"
                   style={{ colorScheme: "dark" }}

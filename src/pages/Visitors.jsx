@@ -236,7 +236,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
   // Existing Data (History)
   const [plotDetails, setPlotDetails] = useState([]);
   const [followUpDetails, setFollowUpDetails] = useState([]);
-
+console.log(followUpDetails,"followUpDetails")
   const isEdit = !!initialData;
   const [Status] = useState([
     { StatusIDPK: 1, StatusName: "Visit Pending" },
@@ -394,6 +394,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
     }
 
     setPlotDetails(data.plots || []);
+    console.log(data.followUps,"data.followUps")
     setFollowUpDetails(data.followUps || []);
   };
 
@@ -479,7 +480,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
       description: state.description,
       employeeId: state.employeeId,
       // For Create Only
-      followUpDate: state.followUpDate,
+      followUpDate: state.followUpDate?.split("T")[0],
       followedUpById: state.followedUpById,
       followUpStatus: state.followUpStatus,
       followUpDescription: state.followUpDescription,
@@ -529,7 +530,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
         payload = {
           visitorId: state._id,
           followUpId: state.followUpId,
-          followUpDate: state.followUpDate,
+          followUpDate: state.followUpDate?.split("T")[0],
           followedUpById: state.followedUpById,
           followUpStatus: state.followUpStatus,
           followUpDescription: state.followUpDescription,
@@ -604,6 +605,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
   // Helper to load a sub-item into form for editing
   const editSubItem = (item, type) => {
     if (type === "followup") {
+      console.log(item.followUpDate,item,"items")
       dispatch({ type: "text", name: "followUpId", value: item._id });
       dispatch({
         type: "text",
@@ -1148,10 +1150,12 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
 // --- MAIN DASHBOARD CONTENT ---
 function VisitorContent() {
   const [visitors, setVisitors] = useState([]);
+  console.log(visitors,"visitors")
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedVisitor, setSelectedVisitor] = useState(null);
+  console.log(selectedVisitor,"selectedVisitor")
   const { toast } = useToast();
 
 
@@ -1193,7 +1197,7 @@ function VisitorContent() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await fetch(config.Api + "Employee/deleteEmployee", {
+          const res = await fetch(config.Api + "Visitor/deleteVisitor", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(row),
@@ -1221,6 +1225,7 @@ function VisitorContent() {
       (v.visitorName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (v.visitorMobile || "").includes(searchTerm)
   );
+  console.log(filteredVisitors,"filteredVisitors")
 
   return (
     <div className="space-y-6 bg-slate-950 min-h-screen p-4 mt-3 text-slate-100">
@@ -1315,6 +1320,7 @@ function VisitorContent() {
                         size="icon"
                         variant="ghost"
                         onClick={() => {
+                          console.log(row,"row")
                           setSelectedVisitor(row);
                           setDialogOpen(true);
                         }}
