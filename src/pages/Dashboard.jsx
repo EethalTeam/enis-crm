@@ -126,7 +126,7 @@ export default function Dashboard() {
       const data = result.data || result;
 
       setDashBoard(data);
-      setStates(data)
+      setStates(data)  
 
     } catch (err) {
       console.log(err, "err")
