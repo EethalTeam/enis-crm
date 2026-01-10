@@ -243,6 +243,22 @@ console.log(followUpDetails,"followUpDetails")
     { StatusIDPK: 2, StatusName: "Visit Completed" },
   ]);
 
+  const resetFollowUpState = () => {
+  // Clear follow up list
+  setFollowUpDetails([]);
+
+  // Clear follow up form fields (reducer state)
+  dispatch({ type: "text", name: "followUpId", value: "" });
+  dispatch({ type: "text", name: "followUpDate", value: "" });
+  dispatch({ type: "text", name: "followUpStatus", value: "Visit Pending" });
+  dispatch({ type: "text", name: "followUpDescription", value: "" });
+  dispatch({ type: "text", name: "notes", value: "" });
+  dispatch({ type: "text", name: "remarks", value: "" });
+
+  // Optional UX improvement
+  setActiveTab("contact");
+};
+
   // --- Data Fetching Helpers ---
   const fetchAPI = async (endpoint, body = {}) => {
     try {
@@ -660,7 +676,15 @@ console.log(followUpDetails,"followUpDetails")
   const min = tomorrow.toISOString().split("T")[0];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+  open={open}
+  onOpenChange={(isOpen) => {
+    if (!isOpen) {
+      resetFollowUpState();   
+    }
+    onOpenChange(isOpen);
+  }}
+>
       <DialogContent className="sm:max-w-[850px] max-h-[90vh] flex flex-col p-0">
         <DialogHeader>
           <div className="flex justify-between items-center w-full">
@@ -668,7 +692,9 @@ console.log(followUpDetails,"followUpDetails")
               {isEdit ? "Edit Visitor" : "Add New Visitor"}
             </DialogTitle>
             <button
-              onClick={() => onOpenChange(false)}
+              onClick={() =>{
+                 resetFollowUpState();
+                 onOpenChange(false);}}
               className="text-slate-400 hover:text-white"
             >
               <X size={20} />
@@ -1127,7 +1153,10 @@ console.log(followUpDetails,"followUpDetails")
           )}
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+          <Button variant="ghost"   onClick={() => {
+    resetFollowUpState();
+    onOpenChange(false);
+  }}>
             Cancel
           </Button>
           {/* Only show main save on Contact Tab or New Entry */}
@@ -1157,6 +1186,8 @@ function VisitorContent() {
   const [selectedVisitor, setSelectedVisitor] = useState(null);
   console.log(selectedVisitor,"selectedVisitor")
   const { toast } = useToast();
+
+  const role = localStorage.getItem('role')
 
 
   const fetchVisitors = useCallback(async () => {
@@ -1237,12 +1268,16 @@ function VisitorContent() {
       <div className="flex md:flex-row flex-col items-start md:justify-between gap-3">
         <h1 className="md:text-3xl text-xl font-bold text-white">Visitors</h1>
         <div className="flex gap-3">
-          <Button
+          {
+            role !== 'AGENT' &&
+             <Button
             variant="outline"
             className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
           >
             <Upload className="w-4 h-4 mr-2" /> Export
           </Button>
+          }
+         
           <Button
             onClick={() => {
               setSelectedVisitor(null);

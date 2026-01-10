@@ -1638,6 +1638,7 @@ function LeadsContent() {
         description: "Please enter notes before saving",
         variant: "destructive",
       });
+      
       return;
     }
 
@@ -1657,6 +1658,12 @@ function LeadsContent() {
       }),
     });
     if ((await res.json()).success) {
+        toast({
+        title: "Success",
+        description: "Lead status and note updated successfully",
+        variant: "success",
+      });
+
       fetchLeads();
       setNotesDialogOpen(false);
       setSelectedStatusId("");
