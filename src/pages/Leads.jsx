@@ -2234,7 +2234,7 @@ function LeadsContent() {
                 </p>
 
                 {/* ===== ACTIONS ===== */}
-                <div className="flex justify-between pt-3 border-t border-slate-800">
+                <div className="flex justify-start pt-3 border-t border-slate-800">
                   {role !== "AGENT" && (
                     <Button
                       variant="icon"
