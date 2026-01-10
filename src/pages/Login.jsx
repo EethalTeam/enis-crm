@@ -246,9 +246,25 @@ export default function Login() {
                   )}
                 </Button>
               </motion.div>
-              <Footer />
+              
+             
+
             </form>
+        
           </div>
+               <div className="flex justify-center  px-4 py-2 rounded-md">
+                <span className="flex items-center gap-2 text-xs md:text-sm text-slate-300">
+                  © {new Date().getFullYear()} Arvat | Developed by
+                  <a
+                    href="https://eethalnaditsolutions.in/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-fuchsia-400 hover:text-fuchsia-300 font-semibold"
+                  >
+                    ENIS
+                  </a>
+                </span>
+              </div>
         </motion.div>
       </div>
     </>
