@@ -86,12 +86,12 @@ export default function Dashboard() {
   const [leads, setLeads] = useState([]);
   const [visitor, setVisitor] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
-const open = Boolean(anchorEl);
+  const open = Boolean(anchorEl);
 
-const [dateRange, setDateRange] = useState([
-  dayjs().startOf("day"),
-  dayjs().endOf("day"),
-]);
+  const [dateRange, setDateRange] = useState([
+    dayjs().startOf("day"),
+    dayjs().endOf("day"),
+  ]);
 
   const navigate = useNavigate()
 
@@ -118,23 +118,48 @@ const [dateRange, setDateRange] = useState([
 
   // ];
 
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const { name, value, color } = payload[0];
+
+      return (
+        <div
+          style={{
+            backgroundColor: color,
+            padding: "8px 12px",
+            borderRadius: "8px",
+            color: "black",
+            fontSize: "12px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+          }}
+        >
+          <p className="font-semibold">{name}</p>
+          <p className='font-bold'>Count: {value}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+
 
 
 
   useEffect(() => {
-  const from = dateRange[0].toDate();
-  const to = dateRange[1].toDate();
+    const from = dateRange[0].toDate();
+    const to = dateRange[1].toDate();
 
-  getAllDashBoard(from, to);
-  getDayWiseAnsweredCalls(from, to);
-  getLeadsBySource(from, to);
-  getCallReport(from, to);
+    getAllDashBoard(from, to);
+    getDayWiseAnsweredCalls(from, to);
+    getLeadsBySource(from, to);
+    getCallReport(from, to);
 
-  getLeadFollowup();
-  fetchLeads();
-  getVisitorFollowup();
-  fetchVisitors();
-}, []);
+    getLeadFollowup();
+    fetchLeads();
+    getVisitorFollowup();
+    fetchVisitors();
+  }, []);
 
   //   useEffect(()=>{
   // console.log(getfilteredfollow(),"getfilteredfollow")
@@ -147,7 +172,7 @@ const [dateRange, setDateRange] = useState([
       const EmployeeID = decode(localStorage.getItem("EmployeeId"))
 
       let url = config.Api + "DashBoard/getAllDashBoard";
-      const payload = role === "AGENT" ? { TelecmiID, role, EmployeeID,fromDate, toDate } : {fromDate, toDate };
+      const payload = role === "AGENT" ? { TelecmiID, role, EmployeeID, fromDate, toDate } : { fromDate, toDate };
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -216,7 +241,7 @@ const [dateRange, setDateRange] = useState([
       const TelecmiID = decode(localStorage.getItem("TelecmiID"))
 
       let url = config.Api + "DashBoard/getDayWiseAnsweredCalls";
-      const payload = role === "AGENT" ? { TelecmiID, role ,fromDate, toDate} : {fromDate, toDate };
+      const payload = role === "AGENT" ? { TelecmiID, role, fromDate, toDate } : { fromDate, toDate };
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -239,7 +264,7 @@ const [dateRange, setDateRange] = useState([
   const getCallReport = async (fromDate, toDate) => {
     const role = localStorage.getItem("role");
     const TelecmiID = decode(localStorage.getItem("TelecmiID"))
-    const payload = role === "AGENT" ? { TelecmiID, role,fromDate, toDate } : {fromDate, toDate };
+    const payload = role === "AGENT" ? { TelecmiID, role, fromDate, toDate } : { fromDate, toDate };
     const res = await fetch(config.Api + "DashBoard/getCallStatusReport", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -257,7 +282,7 @@ const [dateRange, setDateRange] = useState([
 
       const role = localStorage.getItem("role");
       const EmployeeId = decode(localStorage.getItem("EmployeeId"))
-      const payload = role === "AGENT" ? { EmployeeId, role ,fromDate, toDate} : {fromDate, toDate };
+      const payload = role === "AGENT" ? { EmployeeId, role, fromDate, toDate } : { fromDate, toDate };
       let url = config.Api + "DashBoard/getLeadsBySource";
 
       const res = await fetch(url, {
@@ -355,42 +380,42 @@ const [dateRange, setDateRange] = useState([
   };
 
   const applyPreset = (type) => {
-  let from, to;
+    let from, to;
 
-  switch (type) {
-    case "today":
-      from = dayjs().startOf("day");
-      to = dayjs().endOf("day");
-      break;
+    switch (type) {
+      case "today":
+        from = dayjs().startOf("day");
+        to = dayjs().endOf("day");
+        break;
 
-    case "yesterday":
-      from = dayjs().subtract(1, "day").startOf("day");
-      to = dayjs().subtract(1, "day").endOf("day");
-      break;
+      case "yesterday":
+        from = dayjs().subtract(1, "day").startOf("day");
+        to = dayjs().subtract(1, "day").endOf("day");
+        break;
 
-    case "last7":
-      from = dayjs().subtract(6, "day").startOf("day");
-      to = dayjs().endOf("day");
-      break;
+      case "last7":
+        from = dayjs().subtract(6, "day").startOf("day");
+        to = dayjs().endOf("day");
+        break;
 
-    case "last30":
-      from = dayjs().subtract(29, "day").startOf("day");
-      to = dayjs().endOf("day");
-      break;
+      case "last30":
+        from = dayjs().subtract(29, "day").startOf("day");
+        to = dayjs().endOf("day");
+        break;
 
-    default:
-      return;
-  }
+      default:
+        return;
+    }
 
-  setDateRange([from, to]);
+    setDateRange([from, to]);
 
-  getAllDashBoard(from.toDate(), to.toDate());
-  getDayWiseAnsweredCalls(from.toDate(), to.toDate());
-  getCallReport(from.toDate(), to.toDate());
-  getLeadsBySource(from.toDate(), to.toDate());
+    getAllDashBoard(from.toDate(), to.toDate());
+    getDayWiseAnsweredCalls(from.toDate(), to.toDate());
+    getCallReport(from.toDate(), to.toDate());
+    getLeadsBySource(from.toDate(), to.toDate());
 
-  setAnchorEl(null);
-};
+    setAnchorEl(null);
+  };
 
 
 
@@ -408,78 +433,78 @@ const [dateRange, setDateRange] = useState([
       </Helmet>
       <div className="space-y-6 p-3">
         <div className="flex items-center justify-between gap-4">
-  <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
 
-  {/* Calendar Icon */}
-  <IconButton
-    onClick={(e) => setAnchorEl(e.currentTarget)}
-    sx={{ color: "white" }}
-  >
-    <Calendar />
-  </IconButton>
+          {/* Calendar Icon */}
+          <IconButton
+            onClick={(e) => setAnchorEl(e.currentTarget)}
+            sx={{ color: "white" }}
+          >
+            <Calendar />
+          </IconButton>
 
-  {/* Date Filter Popup */}
-  <Popover
-    open={open}
-    anchorEl={anchorEl}
-    onClose={() => setAnchorEl(null)}
-    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-  >
-    <Box sx={{ display: "flex", width: 600 }}>
+          {/* Date Filter Popup */}
+          <Popover
+            open={open}
+            anchorEl={anchorEl}
+            onClose={() => setAnchorEl(null)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          >
+            <Box sx={{ display: "flex", width: 600 }}>
 
-      {/* LEFT – PRESETS */}
-      <Box sx={{ width: 200, borderRight: "1px solid #ddd" }}>
-        <List dense>
-          <ListItemButton onClick={() => applyPreset("today")}>
-            <ListItemText primary="Today" />
-          </ListItemButton>
+              {/* LEFT – PRESETS */}
+              <Box sx={{ width: 200, borderRight: "1px solid #ddd" }}>
+                <List dense>
+                  <ListItemButton onClick={() => applyPreset("today")}>
+                    <ListItemText primary="Today" />
+                  </ListItemButton>
 
-          <ListItemButton onClick={() => applyPreset("yesterday")}>
-            <ListItemText primary="Yesterday" />
-          </ListItemButton>
+                  <ListItemButton onClick={() => applyPreset("yesterday")}>
+                    <ListItemText primary="Yesterday" />
+                  </ListItemButton>
 
-          <ListItemButton onClick={() => applyPreset("last7")}>
-            <ListItemText primary="Last 7 days" />
-          </ListItemButton>
+                  <ListItemButton onClick={() => applyPreset("last7")}>
+                    <ListItemText primary="Last 7 days" />
+                  </ListItemButton>
 
-          <ListItemButton onClick={() => applyPreset("last30")}>
-            <ListItemText primary="Last 30 days" />
-          </ListItemButton>
-        </List>
-      </Box>
+                  <ListItemButton onClick={() => applyPreset("last30")}>
+                    <ListItemText primary="Last 30 days" />
+                  </ListItemButton>
+                </List>
+              </Box>
 
-      {/* RIGHT – DATE PICKERS */}
-      <Box sx={{ p: 2, flex: 1 }}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            label="Start date"
-            value={dateRange[0]}
-            onChange={(newValue) =>
-              setDateRange([newValue, dateRange[1]])
-            }
-            renderInput={(params) => (
-              <TextField fullWidth size="small" {...params} />
-            )}
-          />
+              {/* RIGHT – DATE PICKERS */}
+              <Box sx={{ p: 2, flex: 1 }}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Start date"
+                    value={dateRange[0]}
+                    onChange={(newValue) =>
+                      setDateRange([newValue, dateRange[1]])
+                    }
+                    renderInput={(params) => (
+                      <TextField fullWidth size="small" {...params} />
+                    )}
+                  />
 
-          <Box sx={{ height: 16 }} />
+                  <Box sx={{ height: 16 }} />
 
-          <DatePicker
-            label="End date"
-            value={dateRange[1]}
-            onChange={(newValue) =>
-              setDateRange([dateRange[0], newValue])
-            }
-            renderInput={(params) => (
-              <TextField fullWidth size="small" {...params} />
-            )}
-          />
-        </LocalizationProvider>
-      </Box>
+                  <DatePicker
+                    label="End date"
+                    value={dateRange[1]}
+                    onChange={(newValue) =>
+                      setDateRange([dateRange[0], newValue])
+                    }
+                    renderInput={(params) => (
+                      <TextField fullWidth size="small" {...params} />
+                    )}
+                  />
+                </LocalizationProvider>
+              </Box>
 
-    </Box>
-  </Popover>
-</div>
+            </Box>
+          </Popover>
+        </div>
 
 
 
@@ -659,7 +684,8 @@ const [dateRange, setDateRange] = useState([
                       <Cell key={index} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#2a133b', border: 'none', borderRadius: '8px' }} />
+                  {/* <Tooltip contentStyle={{ backgroundColor: '#2a133b', border: 'none', borderRadius: '8px' }} /> */}
+                  <Tooltip content={<CustomTooltip />} />
                 </PieChart>
 
                 {isMobile && callReport.length > 0 && (
@@ -767,7 +793,9 @@ const [dateRange, setDateRange] = useState([
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#2a133b', border: 'none', borderRadius: '8px' }} />
+                  {/* <Tooltip contentStyle={{ backgroundColor: '#2a133b', border: 'none', borderRadius: '8px' }} /> */}
+                   <Tooltip content={<CustomTooltip />} />
+
                 </PieChart>
               </ResponsiveContainer>
 
