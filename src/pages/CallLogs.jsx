@@ -282,7 +282,7 @@ function CallLogsContent() {
     const numStr = String(rawNumber || "");
     if (!numStr || numStr === "undefined")
       return toast({
-        title: "Error",
+        title: "Phone Number",
         description: "No phone number found",
         variant: "destructive",
       });

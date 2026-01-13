@@ -377,7 +377,7 @@ function PlotViewContent() {
 
       if (response.status !== 200) {
         toast({
-          title: "Error",
+          title: "Plot",
           description: result.message,
           variant: "destructive",
         });
@@ -394,7 +394,7 @@ function PlotViewContent() {
       }
     } catch (error) {
       toast({
-        title: "Error",
+        title: "Plot is not update",
         description: "Update failed",
         variant: "destructive",
       });

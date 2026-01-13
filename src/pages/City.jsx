@@ -248,7 +248,7 @@ function City() {
 
         } catch (err) {
             toast({
-                title: "Error",
+                title: "City",
                 description: "Could not fetch City",
                 variant: "destructive",
             });
@@ -278,7 +278,7 @@ function City() {
             setFilteredData(data);
         } catch (err) {
             toast({
-                title: "Error",
+                title: "City",
                 description: "Could not fetch City",
                 variant: "destructive",
             });
@@ -376,16 +376,16 @@ function City() {
     const Validate = () => {
         if (!state.CityCode) {
             toast({
-                title: "Error",
-                description: "Enter City Code",
+                title: "City Code",
+                description: "please Enter City Code",
                 variant: "destructive",
             });
             return;
         }
         if (!state.CityName) {
             toast({
-                title: "Error",
-                description: "Enter City Name",
+                title: "City Name",
+                description: "please Enter City Name",
                 variant: "destructive",
             });
             return;
@@ -437,7 +437,7 @@ function City() {
             getAllCity();
         } catch (err) {
             toast({
-                title: "Error",
+                title: "City not update and create",
                 description: "Operation failed",
                 variant: "destructive",
             });
@@ -460,7 +460,7 @@ function City() {
             getAllCity();
         } catch (err) {
             toast({
-                title: "Error",
+                title: "City is not delete",
                 description: "Delete failed",
                 variant: "destructive",
             });
@@ -486,15 +486,7 @@ function City() {
                     <Plus className="w-4 h-4 mr-2" /> Add City
                 </Button>
 
-                {/* <Button
-                    onClick={() => {
-                        clear();
-                        setDialogOpen(true);
-                    }}
-                    className="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white"
-                >
-                    <Plus className="w-4 h-4 mr-2" /> Add Employee
-                </Button> */}
+    
             </div>
 
             {/* TABLE */}
@@ -678,7 +670,7 @@ function City() {
                                                 >
                                                     <Pencil className="w-4 h-4 text-yellow-400" />
                                                 </Button>
-
+                                                
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"

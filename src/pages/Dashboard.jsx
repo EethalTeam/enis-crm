@@ -15,6 +15,27 @@ import { config } from "@/components/CustomComponents/config.js";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 
+import dayjs from "dayjs";
+
+import {
+  Box,
+  IconButton,
+  Popover,
+  List,
+  ListItemButton,
+  ListItemText,
+  TextField
+} from "@mui/material";
+// import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import { Calendar } from "lucide-react";
+
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
+
+
+
 const decode = (value) => {
   if (!value) return "";
   try {
@@ -64,6 +85,13 @@ export default function Dashboard() {
   const [visitorFollowups, setVisitorFollowups] = useState([]);
   const [leads, setLeads] = useState([]);
   const [visitor, setVisitor] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+const open = Boolean(anchorEl);
+
+const [dateRange, setDateRange] = useState([
+  dayjs().startOf("day"),
+  dayjs().endOf("day"),
+]);
 
   const navigate = useNavigate()
 
@@ -94,28 +122,32 @@ export default function Dashboard() {
 
 
   useEffect(() => {
-    getAllDashBoard()
-    getDayWiseAnsweredCalls()
-    getLeadsBySource()
-    getCallReport()
-    getLeadFollowup()
-    fetchLeads()
-    getVisitorFollowup()
-    fetchVisitors()
-  }, [])
+  const from = dateRange[0].toDate();
+  const to = dateRange[1].toDate();
+
+  getAllDashBoard(from, to);
+  getDayWiseAnsweredCalls(from, to);
+  getLeadsBySource(from, to);
+  getCallReport(from, to);
+
+  getLeadFollowup();
+  fetchLeads();
+  getVisitorFollowup();
+  fetchVisitors();
+}, []);
 
   //   useEffect(()=>{
   // console.log(getfilteredfollow(),"getfilteredfollow")
   //   },[leads.length])
 
-  const getAllDashBoard = async () => {
+  const getAllDashBoard = async (fromDate, toDate) => {
     try {
       const role = localStorage.getItem("role");
       const TelecmiID = decode(localStorage.getItem("TelecmiID"))
-      const EmployeeID =  decode(localStorage.getItem("EmployeeId"))
+      const EmployeeID = decode(localStorage.getItem("EmployeeId"))
 
       let url = config.Api + "DashBoard/getAllDashBoard";
-      const payload = role === "AGENT" ? { TelecmiID, role,EmployeeID } : {};
+      const payload = role === "AGENT" ? { TelecmiID, role, EmployeeID,fromDate, toDate } : {};
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -126,7 +158,7 @@ export default function Dashboard() {
       const data = result.data || result;
 
       setDashBoard(data);
-      setStates(data)  
+      setStates(data)
 
     } catch (err) {
       console.log(err, "err")
@@ -177,14 +209,14 @@ export default function Dashboard() {
     }
   };
 
-  const getDayWiseAnsweredCalls = async () => {
+  const getDayWiseAnsweredCalls = async (fromDate, toDate) => {
     try {
 
       const role = localStorage.getItem("role");
       const TelecmiID = decode(localStorage.getItem("TelecmiID"))
 
       let url = config.Api + "DashBoard/getDayWiseAnsweredCalls";
-      const payload = role === "AGENT" ? { TelecmiID, role } : {};
+      const payload = role === "AGENT" ? { TelecmiID, role ,fromDate, toDate} : {};
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -204,10 +236,10 @@ export default function Dashboard() {
   };
 
 
-  const getCallReport = async () => {
+  const getCallReport = async (fromDate, toDate) => {
     const role = localStorage.getItem("role");
     const TelecmiID = decode(localStorage.getItem("TelecmiID"))
-    const payload = role === "AGENT" ? { TelecmiID, role } : {};
+    const payload = role === "AGENT" ? { TelecmiID, role,fromDate, toDate } : {};
     const res = await fetch(config.Api + "DashBoard/getCallStatusReport", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -220,12 +252,12 @@ export default function Dashboard() {
 
 
 
-  const getLeadsBySource = async () => {
+  const getLeadsBySource = async (fromDate, toDate) => {
     try {
 
       const role = localStorage.getItem("role");
       const EmployeeId = decode(localStorage.getItem("EmployeeId"))
-      const payload = role === "AGENT" ? { EmployeeId, role } : {};
+      const payload = role === "AGENT" ? { EmployeeId, role ,fromDate, toDate} : {};
       let url = config.Api + "DashBoard/getLeadsBySource";
 
       const res = await fetch(url, {
@@ -322,6 +354,47 @@ export default function Dashboard() {
     }
   };
 
+  const applyPreset = (type) => {
+  let from, to;
+
+  switch (type) {
+    case "today":
+      from = dayjs().startOf("day");
+      to = dayjs().endOf("day");
+      break;
+
+    case "yesterday":
+      from = dayjs().subtract(1, "day").startOf("day");
+      to = dayjs().subtract(1, "day").endOf("day");
+      break;
+
+    case "last7":
+      from = dayjs().subtract(6, "day").startOf("day");
+      to = dayjs().endOf("day");
+      break;
+
+    case "last30":
+      from = dayjs().subtract(29, "day").startOf("day");
+      to = dayjs().endOf("day");
+      break;
+
+    default:
+      return;
+  }
+
+  setDateRange([from, to]);
+
+  getAllDashBoard(from.toDate(), to.toDate());
+  getDayWiseAnsweredCalls(from.toDate(), to.toDate());
+  getCallReport(from.toDate(), to.toDate());
+  getLeadsBySource(from.toDate(), to.toDate());
+
+  setAnchorEl(null);
+};
+
+
+
+
 
 
 
@@ -334,9 +407,81 @@ export default function Dashboard() {
         <meta name="description" content="View your ENIS CRM dashboard with key metrics, analytics, and recent activities." />
       </Helmet>
       <div className="space-y-6 p-3">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-        </div>
+        <div className="flex items-center justify-between gap-4">
+  <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+
+  {/* Calendar Icon */}
+  <IconButton
+    onClick={(e) => setAnchorEl(e.currentTarget)}
+    sx={{ color: "white" }}
+  >
+    <Calendar />
+  </IconButton>
+
+  {/* Date Filter Popup */}
+  <Popover
+    open={open}
+    anchorEl={anchorEl}
+    onClose={() => setAnchorEl(null)}
+    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+  >
+    <Box sx={{ display: "flex", width: 600 }}>
+
+      {/* LEFT – PRESETS */}
+      <Box sx={{ width: 200, borderRight: "1px solid #ddd" }}>
+        <List dense>
+          <ListItemButton onClick={() => applyPreset("today")}>
+            <ListItemText primary="Today" />
+          </ListItemButton>
+
+          <ListItemButton onClick={() => applyPreset("yesterday")}>
+            <ListItemText primary="Yesterday" />
+          </ListItemButton>
+
+          <ListItemButton onClick={() => applyPreset("last7")}>
+            <ListItemText primary="Last 7 days" />
+          </ListItemButton>
+
+          <ListItemButton onClick={() => applyPreset("last30")}>
+            <ListItemText primary="Last 30 days" />
+          </ListItemButton>
+        </List>
+      </Box>
+
+      {/* RIGHT – DATE PICKERS */}
+      <Box sx={{ p: 2, flex: 1 }}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="Start date"
+            value={dateRange[0]}
+            onChange={(newValue) =>
+              setDateRange([newValue, dateRange[1]])
+            }
+            renderInput={(params) => (
+              <TextField fullWidth size="small" {...params} />
+            )}
+          />
+
+          <Box sx={{ height: 16 }} />
+
+          <DatePicker
+            label="End date"
+            value={dateRange[1]}
+            onChange={(newValue) =>
+              setDateRange([dateRange[0], newValue])
+            }
+            renderInput={(params) => (
+              <TextField fullWidth size="small" {...params} />
+            )}
+          />
+        </LocalizationProvider>
+      </Box>
+
+    </Box>
+  </Popover>
+</div>
+
+
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {statsData.map((stat, index) => (

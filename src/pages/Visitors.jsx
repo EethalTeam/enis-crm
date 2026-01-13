@@ -524,7 +524,7 @@ console.log(followUpDetails,"followUpDetails")
       }
     } catch (e) {
       toast({
-        title: "Error",
+        title: "visitor",
         description: "Failed to save visitor",
         variant: "destructive",
       });
@@ -1242,7 +1242,7 @@ function VisitorContent() {
           }
         } catch (error) {
           toast({
-            title: "Error",
+            title: "Visitor",
             description: error.message,
             variant: "destructive",
           });
