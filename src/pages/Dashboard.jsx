@@ -147,7 +147,7 @@ const [dateRange, setDateRange] = useState([
       const EmployeeID = decode(localStorage.getItem("EmployeeId"))
 
       let url = config.Api + "DashBoard/getAllDashBoard";
-      const payload = role === "AGENT" ? { TelecmiID, role, EmployeeID,fromDate, toDate } : {};
+      const payload = role === "AGENT" ? { TelecmiID, role, EmployeeID,fromDate, toDate } : {fromDate, toDate };
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -216,7 +216,7 @@ const [dateRange, setDateRange] = useState([
       const TelecmiID = decode(localStorage.getItem("TelecmiID"))
 
       let url = config.Api + "DashBoard/getDayWiseAnsweredCalls";
-      const payload = role === "AGENT" ? { TelecmiID, role ,fromDate, toDate} : {};
+      const payload = role === "AGENT" ? { TelecmiID, role ,fromDate, toDate} : {fromDate, toDate };
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -239,7 +239,7 @@ const [dateRange, setDateRange] = useState([
   const getCallReport = async (fromDate, toDate) => {
     const role = localStorage.getItem("role");
     const TelecmiID = decode(localStorage.getItem("TelecmiID"))
-    const payload = role === "AGENT" ? { TelecmiID, role,fromDate, toDate } : {};
+    const payload = role === "AGENT" ? { TelecmiID, role,fromDate, toDate } : {fromDate, toDate };
     const res = await fetch(config.Api + "DashBoard/getCallStatusReport", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -257,7 +257,7 @@ const [dateRange, setDateRange] = useState([
 
       const role = localStorage.getItem("role");
       const EmployeeId = decode(localStorage.getItem("EmployeeId"))
-      const payload = role === "AGENT" ? { EmployeeId, role ,fromDate, toDate} : {};
+      const payload = role === "AGENT" ? { EmployeeId, role ,fromDate, toDate} : {fromDate, toDate };
       let url = config.Api + "DashBoard/getLeadsBySource";
 
       const res = await fetch(url, {
