@@ -293,8 +293,8 @@ export const AuthProvider = ({ children }) => {
         role: result.employee.role,
         TelecmiID: result.employee.TelecmiID,
         TelecmiPassword: result.employee.TelecmiPassword,
-        SiteId:result.employee.SiteId
-
+        SiteId:result.employee.SiteId,
+        _id:result.employee._id
       };
 
       setUser(userData);

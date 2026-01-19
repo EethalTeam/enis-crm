@@ -10,41 +10,45 @@ import { useToast } from "@/components/ui/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { config } from "@/components/CustomComponents/config.js";
+import { io } from "socket.io-client";
 const decode = (value) => {
-    if (!value) return "";
-    try {
-      return atob(value); // DECRYPT
-    } catch {
-      return "";
-    }
-  };
+  if (!value) return "";
+  try {
+    return atob(value); // DECRYPT
+  } catch {
+    return "";
+  }
+};
 
 export default function Header({ toggleSidebar }) {
   const { user, logout } = useAuth();
-
+console.log(user,"user")
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
   const userNotifications = notifications.filter(
     (n) =>
       (n.toEmployeeId?._id || n.toEmployeeId) === user._id &&
       n.status === "unseen"
   );
   const { toast } = useToast();
- 
+
 
   const markAsRead = async (notificationId) => {
     try {
-       let url = config.Api + "Notifications/markAsSeen/";
+      let url = config.Api + "Notifications/markAsSeen";
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ notificationId }),
       });
 
-      if (res) {
-        // Re-fetch updated notifications
+      const data = await res.json();
+
+      if (res.ok) {
         fetchNotifications();
         toast({
           title: "Marked as read",
@@ -53,10 +57,11 @@ export default function Header({ toggleSidebar }) {
       } else {
         toast({
           title: "Error",
-          description: res.message,
+          description: data?.message || "Failed",
           variant: "destructive",
         });
       }
+
     } catch (err) {
       console.error("Error marking notification:", err);
       toast({
@@ -68,23 +73,50 @@ export default function Header({ toggleSidebar }) {
   };
 
   const fetchNotifications = async () => {
-    
-    try { 
-        const EmployeeID =  decode(localStorage.getItem("EmployeeId"))
-        
-       let url = config.Api + "Notifications/getNotifications"
-       
+
+    try {
+      const EmployeeID = decode(localStorage.getItem("EmployeeId"))
+
+      let url = config.Api + "Notifications/getNotifications"
+
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ EmployeeId: EmployeeID }),
       });
-      const data = res;
-      if (data?.data) setNotifications(data.data);
+      const data = await res.json();
+
+      if (data?.data) {
+        setNotifications(data.data);
+      }
     } catch (err) {
       console.error("Failed to fetch notifications:", err);
     }
   };
+
+
+  const handleNotificationAction = async (notification, action) => {
+    try {
+      let url = config.Api + "Notifications/updateNotificationStatus"
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notificationId: notification._id, action }),
+      });
+
+      if (res) {
+        // Re-fetch updated notifications
+        fetchNotifications();
+        toast({ title: `Request ${action}d`, description: `The request has been ${action}d.` });
+      } else {
+        toast({ title: "Error", description: res.message, variant: "destructive" });
+      }
+    } catch (err) {
+      console.error("Error updating notification:", err);
+      toast({ title: "Error", description: "Failed to update notification.", variant: "destructive" });
+    }
+  };
+
 
   const handleLogout = () => {
     logout();
@@ -121,13 +153,15 @@ export default function Header({ toggleSidebar }) {
             <Bell className="w-5 h-5 text-purple-300 " />
             <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-gradient-to-r from-pink-500 to-yellow-500 rounded-full animate-pulse"></span>
           </Button> */}
+
+
           <Button
             variant="ghost"
             size="icon"
             className="relative"
             onClick={() => {
-              setOpen((prev) => !prev);   // open immediately
-              if (!open) fetchNotifications(); // fetch only when opening
+              setShowNotifications((prev) => !prev);
+              fetchNotifications();
             }}
           >
             <Bell className="w-5 h-5 text-purple-300" />
@@ -139,58 +173,66 @@ export default function Header({ toggleSidebar }) {
             )}
           </Button>
 
-          <AnimatePresence>
-            {open && (
-              <motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                className="
-        absolute z-auto top-14
-        bg-gradient-to-b from-slate-900 to-slate-600
-        border border-purple-700/40 rounded-xl shadow-2xl
+          {showNotifications && (
+  <div className="  fixed
+    right-1
+    top-16
+    z-[9999]
+    w-[70vw]
+    max-w-sm
+    rounded-lg
+    bg-slate-900
+    border border-purple-700/50
+    shadow-xl">
+    <div className="p-3 font-semibold border-b border-purple-700/50">
+      Notifications
+    </div>
 
-        left-1/2 -translate-x-1/2 w-72
-        md:left-auto md:right-14 md:translate-x-0 md:w-96
-      "
+    <div className="max-h-72 overflow-y-auto">
+      {userNotifications.length ? (
+        userNotifications.map((n) => (
+          <div key={n._id} className="p-3 text-sm border-b border-white/10">
+            <p className="mb-2">{n.message}</p>
+
+            {["permission-request", "leave-request", "task-complete"].includes(n.type) &&
+            n.fromEmployeeId !== user?._id ? (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className="bg-green-500 h-7"
+                  onClick={() => handleNotificationAction(n, "approve")}
+                >
+                  Approve
+                </Button>
+
+                <Button
+                  size="sm"
+                  className="bg-red-500 h-7"
+                  onClick={() => handleNotificationAction(n, "reject")}
+                >
+                  Reject
+                </Button>
+              </div>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7"
+                onClick={() => markAsRead(n._id)}
               >
-                {/* HEADER */}
-                <div className="px-4 py-3 border-b border-purple-700/40 text-white font-semibold">
-                  Notifications
-                </div>
-
-                {/* BODY */}
-                <div className="max-h-72 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <p className="text-center text-slate-400 py-6">
-                      No notifications
-                    </p>
-                  ) : (
-                    notifications.map((n) => (
-                      <div
-                        key={n._id}
-                        onClick={() => markAsRead(n._id)}
-                        className={`px-4 py-3 border-b border-purple-700/20 text-sm cursor-pointer transition ${n.status === "seen"
-                            ? "text-slate-400"
-                            : "text-white bg-purple-900/20 hover:bg-purple-900/40"
-                          }`}
-                      >
-                        {n.message}
-                        <p className="text-xs text-slate-500 mt-1">
-                          {new Date(n.createdAt).toLocaleString()}
-                        </p>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </motion.div>
+                Mark as read
+              </Button>
             )}
-          </AnimatePresence>
-
-
-
-
-
+          </div>
+        ))
+      ) : (
+        <p className="p-4 text-center text-sm text-gray-400">
+          No new notifications
+        </p>
+      )}
+    </div>
+  </div>
+)}
 
           <div className="flex items-start gap-3 pl-3 border-l border-purple-700/50">
             <motion.div whileHover={{ scale: 1.1 }}>

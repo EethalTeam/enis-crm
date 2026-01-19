@@ -532,7 +532,7 @@ function CallLogsContent() {
         </div>
       )}
 
-      <div className="sticky top-0 z-30 bg-slate-950 p-4 space-y-10">
+      <div className="sticky top-0 z-10 bg-slate-950 p-4 space-y-10">
         <div className="flex md:flex-row flex-col items-start md:items-center space-y-4 justify-between">
           <div className="flex items-center gap-4">
             <h1 className="md:text-3xl text-2xl font-bold text-white">

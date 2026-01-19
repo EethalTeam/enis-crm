@@ -1118,7 +1118,7 @@ const LeadDialog = ({
                     name="leadNotes"
                     value={formData.leadNotes}
                     onChange={handleChange}
-                    readOnly={mode === "edit"}
+                    // readOnly={mode === "edit"}
                     className="w-full h-28 bg-slate-900 border border-slate-700 rounded-md p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-fuchsia-500"
                   />
                 </div>
@@ -1936,7 +1936,7 @@ function LeadsContent() {
         </div>
       )}
 
-      <div className="sticky top-0 z-30 bg-slate-950 pb-4 space-y-10">
+      <div className="sticky top-0 z-10 bg-slate-950 pb-4 space-y-10">
         <div className="flex md:flex-row flex-col items-start md:justify-between gap-3 sticky ">
           <h1 className="text-3xl font-bold text-white">Leads</h1>
           <div className="grid md:grid-cols-3 grid-cols-2 gap-3">
