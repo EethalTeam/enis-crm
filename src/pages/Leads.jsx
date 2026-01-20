@@ -2152,7 +2152,7 @@ function LeadsContent() {
                           <Pencil className="w-4 h-4" />
                         </Button>
                       )}
-                      {role !== "AGENT" && (
+                    
                         <Button
                           variant="icon"
                           size="icon"
@@ -2167,7 +2167,7 @@ function LeadsContent() {
                         >
                           <Clock className="w-4 h-4" />
                         </Button>
-                      )}
+                  
                     </td>
                   </tr>
                 ))}
@@ -2277,7 +2277,6 @@ function LeadsContent() {
                     </Button>
                   )}
 
-                  {role !== "AGENT" && (
                     <Button
                       variant="icon"
                       size="icon"
@@ -2291,7 +2290,7 @@ function LeadsContent() {
                     >
                       <Clock className="w-4 h-4" />
                     </Button>
-                  )}
+                
                 </div>
               </div>
             ))}

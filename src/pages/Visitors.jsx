@@ -175,13 +175,13 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
       return "";
     }
   };
-  const role = decode(localStorage.getItem("role"));
+  const role = localStorage.getItem("role");
 
   // Initial State matches your reducer structure
   const initialState = {
     _id: "",
     visitorCode: "",
-    siteId: "",
+    siteId: decode(localStorage.getItem("SiteId")),
     sitename: "",
     visitorName: "",
     visitorEmail: "",
@@ -204,6 +204,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
     UnitName: "",
     plotId: [],
     plotNumber: "",
+    areaInSqFt: "",
     statusId: "",
     statusName: "",
     // Follow Up Specifics
@@ -235,8 +236,10 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
   const [variantList, setVariantList] = useState([]);
   // Existing Data (History)
   const [plotDetails, setPlotDetails] = useState([]);
+  console.log(plotDetails, "plotDetails")
   const [followUpDetails, setFollowUpDetails] = useState([]);
-console.log(followUpDetails,"followUpDetails")
+  console.log(followUpDetails, "followUpDetails")
+
   const isEdit = !!initialData;
   const [Status] = useState([
     { StatusIDPK: 1, StatusName: "Visit Pending" },
@@ -244,20 +247,21 @@ console.log(followUpDetails,"followUpDetails")
   ]);
 
   const resetFollowUpState = () => {
-  // Clear follow up list
-  setFollowUpDetails([]);
+    // Clear follow up list
 
-  // Clear follow up form fields (reducer state)
-  dispatch({ type: "text", name: "followUpId", value: "" });
-  dispatch({ type: "text", name: "followUpDate", value: "" });
-  dispatch({ type: "text", name: "followUpStatus", value: "Visit Pending" });
-  dispatch({ type: "text", name: "followUpDescription", value: "" });
-  dispatch({ type: "text", name: "notes", value: "" });
-  dispatch({ type: "text", name: "remarks", value: "" });
-
-  // Optional UX improvement
-  setActiveTab("contact");
-};
+    // Clear follow up form fields (reducer state)
+    dispatch({ type: "text", name: "followUpId", value: "" });
+    dispatch({ type: "text", name: "followUpDate", value: "" });
+    dispatch({ type: "text", name: "followUpStatus", value: "Visit Pending" });
+    dispatch({ type: "text", name: "followUpDescription", value: "" });
+    dispatch({ type: "text", name: "notes", value: "" });
+    dispatch({ type: "text", name: "remarks", value: "" });
+    dispatch({ type: "text", name: "unitId", value: "" });
+    dispatch({ type: "text", name: "plotId", value: "" });
+    dispatch({ type: "text", name: "statusId", value: "" });
+    // Optional UX improvement
+    setActiveTab("contact");
+  };
 
   // --- Data Fetching Helpers ---
   const fetchAPI = async (endpoint, body = {}) => {
@@ -410,7 +414,7 @@ console.log(followUpDetails,"followUpDetails")
     }
 
     setPlotDetails(data.plots || []);
-    console.log(data.followUps,"data.followUps")
+    console.log(data.followUps, "data.followUps")
     setFollowUpDetails(data.followUps || []);
   };
 
@@ -463,6 +467,7 @@ console.log(followUpDetails,"followUpDetails")
       if (name === "plotId") {
         dispatch({ type: "text", name: "plotId", value: e._id });
         dispatch({ type: "text", name: "plotNumber", value: e.plotNumber });
+        dispatch({ type: "text", name: "areaInSqFt", value: e.areaInSqFt });
       }
       if (name === "employeeId") {
         dispatch({ type: "text", name: "employeeId", value: e._id });
@@ -582,10 +587,11 @@ console.log(followUpDetails,"followUpDetails")
       });
 
       if (res.ok) {
+        const data = await res.json()
         toast({
-          title: "Success",
-          description: `${type === "followup" ? "Follow Up" : "Plot"} Saved`,
-          variant: "success",
+          title: `${data.message ? "Alert" : "Success"}`,
+          description: `${data.message ? data.message : (type === "followup" ? "Follow Up Saved" : "Plot Saved")}`,
+          variant: `${data.message ? "destructive" : "success"}`,
         });
         // Refresh sub-lists
         const updated = await res.json();
@@ -608,11 +614,11 @@ console.log(followUpDetails,"followUpDetails")
         throw new Error("Failed");
       }
     } catch (e) {
-      toast({
-        title: "Alert",
-        description: e.message || "Failed",
-        variant: "destructive",
-      });
+      // toast({
+      //   title: "Alert",
+      //   description: e.message ||  "Plot already added to this visitor",
+      //   variant: "destructive",
+      // });
     } finally {
       setLoading(false);
     }
@@ -621,7 +627,7 @@ console.log(followUpDetails,"followUpDetails")
   // Helper to load a sub-item into form for editing
   const editSubItem = (item, type) => {
     if (type === "followup") {
-      console.log(item.followUpDate,item,"items")
+      console.log(item.followUpDate, item, "items")
       dispatch({ type: "text", name: "followUpId", value: item._id });
       dispatch({
         type: "text",
@@ -656,8 +662,8 @@ console.log(followUpDetails,"followUpDetails")
       type="button"
       onClick={() => setActiveTab(id)}
       className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${activeTab === id
-          ? "bg-fuchsia-600 text-white shadow-md"
-          : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+        ? "bg-fuchsia-600 text-white shadow-md"
+        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
         }`}
     >
       {Icon && <Icon className="w-4 h-4" />}
@@ -677,14 +683,14 @@ console.log(followUpDetails,"followUpDetails")
 
   return (
     <Dialog
-  open={open}
-  onOpenChange={(isOpen) => {
-    if (!isOpen) {
-      resetFollowUpState();   
-    }
-    onOpenChange(isOpen);
-  }}
->
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          resetFollowUpState();
+        }
+        onOpenChange(isOpen);
+      }}
+    >
       <DialogContent className="sm:max-w-[850px] max-h-[90vh] flex flex-col p-0">
         <DialogHeader>
           <div className="flex justify-between items-center w-full">
@@ -692,9 +698,10 @@ console.log(followUpDetails,"followUpDetails")
               {isEdit ? "Edit Visitor" : "Add New Visitor"}
             </DialogTitle>
             <button
-              onClick={() =>{
-                 resetFollowUpState();
-                 onOpenChange(false);}}
+              onClick={() => {
+                resetFollowUpState();
+                onOpenChange(false);
+              }}
               className="text-slate-400 hover:text-white"
             >
               <X size={20} />
@@ -1010,26 +1017,33 @@ console.log(followUpDetails,"followUpDetails")
                   Add Plot Interest
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Site</Label>
-                    <select
-                      value={state.siteId}
-                      onChange={(e) => {
-                        const selected = siteList.find(
-                          (s) => s._id === e.target.value
-                        );
-                        storeDispatch(selected, "siteId", "select");
-                      }}
-                      className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"
-                    >
-                      <option value="">Select Site</option>
-                      {siteList.map((s) => (
-                        <option key={s._id} value={s._id}>
-                          {s.sitename}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+
+                  {
+                    role !== "AGENT" &&
+                    <div className="space-y-2">
+                      <Label>Site</Label>
+                      <select
+                        value={state.siteId}
+                        onChange={(e) => {
+                          const selected = siteList.find(
+                            (s) => s._id === e.target.value
+                          );
+                          storeDispatch(selected, "siteId", "select");
+                        }}
+                        className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"
+                      >
+                        <option value="">Select Site</option>
+                        {siteList.map((s) => (
+                          <option key={s._id} value={s._id}>
+                            {s.sitename}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  }
+
+
+
                   <div className="space-y-2">
                     <Label>Unit</Label>
                     <select
@@ -1065,7 +1079,7 @@ console.log(followUpDetails,"followUpDetails")
                       <option value="">Select Plot</option>
                       {plotList.map((p) => (
                         <option key={p._id} value={p._id}>
-                          {p.plotNumber}
+                          {p.plotNumber} - ({p.areaInSqFt}) Sq.ft, {p.facing} Facing
                         </option>
                       ))}
                     </select>
@@ -1132,7 +1146,7 @@ console.log(followUpDetails,"followUpDetails")
                           <td className="p-3">
                             {item.plotId?.unitId.UnitName}
                           </td>
-                          <td className="p-3">{item.plotId?.plotNumber}</td>
+                          <td className="p-3">{item.plotId?.plotNumber} - <span className="text-sm">({item.plotId?.areaInSqFt} sq.ft), {item.plotId?.facing} Facing</span></td>
                           <td className="p-3">
                             <Badge
                               style={{
@@ -1153,10 +1167,10 @@ console.log(followUpDetails,"followUpDetails")
           )}
         </div>
         <DialogFooter>
-          <Button variant="ghost"   onClick={() => {
-    resetFollowUpState();
-    onOpenChange(false);
-  }}>
+          <Button variant="ghost" onClick={() => {
+            resetFollowUpState();
+            onOpenChange(false);
+          }}>
             Cancel
           </Button>
           {/* Only show main save on Contact Tab or New Entry */}
@@ -1179,12 +1193,14 @@ console.log(followUpDetails,"followUpDetails")
 // --- MAIN DASHBOARD CONTENT ---
 function VisitorContent() {
   const [visitors, setVisitors] = useState([]);
-  console.log(visitors,"visitors")
+  console.log(visitors, "visitors")
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedVisitor, setSelectedVisitor] = useState(null);
-  console.log(selectedVisitor,"selectedVisitor")
+  const [viewOpen, setViewOpen] = useState(false);
+  const [viewData, setViewData] = useState({});
+  console.log(selectedVisitor, "selectedVisitor")
   const { toast } = useToast();
 
   const role = localStorage.getItem('role')
@@ -1194,7 +1210,7 @@ function VisitorContent() {
     setLoading(true);
     const role = localStorage.getItem("role");
     const employeeId = decode(localStorage.getItem("EmployeeId"));
-     const payload = role === "AGENT"   ? { employeeId,role } : {}; 
+    const payload = role === "AGENT" ? { employeeId, role } : {};
     try {
       const res = await fetch(config.Api + "Visitor/getAllVisitor", {
         method: "POST",
@@ -1256,7 +1272,18 @@ function VisitorContent() {
       (v.visitorName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (v.visitorMobile || "").includes(searchTerm)
   );
-  console.log(filteredVisitors,"filteredVisitors")
+  console.log(filteredVisitors, "filteredVisitors")
+
+  const handleViewClick = (row) => {
+    setViewData({
+      Name: row.visitorName,
+      Phone: row.visitorMobile,
+      Email: row.visitorEmail,
+      Status: row.followUps[row.followUps.length - 1].followUpStatus,
+      Date: row.followUps[row.followUps.length - 1].followUpDate?.split("T")[0]
+    });
+    setViewOpen(true);
+  };
 
   return (
     <div className="space-y-6 bg-slate-950 min-h-screen p-4 mt-3 text-slate-100">
@@ -1270,14 +1297,14 @@ function VisitorContent() {
         <div className="flex gap-3">
           {
             role !== 'AGENT' &&
-             <Button
-            variant="outline"
-            className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
-          >
-            <Upload className="w-4 h-4 mr-2" /> Export
-          </Button>
+            <Button
+              variant="outline"
+              className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
+            >
+              <Upload className="w-4 h-4 mr-2" /> Export
+            </Button>
           }
-         
+
           <Button
             onClick={() => {
               setSelectedVisitor(null);
@@ -1321,6 +1348,8 @@ function VisitorContent() {
                   <th className="py-3 px-4">Name</th>
                   <th className="py-3 px-4">Mobile</th>
                   <th className="py-3 px-4">Email</th>
+                  <th className="py-3 px-4">Date</th>
+                  <th className="py-3 px-4">Status</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -1336,8 +1365,8 @@ function VisitorContent() {
                     <td className="py-3 px-4 font-medium text-white">
                       <span
                         onClick={() => {
-                          setSelectedVisitor(row);
-                          setDialogOpen(true);
+                          handleViewClick(row);
+
                         }}
                         className="cursor-pointer underline-offset-4 group-hover:underline text-fuchsia-400"
                       >
@@ -1350,13 +1379,25 @@ function VisitorContent() {
                     <td className="py-3 px-4 text-slate-300">
                       {row.visitorEmail}
                     </td>
+                    <td className="py-3 px-4 text-slate-300">
+                      {row.followUps?.length
+                        ? row.followUps[row.followUps.length - 1].followUpDate?.split("T")[0]
+                        : "-"}
+                    </td>
+
+                    <td className="py-3 px-4 text-slate-300">
+                      {row.followUps?.length
+                        ? row.followUps[row.followUps.length - 1].followUpStatus
+                        : "-"}
+                    </td>
                     <td className="py-3 px-4 flex justify-end gap-2">
                       <Button
                         size="icon"
                         variant="ghost"
                         onClick={() => {
-                          console.log(row,"row")
+                          console.log(row, "row")
                           setSelectedVisitor(row);
+
                           setDialogOpen(true);
                         }}
                         className="text-yellow-400 hover:bg-yellow-400/10"
@@ -1380,61 +1421,124 @@ function VisitorContent() {
 
           {/* MOBILE CARDS */}
           <div className="space-y-4 md:hidden">
-            {filteredVisitors.map((row) => (
-              <div
-                key={row._id}
-                className="rounded-xl border border-slate-700 bg-slate-900 shadow-md p-5 space-y-3"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-xs text-slate-400">
-                      Code: {row.visitorCode}
-                    </p>
-                    <h3
-                      className="text-lg font-bold text-fuchsia-400"
+            {filteredVisitors.map((row) => {
+              const lastFollowUp =
+                row.followUps?.length
+                  ? row.followUps[row.followUps.length - 1]
+                  : null;
+
+              return (
+                <div
+                  key={row._id}
+                  className="rounded-xl border border-slate-700 bg-slate-900 shadow-md p-5"
+                >
+                  {/* HEADER */}
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3
+                        className="text-lg font-bold text-fuchsia-400 cursor-pointer"
+                        onClick={() => {
+                          handleViewClick(row)
+                        }}
+                      >
+                        {row.visitorName}
+                      </h3>
+                      <p className="text-sm text-slate-400 mt-1">
+                      
+                         {lastFollowUp?.followUpStatus || "No Status"}
+                      </p>
+                    </div>
+
+                    <span className="text-xs px-2 py-1 rounded-full bg-slate-700 text-white">
+                       {row.visitorCode || "—"}
+                    </span>
+                  </div>
+
+                  {/* BODY */}
+                  <div className="mt-4 space-y-2 text-sm text-slate-300">
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-fuchsia-400" />
+                      <span>{row.visitorMobile || "-"}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-fuchsia-400" />
+                      <span className="truncate">{row.visitorEmail || "-"}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-fuchsia-400" />
+                      <span>
+                        {lastFollowUp?.followUpDate
+                          ? lastFollowUp.followUpDate.split("T")[0]
+                          : "No follow-up"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* ACTIONS */}
+                  <div className="flex justify-start gap-3 pt-4 mt-4 border-t border-slate-800">
+                    <Button
+                      size="icon"
+                      variant="ghost"
                       onClick={() => {
                         setSelectedVisitor(row);
                         setDialogOpen(true);
                       }}
+                      className="text-yellow-400 hover:bg-yellow-400/10"
                     >
-                      {row.visitorName}
-                    </h3>
+                      <Edit className="w-5 h-5" />
+                    </Button>
+
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleDelete(row)}
+                      className="text-red-400 hover:bg-red-900/20"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </Button>
                   </div>
                 </div>
-                <div className="text-sm space-y-1">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Phone className="w-4 h-4" /> {row.visitorMobile}
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Mail className="w-4 h-4" /> {row.visitorEmail}
-                  </div>
-                </div>
-                <div className="flex justify-start gap-3 pt-3 border-t border-slate-800">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => {
-                      setSelectedVisitor(row);
-                      setDialogOpen(true);
-                    }}
-                    className="text-yellow-400"
-                  >
-                    <Edit className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => handleDelete(row)}
-                    className="text-red-400"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </Button>
-                </div>
+              );
+            })}
+          </div>
+
+        </CardContent>
+      </Card>
+
+      <Dialog open={viewOpen} onOpenChange={setViewOpen}>
+        <DialogContent className="sm:max-w-[450px] p-0">
+          {/* HEADER (same as Employee Details) */}
+          <DialogHeader className="!flex !flex-row !items-center !justify-between !text-left p-6 border-b border-slate-800">
+            <DialogTitle className="text-lg font-semibold text-fuchsia-500">
+              Lead Details
+            </DialogTitle>
+
+            <button
+              onClick={() => setViewOpen(false)}
+              className="p-1 rounded text-fuchsia-400 hover:text-white hover:bg-slate-800 transition"
+            >
+              <X size={20} />
+            </button>
+          </DialogHeader>
+
+          {/* BODY */}
+          <div className="p-6 space-y-3">
+            {Object.entries(viewData).map(([key, value]) => (
+              <div
+                key={key}
+                className="flex justify-between items-center border-b border-slate-800 pb-2"
+              >
+                <span className="text-slate-400 text-sm">{key}</span>
+                <span className="text-white text-sm font-semibold text-right">
+                  {value || "—"}
+                </span>
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </DialogContent>
+      </Dialog>
 
       <VisitorDialog
         open={dialogOpen}
@@ -1443,6 +1547,9 @@ function VisitorContent() {
         initialData={selectedVisitor}
       />
     </div>
+
+
+
   );
 }
 
