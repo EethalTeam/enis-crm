@@ -500,7 +500,7 @@ function PlotViewContent() {
   return (
     <div className=" bg-slate-950 min-h-screen p-4 text-slate-100">
       {/* HEADER */}
-      <div className="sticky top-0 z-30 bg-slate-950 pb-4 space-y-10 overflow-hidden">
+      <div className="sticky top-0 z-10 bg-slate-950 pb-4 space-y-10 overflow-hidden">
         <div className="flex items-center justify-between">
           <h1 className="md:text-3xl text-xl font-bold text-white">Plot View</h1>
           <Button

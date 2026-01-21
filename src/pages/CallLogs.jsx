@@ -77,9 +77,8 @@ const Button = ({
   };
   return (
     <button
-      className={`${baseStyles} ${variants[variant] || variants.default} ${
-        sizes[size] || sizes.default
-      } ${className}`}
+      className={`${baseStyles} ${variants[variant] || variants.default} ${sizes[size] || sizes.default
+        } ${className}`}
       onClick={onClick}
       disabled={disabled}
     >
@@ -87,6 +86,56 @@ const Button = ({
     </button>
   );
 };
+
+const Dialog = ({ open, onOpenChange, children }) => (
+  <AnimatePresence>
+    {open && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => onOpenChange(false)}
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+        />
+        {children}
+      </div>
+    )}
+  </AnimatePresence>
+);
+
+const DialogContent = ({ className, children }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+    animate={{ opacity: 1, scale: 1, y: 0 }}
+    exit={{ opacity: 0, scale: 0.95, y: 10 }}
+    className={`relative z-50 w-full bg-slate-950 border border-slate-800 rounded-lg shadow-lg ${className}`}
+    onClick={(e) => e.stopPropagation()}
+  >
+    {children}
+  </motion.div>
+);
+const DialogHeader = ({ className, children }) => (
+  <div
+    className={`flex flex-col space-y-1.5 text-center sm:text-left p-6 border-b border-slate-800 ${className}`}
+  >
+    {children}
+  </div>
+);
+const DialogTitle = ({ className, children }) => (
+  <h2
+    className={`text-lg font-semibold leading-none tracking-tight text-white ${className}`}
+  >
+    {children}
+  </h2>
+);
+const DialogFooter = ({ className, children }) => (
+  <div
+    className={`flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 p-6 border-t border-slate-800 bg-slate-950 ${className}`}
+  >
+    {children}
+  </div>
+);
 
 // --- Toast Implementation ---
 const ToastContext = createContext({});
@@ -113,13 +162,12 @@ const ToastProvider = ({ children }) => {
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${
-                t.variant === "destructive"
-                  ? "bg-red-900/90 border-red-800 text-white"
-                  : t.variant === "success"
+              className={`pointer-events-auto p-4 rounded-lg shadow-lg border flex justify-between items-start gap-3 ${t.variant === "destructive"
+                ? "bg-red-900/90 border-red-800 text-white"
+                : t.variant === "success"
                   ? "bg-green-900/90 border-green-800 text-white"
                   : "bg-slate-900/90 border-slate-700 text-slate-100 backdrop-blur-sm"
-              }`}
+                }`}
             >
               <div>
                 {t.title && (
@@ -190,6 +238,9 @@ function CallLogsContent() {
   const [playingId, setPlayingId] = useState(null);
   const [leadDialogOpen, setLeadDialogOpen] = useState(false);
   const [leadInitialData, setLeadInitialData] = useState(null);
+  const [DialogOpen, setDialogOpen] = useState(false)
+  const [selectedRecording, setSelectedRecording] = useState(null);
+
 
   const resetCallState = () => {
     setCallStatus("Idle");
@@ -417,6 +468,8 @@ function CallLogsContent() {
     };
   };
 
+
+
   const exportCallLogsToExcel = () => {
     if (!filteredLogs.length) return;
     const excelData = filteredLogs.map((call, index) => ({
@@ -437,11 +490,10 @@ function CallLogsContent() {
   const TabButton = ({ id, label }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`relative px-4 py-2 text-sm font-medium transition-all rounded-md ${
-        activeTab === id
-          ? "bg-blue-600 text-white shadow-md"
-          : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-      }`}
+      className={`relative px-4 py-2 text-sm font-medium transition-all rounded-md ${activeTab === id
+        ? "bg-blue-600 text-white shadow-md"
+        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+        }`}
     >
       {label}
       {activeTab === id && (
@@ -542,16 +594,14 @@ function CallLogsContent() {
           </div>
           <div className="flex gap-3">
             <div
-              className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2 ${
-                isLoggedIn
-                  ? "bg-green-900/30 text-green-400"
-                  : "bg-red-900/30 text-red-400"
-              }`}
+              className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2 ${isLoggedIn
+                ? "bg-green-900/30 text-green-400"
+                : "bg-red-900/30 text-red-400"
+                }`}
             >
               <div
-                className={`w-2 h-2 rounded-full ${
-                  isLoggedIn ? "bg-green-400 animate-pulse" : "bg-red-400"
-                }`}
+                className={`w-2 h-2 rounded-full ${isLoggedIn ? "bg-green-400 animate-pulse" : "bg-red-400"
+                  }`}
               />
               {isLoggedIn ? "Dialer Ready" : "Dialer Offline"}
             </div>
@@ -613,6 +663,7 @@ function CallLogsContent() {
         </div>
       </div>
 
+
       {/* Desktop Table */}
       <Card className="bg-slate-900 border-slate-800 hidden md:block">
         <CardContent className="p-6">
@@ -624,9 +675,9 @@ function CallLogsContent() {
                   <th className="text-left py-3 px-4 font-semibold">Caller</th>
                   <th className="text-left py-3 px-4 font-semibold">Number</th>
                   <th className="text-left py-3 px-4 font-semibold">Time</th>
-                  <th className="text-left py-3 px-4 font-semibold">
+                   <th className="text-left py-3 px-4 font-semibold">
                     Duration
-                  </th>
+                  </th> 
                   <th className="text-left py-3 px-4 font-semibold">Status</th>
                   <th className="text-left py-3 px-4 font-semibold">
                     Recording
@@ -639,7 +690,7 @@ function CallLogsContent() {
                   filteredLogs.map((call, index) => {
                     const targetNumber =
                       call.direction === "inbound" ||
-                      call.direction === "incoming"
+                        call.direction === "incoming"
                         ? call.from
                         : call.to;
                     return (
@@ -649,12 +700,12 @@ function CallLogsContent() {
                       >
                         <td className="py-3 px-4">
                           {call.status === "missed" ? (
-                            <PhoneMissed className="w-5 h-5 text-red-400" />
+                           <button onClick={() => handleInitiateCall(targetNumber)} ><PhoneMissed className="w-5 h-5 text-red-400 hover:text-red-600" /></button> 
                           ) : call.direction === "inbound" ||
                             call.direction === "incoming" ? (
-                            <PhoneIncoming className="w-5 h-5 text-green-400" />
+                          <button onClick={() => handleInitiateCall(targetNumber)}> <PhoneIncoming className="w-5 h-5 text-green-400 hover:text-green-600" /></button>  
                           ) : (
-                            <PhoneOutgoing className="w-5 h-5 text-blue-400" />
+                          <button onClick={() => handleInitiateCall(targetNumber)}> <PhoneOutgoing className="w-5 h-5 text-blue-400 hover:text-blue-600" /> </button> 
                           )}
                         </td>
                         {/* <td className="py-3 px-4 font-medium text-white">{targetNumber || "Unknown"}</td> */}
@@ -692,6 +743,8 @@ function CallLogsContent() {
                             {call.status}
                           </Badge>
                         </td>
+
+                        {/* 
                         <td className="py-3 px-4">
                           {call.recordingUrl && (
                             <Button
@@ -707,13 +760,29 @@ function CallLogsContent() {
                               }
                             >
                               {playingId === call._id ? (
-                                <Pause className="w-4 h-4" />
+                                <Pause className="w-4 h-4"  />
                               ) : (
                                 <Play className="w-4 h-4" />
                               )}
                             </Button>
                           )}
+                        </td> */}
+
+                        <td className="py-3 px-4">
+
+                          <Button 
+                            onClick={() => {
+                              setSelectedRecording(call.recordingUrl);
+                              setDialogOpen(true);
+                            }}
+                            disabled={!call.recordingUrl}
+                          >
+                            <Play className="w-4 h-4" />
+                          </Button>
+
                         </td>
+
+
                         <td className="py-3 px-4">
                           <Button
                             size="sm"
@@ -727,12 +796,12 @@ function CallLogsContent() {
                             onClick={() => {
                               // if (call.leadName)
                               //   return
-                               setLeadInitialData({
-                                  leadCreatedById: decode(
-                                    localStorage.getItem("EmployeeId")
-                                  ),
-                                  leadPhone: targetNumber || "",
-                                });
+                              setLeadInitialData({
+                                leadCreatedById: decode(
+                                  localStorage.getItem("EmployeeId")
+                                ),
+                                leadPhone: targetNumber || "",
+                              });
                               setLeadDialogOpen(true);
                             }}
                           >
@@ -770,7 +839,7 @@ function CallLogsContent() {
               >
                 <div className="flex justify-between items-center mb-3">
                   {call.direction === "inbound" ||
-                  call.direction === "incoming" ? (
+                    call.direction === "incoming" ? (
                     <PhoneIncoming className="w-6 h-6 text-green-400" />
                   ) : (
                     <PhoneOutgoing className="w-6 h-6 text-blue-400" />
@@ -808,18 +877,22 @@ function CallLogsContent() {
                   {formatDuration(call.answeredsec)}
                 </div>
                 <div className="flex gap-2 border-t border-slate-700 pt-3">
-                  {call.recordingUrl && (
+                
                     <Button
                       className="flex-1"
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        handlePlayRecording(call.recordingUrl, call._id)
-                      }
+                      onClick={() => {
+                              setSelectedRecording(call.recordingUrl);
+                              setDialogOpen(true);
+                            }}
+                              disabled={!call.recordingUrl}
                     >
-                      {playingId === call._id ? "Pause" : "Play"}
+                       Play
                     </Button>
-                  )}
+                
+                  
+                 
                   <div className="flex-1 ">
                     <Button
                       size="sm"
@@ -830,11 +903,11 @@ function CallLogsContent() {
                         // if (call.leadName)
                         //   return 
                         setLeadInitialData({
-                            leadCreatedById: decode(
-                              localStorage.getItem("EmployeeId")
-                            ),
-                            leadPhone: targetNumber || "",
-                          });
+                          leadCreatedById: decode(
+                            localStorage.getItem("EmployeeId")
+                          ),
+                          leadPhone: targetNumber || "",
+                        });
                         setLeadDialogOpen(true);
                       }}
                     >
@@ -849,6 +922,48 @@ function CallLogsContent() {
           <div className="py-8 text-center text-slate-500">No logs found</div>
         )}
       </div>
+
+      <Dialog open={DialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-[420px] p-0">
+          {/* Header */}
+          <DialogHeader className="flex flex-row items-center justify-between p-6 border-b border-slate-800">
+            <div className="flex gap-3 ">
+              <div>
+                <DialogTitle>Play The Audio</DialogTitle>
+              </div>
+              <button
+                onClick={() => setDialogOpen(false)}
+                className="text-slate-400 hover:text-white"
+              >
+                <X size={18} />
+              </button>
+
+
+            </div>
+          </DialogHeader>
+
+         <div className="p-4">
+           {selectedRecording ? (
+            <audio
+              src={selectedRecording}
+              controls
+              autoPlay
+              controlsList="nodownload noplaybackrate novolume"
+              className="w-full mt-4"
+              preload="none"
+            />
+          ) : (
+            <p className="text-slate-400 text-sm text-center mt-4">
+              No recording available
+            </p>
+          )}
+
+         </div>
+         
+
+
+        </DialogContent>
+      </Dialog>
 
       <LeadDialogWrapper
         open={leadDialogOpen}

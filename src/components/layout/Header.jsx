@@ -117,6 +117,13 @@ console.log(user,"user")
     }
   };
 
+ const handleClick = () =>{
+ setShowNotifications((prev) => !prev);
+              fetchNotifications();
+ }
+
+
+
 
   const handleLogout = () => {
     logout();
@@ -159,10 +166,7 @@ console.log(user,"user")
             variant="ghost"
             size="icon"
             className="relative"
-            onClick={() => {
-              setShowNotifications((prev) => !prev);
-              fetchNotifications();
-            }}
+            onClick={handleClick}
           >
             <Bell className="w-5 h-5 text-purple-300" />
 

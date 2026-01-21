@@ -21,7 +21,7 @@ export default function MainLayout() {
           className="fixed inset-0  z-20 md:hidden"
         />
       )}
-      <div className="md:flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <main
           ref={scrollRef}

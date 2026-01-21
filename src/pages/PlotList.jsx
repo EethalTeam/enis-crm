@@ -772,7 +772,7 @@ const handleSearchChange = (value) => {
 
 
   return (
-    <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
+    <div className="space-y-6 bg-slate-950 min-h-screen md:p-4 p-5 text-slate-100">
 
       {/* --- HEADER --- */}
       <div className="flex md:flex-row flex-col  items-start md:justify-between gap-2">

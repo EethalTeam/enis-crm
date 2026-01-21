@@ -214,7 +214,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
       role === "AGENT" ? decode(localStorage.getItem("EmployeeId")) : "",
     followedUpByName:
       role === "AGENT" ? decode(localStorage.getItem("EmployeeName")) : "",
-    followUpStatus: "Visit Pending",
+    followUpStatus: "Visit Not Yet",
     followUpDescription: "",
     notes: "",
     remarks: "",
@@ -242,7 +242,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
 
   const isEdit = !!initialData;
   const [Status] = useState([
-    { StatusIDPK: 1, StatusName: "Visit Pending" },
+    { StatusIDPK: 1, StatusName: "Visit Not Yet" },
     { StatusIDPK: 2, StatusName: "Visit Completed" },
   ]);
 
@@ -252,7 +252,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
     // Clear follow up form fields (reducer state)
     dispatch({ type: "text", name: "followUpId", value: "" });
     dispatch({ type: "text", name: "followUpDate", value: "" });
-    dispatch({ type: "text", name: "followUpStatus", value: "Visit Pending" });
+    dispatch({ type: "text", name: "followUpStatus", value: "Visit Not Yet" });
     dispatch({ type: "text", name: "followUpDescription", value: "" });
     dispatch({ type: "text", name: "notes", value: "" });
     dispatch({ type: "text", name: "remarks", value: "" });
@@ -297,6 +297,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
       // 2. Populate Data if Edit
       if (initialData) {
         populateData(initialData);
+        setActiveTab("followup");
       } else {
         // Reset Logic handled by reducer initial state, just clear logic if needed
         dispatch({ type: "reset", payload: initialState });
@@ -972,7 +973,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
                           <div className="flex items-center gap-2 mb-1">
                             <Badge
                               variant={
-                                item.followUpStatus === "Visit Pending"
+                                item.followUpStatus === "Visit Not Yet"
                                   ? "destructive"
                                   : "default"
                               }
