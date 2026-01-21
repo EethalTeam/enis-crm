@@ -259,6 +259,19 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
     dispatch({ type: "text", name: "unitId", value: "" });
     dispatch({ type: "text", name: "plotId", value: "" });
     dispatch({ type: "text", name: "statusId", value: "" });
+    dispatch({ type: "text", name:"visitorName", value: "" });
+    dispatch({ type: "text", name:"visitorCode", value: "" });
+    dispatch({ type: "text", name:"visitorEmail", value: "" });
+    dispatch({ type: "text", name:"visitorAddress", value: "" });
+    dispatch({ type: "text", name:"visitorMobile", value: "" });
+    dispatch({ type: "text", name:"visitorPhone", value: "" });
+    dispatch({ type: "text", name:"visitorVariantId", value: "" });
+    dispatch({ type: "text", name:"visitorWhatsApp", value: "" });
+    dispatch({ type: "text", name:"employeeId", value: "" });
+    dispatch({ type: "text", name:"description", value: "" });
+    dispatch({ type: "text", name:"StateID", value: "" });
+    dispatch({ type: "text", name:"cityId", value: "" });
+
     // Optional UX improvement
     setActiveTab("contact");
   };
@@ -487,6 +500,7 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
       });
       return;
     }
+  
 
     setLoading(true);
     const payload = {
@@ -539,8 +553,72 @@ const VisitorDialog = ({ open, onOpenChange, onSuccess, initialData }) => {
     }
   };
 
+
+  const validateFollowUp = () => {
+  if (!state.followUpDate) {
+    toast({ title: "Validation", description: "Follow-up date required", variant: "destructive" });
+    return false;
+  }
+
+  if (!state.followUpStatus) {
+    toast({ title: "Validation", description: "Follow-up status required", variant: "destructive" });
+    return false;
+  }
+
+  if (!state.followedUpById) {
+    toast({ title: "Validation", description: "Please assign staff", variant: "destructive" });
+    return false;
+  }
+
+  return true;
+};
+
+const validatePlot = () => {
+  if (!state.siteId) {
+    toast({ title: "Validation", description: "Select site", variant: "destructive" });
+    return false;
+  }
+
+  if (!state.unitId) {
+    toast({ title: "Validation", description: "Select unit", variant: "destructive" });
+    return false;
+  }
+
+  if (!state.plotId) {
+    toast({ title: "Validation", description: "Select plot", variant: "destructive" });
+    return false;
+  }
+
+  if (!state.statusId) {
+    toast({ title: "Validation", description: "Select plot status", variant: "destructive" });
+    return false;
+  }
+
+  const alreadyAdded = plotDetails.some(
+    (p) => p.plotId?._id === state.plotId
+  );
+
+  if (alreadyAdded) {
+    toast({ title: "Alert", description: "Plot already added to this visitor", variant: "destructive" });
+    return false;
+  }
+
+  return true;
+};
+
+
+
   const handleSubItemSubmit = async (type) => {
-    setLoading(true);
+    
+
+    if (type === "followup") {
+  if (!validateFollowUp()) return;
+}
+
+if (type === "plot") {
+  if (!validatePlot()) return;
+}
+setLoading(true);
     try {
       let url = "",
         payload = {};

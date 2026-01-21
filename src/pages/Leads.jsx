@@ -409,7 +409,11 @@ const LeadDialog = ({
   const { toast } = useToast();
 
   const isViewMode = mode === "view";
-
+useEffect(()=>{
+if(mode==="edit"){
+  setActiveFormTab("deal")
+}
+},[mode])
   const fetchData = useCallback(async (endpoint, key) => {
     try {
       const res = await fetch(config.Api + endpoint, {
@@ -1734,7 +1738,10 @@ function LeadsContent() {
       State: row.leadStateId.StateName,
       City: row.leadCityId.CityName,
       Unit: row.leadUnitId?.UnitName || "-",
-      Site: row.leadSiteId?.sitename || "-",
+     ...(role !== "AGENT" && {
+      Site: row.leadSiteId?.sitename || "-"
+    }),
+      
       Status: row.leadStatusId.leadStatustName,
       "Assigned To": row.leadAssignedId ? row.leadAssignedId.EmployeeName : "",
     });
@@ -2145,6 +2152,7 @@ function LeadsContent() {
                           onClick={() => {
                             setSelectedLead(l);
                             setDialogMode("edit");
+                             setActiveFormTab("deal");
                             setDialogOpen(true);
                           }}
                           className="text-yellow-400"
@@ -2270,6 +2278,7 @@ function LeadsContent() {
                       onClick={() => {
                         setSelectedLead(l);
                         setDialogMode("edit");
+                        setActiveFormTab("deal")
                         setDialogOpen(true);
                       }}
                     >

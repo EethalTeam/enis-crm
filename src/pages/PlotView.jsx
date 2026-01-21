@@ -430,7 +430,10 @@ function PlotViewContent() {
 
   const handleView = (row) => {
     setViewData({
-      Site: row.unitId?.siteId?.sitename || row.siteId?.sitename || "-",
+    ...(role !== "AGENT" && {
+      Site: row.unitId?.siteId?.sitename || row.siteId?.sitename || "-"
+    }),
+     
       "Plot Number": row.plotNumber,
       Unit: row.unitId?.UnitName || "-",
       "Plot Dimension": row.dimension,
