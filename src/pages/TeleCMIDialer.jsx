@@ -12,6 +12,8 @@ const decode = (value) => {
     }
 };
 
+import { config } from "@/components/CustomComponents/config.js";
+
 const TeleCMIDialer = () => {
     const piopiyRef = useRef(null);
     const audioRef = useRef(typeof Audio !== "undefined" ? new Audio('') : null);
@@ -30,6 +32,7 @@ const TeleCMIDialer = () => {
     const [incomingCallData, setIncomingCallData] = useState(null);
     const [isMuted, setIsMuted] = useState(false);
     const [isOnHold, setIsOnHold] = useState(false);
+    const [LeadName,setLeadName] = useState('')
 
     const resetCallState = () => {
         stopRingtone();
@@ -75,11 +78,13 @@ const TeleCMIDialer = () => {
                 stopRingtone();
                 setCallStatus('Connected');
                 setPhoneNumber("91")
+                setLeadName('')
             });
             sdk.on('ended', () => {
                 stopRingtone();
                 resetCallState();
                 setPhoneNumber("91")
+                setLeadName('')
                navigate("/call-logs");
             });
             sdk.on('cancel', () => resetCallState());
@@ -133,6 +138,35 @@ const TeleCMIDialer = () => {
     }, [TelecmiID, TelecmiPassword, isLoggedIn]); // Re-run if credentials or login status changes
 
     // --- Handlers ---
+
+    
+     const getLeadName = async (number) => {
+  try {
+    const url = config.Api + "Lead/getLeadNameByNumber";
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ number }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch lead name");
+    }
+
+    const result = await res.json();
+    const data = result.data || result;
+    const fullName=data.leadFirstName + " " + data.leadLastName
+    setLeadName(fullName);
+    console.log(data.leadFirstName,data.leadLastName,"data.leadName")
+
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+
     const playRingtone = () => {
         if (audioRef.current) audioRef.current.play().catch(e => console.log("Audio blocked", e));
     };
@@ -155,6 +189,7 @@ const TeleCMIDialer = () => {
         if (piopiyRef.current) piopiyRef.current.terminate();
         resetCallState();
         setPhoneNumber("91")
+        setLeadName('')
     };
 
     const handleAnswer = () => {
@@ -174,6 +209,11 @@ const TeleCMIDialer = () => {
         // Allow only digits (keeps the prefix and adds new numbers)
         const onlyNums = value.replace(/[^\d]/g, '');
         setPhoneNumber(onlyNums);
+        if(value.length ===12){
+          getLeadName(value)
+        }else{
+          setLeadName('')
+        }
     } else if (value.length < 2) {
         // If they try to backspace the '91', reset it to '91'
         setPhoneNumber('91');
@@ -242,11 +282,13 @@ const handleReject = () => {
         {callStatus === 'Idle' ? (
           <>
             <input type="tel" placeholder="Enter number..." value={phoneNumber} onChange={handleInputChange} style={styles.input} />
+            <div style={{textAlign: 'center', fontSize: '20px', fontWeight: 'bold', color: '#1F2937'}}>{LeadName ? LeadName : ''}</div>
             <button onClick={handleCall} style={{...styles.btnPrimary, opacity: isLoggedIn ? 1 : 0.5}}>Call Now</button>
           </>
         ) : (
           <>
             <div style={{textAlign: 'center', fontSize: '20px', fontWeight: 'bold', color: '#1F2937'}}>{phoneNumber !== '91' ? phoneNumber : incomingCallData?.from || 'Unknown'}</div>
+            <div style={{textAlign: 'center', fontSize: '20px', fontWeight: 'bold', color: '#1F2937'}}>{LeadName ? LeadName : ''}</div>
 
             {callStatus === 'Connected' && (
               <div style={styles.grid}>

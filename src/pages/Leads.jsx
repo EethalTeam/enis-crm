@@ -409,11 +409,11 @@ const LeadDialog = ({
   const { toast } = useToast();
 
   const isViewMode = mode === "view";
-useEffect(()=>{
-if(mode==="edit"){
-  setActiveFormTab("deal")
-}
-},[mode])
+  useEffect(() => {
+    if (mode === "edit") {
+      setActiveFormTab("deal")
+    }
+  }, [mode])
   const fetchData = useCallback(async (endpoint, key) => {
     try {
       const res = await fetch(config.Api + endpoint, {
@@ -520,7 +520,7 @@ if(mode==="edit"){
       setFormData((prev) => ({
         ...prev,
         leadStatusId: value,
-        leadNotes:'',
+        leadNotes: '',
         leadStatusName: selectedStatus ? selectedStatus.leadStatustName : "",
       }));
       return;
@@ -699,8 +699,8 @@ if(mode==="edit"){
       });
       setIsSubmitting(false);
       return;
-    }else if(!formData.leadNotes || formData.leadNotes == ""){
-        setActiveFormTab("deal");
+    } else if (!formData.leadNotes || formData.leadNotes == "") {
+      setActiveFormTab("deal");
       toast({
         title: "Alert",
         description: "Please enter notes",
@@ -1064,7 +1064,7 @@ if(mode==="edit"){
                         value={formData.SiteVisitDate}
                         onChange={handleChange}
                         disabled={isViewMode}
-                         min={min}
+                        min={min}
                       />
                     </div>
                   )}
@@ -1386,6 +1386,7 @@ function LeadsContent() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isMuted, setIsMuted] = useState(false);
   const [isOnHold, setIsOnHold] = useState(false);
+  const [leadname, setLeadName] = useState("");
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -1499,7 +1500,7 @@ function LeadsContent() {
     };
   }, []);
 
-  const handleInitiateCall = (rawNumber) => {
+  const handleInitiateCall = (rawNumber,name= "") => {
     if (!isLoggedIn)
       return toast({
         title: "Connecting",
@@ -1518,6 +1519,8 @@ function LeadsContent() {
     if (!cleanNumber.startsWith("91")) cleanNumber = "91" + cleanNumber;
 
     setPhoneNumber(cleanNumber);
+    setLeadName(name); 
+
     toast({
       title: "Calling...",
       description: `Dialing ${cleanNumber}`,
@@ -1642,7 +1645,7 @@ function LeadsContent() {
         description: "Please enter notes before saving",
         variant: "destructive",
       });
-      
+
       return;
     }
 
@@ -1654,15 +1657,15 @@ function LeadsContent() {
       body: JSON.stringify({
         leadId: notesLead._id,
         leadStatusId: selectedStatusId,
-        leadNotes:noteText,
+        leadNotes: noteText,
         details: `Status changed to "${selectedStatus?.leadStatustName}" - ${noteText}`,
-        FollowDate:followDate,
-        SiteVisitDate:siteVisitDate,
+        FollowDate: followDate,
+        SiteVisitDate: siteVisitDate,
         employeeName: user?.EmployeeName,
       }),
     });
     if ((await res.json()).success) {
-        toast({
+      toast({
         title: "Success",
         description: "Lead status and note updated successfully",
         variant: "success",
@@ -1738,10 +1741,10 @@ function LeadsContent() {
       State: row.leadStateId.StateName,
       City: row.leadCityId.CityName,
       Unit: row.leadUnitId?.UnitName || "-",
-     ...(role !== "AGENT" && {
-      Site: row.leadSiteId?.sitename || "-"
-    }),
-      
+      ...(role !== "AGENT" && {
+        Site: row.leadSiteId?.sitename || "-"
+      }),
+
       Status: row.leadStatusId.leadStatustName,
       "Assigned To": row.leadAssignedId ? row.leadAssignedId.EmployeeName : "",
     });
@@ -1751,8 +1754,8 @@ function LeadsContent() {
   const handleViewNotes = (l) => {
     setNotesLead(l);
     setSelectedStatusId(l.leadStatusId?._id || "");
-     setFollowDate( l.FollowDate ? l.FollowDate.split("T")[0] : "" );
-    setSiteVisitDate(  l.SiteVisitDate ? l.SiteVisitDate.split("T")[0] : "");
+    setFollowDate(l.FollowDate ? l.FollowDate.split("T")[0] : "");
+    setSiteVisitDate(l.SiteVisitDate ? l.SiteVisitDate.split("T")[0] : "");
     setNoteText("");
     setNotesDialogOpen(true);
   };
@@ -1925,7 +1928,13 @@ function LeadsContent() {
         <div style={popupStyles.modal}>
           <div style={popupStyles.card}>
             <div style={popupStyles.status}>{callStatus}</div>
-            <div style={popupStyles.num}>{phoneNumber}</div>
+            {/* <div style={popupStyles.num}>{phoneNumber}</div> */}
+            <div style={popupStyles.num}>
+  {leadname || "Unknown Lead"}
+</div>
+<div style={popupStyles.num}>
+  {phoneNumber}
+</div>
             {callStatus === "Connected" && (
               <div style={popupStyles.btnGroup}>
                 <button onClick={toggleMute} style={popupStyles.btn}>
@@ -2098,7 +2107,15 @@ function LeadsContent() {
                       </td>
                     )}
                     <td className="py-3 px-4 text-slate-300 flex gap-2">
-                      <button onClick={() => handleInitiateCall(l.leadPhone)}>
+                      {/* <button onClick={() => handleInitiateCall(l.leadPhone)}> */}
+                      <button
+                        onClick={() =>
+                          handleInitiateCall(
+                            l.leadPhone,
+                            `${l.leadFirstName} ${l.leadLastName || ""}`
+                          )
+                        }
+                      >
                         <Phone size={18} className=" hover:text-fuchsia-400" />
                       </button>
                       {l.leadPhone}
@@ -2152,7 +2169,7 @@ function LeadsContent() {
                           onClick={() => {
                             setSelectedLead(l);
                             setDialogMode("edit");
-                             setActiveFormTab("deal");
+                            setActiveFormTab("deal");
                             setDialogOpen(true);
                           }}
                           className="text-yellow-400"
@@ -2160,22 +2177,22 @@ function LeadsContent() {
                           <Pencil className="w-4 h-4" />
                         </Button>
                       )}
-                    
-                        <Button
-                          variant="icon"
-                          size="icon"
-                          onClick={() => {
-                            setSelectedLead(l);
-                            setInitialData(l);
-                            setActiveFormTab("history");
-                            setHistoryDialogOpen(true);
-                          }}
-                          className="text-purple-400"
-                          title="View History"
-                        >
-                          <Clock className="w-4 h-4" />
-                        </Button>
-                  
+
+                      <Button
+                        variant="icon"
+                        size="icon"
+                        onClick={() => {
+                          setSelectedLead(l);
+                          setInitialData(l);
+                          setActiveFormTab("history");
+                          setHistoryDialogOpen(true);
+                        }}
+                        className="text-purple-400"
+                        title="View History"
+                      >
+                        <Clock className="w-4 h-4" />
+                      </Button>
+
                     </td>
                   </tr>
                 ))}
@@ -2229,7 +2246,12 @@ function LeadsContent() {
 
                 {/* ===== PHONE ===== */}
                 <div className="flex items-center gap-2 text-slate-300">
-                  <button onClick={() => handleInitiateCall(l.leadPhone)}>
+                  <button  onClick={() =>
+                          handleInitiateCall(
+                            l.leadPhone,
+                            `${l.leadFirstName} ${l.leadLastName || ""}`
+                          )
+                        }>
                     <Phone size={18} className="text-green-400" />
                   </button>
                   <span>{l.leadPhone}</span>
@@ -2286,20 +2308,20 @@ function LeadsContent() {
                     </Button>
                   )}
 
-                    <Button
-                      variant="icon"
-                      size="icon"
-                      className="text-purple-400"
-                      onClick={() => {
-                        setSelectedLead(l);
-                        setInitialData(l);
-                        setActiveFormTab("history");
-                        setHistoryDialogOpen(true);
-                      }}
-                    >
-                      <Clock className="w-4 h-4" />
-                    </Button>
-                
+                  <Button
+                    variant="icon"
+                    size="icon"
+                    className="text-purple-400"
+                    onClick={() => {
+                      setSelectedLead(l);
+                      setInitialData(l);
+                      setActiveFormTab("history");
+                      setHistoryDialogOpen(true);
+                    }}
+                  >
+                    <Clock className="w-4 h-4" />
+                  </Button>
+
                 </div>
               </div>
             ))}
@@ -2482,12 +2504,12 @@ function LeadsContent() {
                 <Label>Follow Up Date *</Label>
                 <Input
                   type="date"
-                   min={min}
+                  min={min}
                   value={followDate}
                   onChange={(e) => setFollowDate(e.target.value)}
                   className="text-white"
-        
-                        style={{ colorScheme: "dark" }}
+
+                  style={{ colorScheme: "dark" }}
                 />
               </div>
             )}
@@ -2501,7 +2523,7 @@ function LeadsContent() {
                 <Input
                   type="date"
                   value={siteVisitDate}
-                   min={min}
+                  min={min}
                   onChange={(e) => setSiteVisitDate(e.target.value)}
                   className="text-white"
                   style={{ colorScheme: "dark" }}

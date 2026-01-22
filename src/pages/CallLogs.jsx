@@ -240,6 +240,7 @@ function CallLogsContent() {
   const [leadInitialData, setLeadInitialData] = useState(null);
   const [DialogOpen, setDialogOpen] = useState(false)
   const [selectedRecording, setSelectedRecording] = useState(null);
+  const [leadName, setLeadName] = useState("");
 
 
   const resetCallState = () => {
@@ -323,7 +324,7 @@ function CallLogsContent() {
     };
   }, []);
 
-  const handleInitiateCall = (rawNumber) => {
+  const handleInitiateCall = (rawNumber, name = "") => {
     if (!isLoggedIn)
       return toast({
         title: "Connecting",
@@ -342,6 +343,7 @@ function CallLogsContent() {
     if (!cleanNumber.startsWith("91")) cleanNumber = "91" + cleanNumber;
 
     setPhoneNumber(cleanNumber);
+    setLeadName(name);
     toast({
       title: "Calling...",
       description: `Dialing ${cleanNumber}`,
@@ -566,7 +568,13 @@ function CallLogsContent() {
         <div style={popupStyles.modal}>
           <div style={popupStyles.card}>
             <div style={popupStyles.status}>{callStatus}</div>
-            <div style={popupStyles.num}>{phoneNumber}</div>
+            {/* <div style={popupStyles.num}>{phoneNumber}</div> */}
+            <div style={popupStyles.num}>
+              {leadName || "Unknown Lead"}
+            </div>
+            <div style={popupStyles.num}>
+              {phoneNumber}
+            </div>
             {callStatus === "Connected" && (
               <div style={popupStyles.btnGroup}>
                 <button onClick={toggleMute} style={popupStyles.btn}>
@@ -675,9 +683,9 @@ function CallLogsContent() {
                   <th className="text-left py-3 px-4 font-semibold">Caller</th>
                   <th className="text-left py-3 px-4 font-semibold">Number</th>
                   <th className="text-left py-3 px-4 font-semibold">Time</th>
-                   <th className="text-left py-3 px-4 font-semibold">
+                  <th className="text-left py-3 px-4 font-semibold">
                     Duration
-                  </th> 
+                  </th>
                   <th className="text-left py-3 px-4 font-semibold">Status</th>
                   <th className="text-left py-3 px-4 font-semibold">
                     Recording
@@ -700,12 +708,12 @@ function CallLogsContent() {
                       >
                         <td className="py-3 px-4">
                           {call.status === "missed" ? (
-                           <button onClick={() => handleInitiateCall(targetNumber)} ><PhoneMissed className="w-5 h-5 text-red-400 hover:text-red-600" /></button> 
+                            <button   onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)}><PhoneMissed className="w-5 h-5 text-red-400 hover:text-red-600" /></button>
                           ) : call.direction === "inbound" ||
                             call.direction === "incoming" ? (
-                          <button onClick={() => handleInitiateCall(targetNumber)}> <PhoneIncoming className="w-5 h-5 text-green-400 hover:text-green-600" /></button>  
+                            <button onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)}> <PhoneIncoming className="w-5 h-5 text-green-400 hover:text-green-600" /></button>
                           ) : (
-                          <button onClick={() => handleInitiateCall(targetNumber)}> <PhoneOutgoing className="w-5 h-5 text-blue-400 hover:text-blue-600" /> </button> 
+                            <button onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)} > <PhoneOutgoing className="w-5 h-5 text-blue-400 hover:text-blue-600" /> </button>
                           )}
                         </td>
                         {/* <td className="py-3 px-4 font-medium text-white">{targetNumber || "Unknown"}</td> */}
@@ -725,7 +733,12 @@ function CallLogsContent() {
                           <div className="flex items-center gap-2 group">
                             <span>{targetNumber}</span>
                             <button
-                              onClick={() => handleInitiateCall(targetNumber)}
+                              onClick={() =>
+                                handleInitiateCall(
+                                  targetNumber,
+                                  call.leadName || targetNumber
+                                )
+                              }
                               className="p-1.5 rounded-full bg-blue-600/10 text-blue-400 hover:bg-blue-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"
                             >
                               <PhoneCall size={12} />
@@ -770,7 +783,7 @@ function CallLogsContent() {
 
                         <td className="py-3 px-4">
 
-                          <Button 
+                          <Button
                             onClick={() => {
                               setSelectedRecording(call.recordingUrl);
                               setDialogOpen(true);
@@ -865,7 +878,12 @@ function CallLogsContent() {
                     <Phone className="w-4 h-4" /> {targetNumber}
                   </div>
                   <button
-                    onClick={() => handleInitiateCall(targetNumber)}
+                    onClick={() =>
+                      handleInitiateCall(
+                        targetNumber,
+                        call.leadName || targetNumber
+                      )
+                    }
                     className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold"
                   >
                     <PhoneCall size={12} /> Call
@@ -877,22 +895,22 @@ function CallLogsContent() {
                   {formatDuration(call.answeredsec)}
                 </div>
                 <div className="flex gap-2 border-t border-slate-700 pt-3">
-                
-                    <Button
-                      className="flex-1"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                              setSelectedRecording(call.recordingUrl);
-                              setDialogOpen(true);
-                            }}
-                              disabled={!call.recordingUrl}
-                    >
-                       Play
-                    </Button>
-                
-                  
-                 
+
+                  <Button
+                    className="flex-1"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedRecording(call.recordingUrl);
+                      setDialogOpen(true);
+                    }}
+                    disabled={!call.recordingUrl}
+                  >
+                    Play
+                  </Button>
+
+
+
                   <div className="flex-1 ">
                     <Button
                       size="sm"
@@ -942,24 +960,24 @@ function CallLogsContent() {
             </div>
           </DialogHeader>
 
-         <div className="p-4">
-           {selectedRecording ? (
-            <audio
-              src={selectedRecording}
-              controls
-              autoPlay
-              controlsList="nodownload noplaybackrate novolume"
-              className="w-full mt-4"
-              preload="none"
-            />
-          ) : (
-            <p className="text-slate-400 text-sm text-center mt-4">
-              No recording available
-            </p>
-          )}
+          <div className="p-4">
+            {selectedRecording ? (
+              <audio
+                src={selectedRecording}
+                controls
+                autoPlay
+                controlsList="nodownload noplaybackrate novolume"
+                className="w-full mt-4"
+                preload="none"
+              />
+            ) : (
+              <p className="text-slate-400 text-sm text-center mt-4">
+                No recording available
+              </p>
+            )}
 
-         </div>
-         
+          </div>
+
 
 
         </DialogContent>

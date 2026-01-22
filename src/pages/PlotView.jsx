@@ -508,7 +508,11 @@ function PlotViewContent() {
           <h1 className="md:text-3xl text-xl font-bold text-white">Plot View</h1>
           <Button
             variant="outline"
-            onClick={() => getPlotView()}
+            onClick={() => {
+                setSelectedStatus("All");
+                dispatch({ type: "reset" });
+                getPlotView();
+              }}
             className="border-fuchsia-700 text-fuchsia-300 hover:bg-fuchsia-900/20"
           >
             <RefreshCw

@@ -37,6 +37,8 @@ import { config } from "@/components/CustomComponents/config";
 import Reducer from "@/components/Reducer/commonReducer.js";
 import { useAuth } from "@/contexts/AuthContext";
 
+import { useNavigate } from "react-router-dom";
+
 const decode = (value) => {
   if (!value) return "";
   try {
@@ -1279,6 +1281,9 @@ function VisitorContent() {
   const [selectedVisitor, setSelectedVisitor] = useState(null);
   const [viewOpen, setViewOpen] = useState(false);
   const [viewData, setViewData] = useState({});
+   const navigate = useNavigate()
+      const { getPermissionsByPath } = useAuth();
+      const [Permissions, setPermissions] = useState({ isAdd: false, isView: false, isEdit: false, isDelete: false })
   console.log(selectedVisitor, "selectedVisitor")
   const { toast } = useToast();
 
@@ -1305,9 +1310,27 @@ function VisitorContent() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchVisitors();
-  }, [fetchVisitors]);
+  // useEffect(() => {
+  //   fetchVisitors();
+  // }, [fetchVisitors]);
+
+  
+      useEffect(() => {
+          getPermissionsByPath(window.location.pathname).then(res => {
+              if (res) {
+                  setPermissions(res)
+              } else {
+                  navigate('/dashboard')
+              }
+          })
+  
+      }, [])
+  
+      useEffect(() => {
+          if (Permissions.isView) {
+              fetchVisitors();
+          }
+      }, [Permissions])
 
   const handleDelete = (row) => {
     Swal.fire({
@@ -1383,8 +1406,9 @@ function VisitorContent() {
               <Upload className="w-4 h-4 mr-2" /> Export
             </Button>
           }
-
-          <Button
+          {
+            Permissions.isAdd &&
+            <Button
             onClick={() => {
               setSelectedVisitor(null);
               setDialogOpen(true);
@@ -1393,6 +1417,8 @@ function VisitorContent() {
           >
             <Plus className="w-4 h-4 mr-2" /> Add Visitor
           </Button>
+          }
+          
         </div>
       </div>
 
@@ -1411,10 +1437,10 @@ function VisitorContent() {
             </div>
             <Button
               variant="ghost"
-              onClick={fetchVisitors}
+              onClick={()=>{fetchVisitors();setSearchTerm("")}}
               className="text-fuchsia-300"
             >
-              <RefreshCw className="w-5 h-5" />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}/>
             </Button>
           </div>
 
@@ -1470,7 +1496,9 @@ function VisitorContent() {
                         : "-"}
                     </td>
                     <td className="py-3 px-4 flex justify-end gap-2">
-                      <Button
+                      {
+                        Permissions.isEdit && 
+                         <Button
                         size="icon"
                         variant="ghost"
                         onClick={() => {
@@ -1483,6 +1511,10 @@ function VisitorContent() {
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
+                      }
+                     
+                     {
+                      Permissions.isDelete && 
                       <Button
                         size="icon"
                         variant="ghost"
@@ -1491,6 +1523,8 @@ function VisitorContent() {
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
+                     }
+                      
                     </td>
                   </tr>
                 ))}
@@ -1557,7 +1591,9 @@ function VisitorContent() {
 
                   {/* ACTIONS */}
                   <div className="flex justify-start gap-3 pt-4 mt-4 border-t border-slate-800">
-                    <Button
+                    {
+                      Permissions.isEdit && 
+                       <Button
                       size="icon"
                       variant="ghost"
                       onClick={() => {
@@ -1568,8 +1604,11 @@ function VisitorContent() {
                     >
                       <Edit className="w-5 h-5" />
                     </Button>
-
-                    <Button
+                    }
+                   
+                     {
+                      Permissions.isDelete && 
+                        <Button
                       size="icon"
                       variant="ghost"
                       onClick={() => handleDelete(row)}
@@ -1577,6 +1616,8 @@ function VisitorContent() {
                     >
                       <Trash2 className="w-5 h-5" />
                     </Button>
+                     }
+                  
                   </div>
                 </div>
               );
