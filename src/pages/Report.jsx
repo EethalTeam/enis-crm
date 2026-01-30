@@ -135,7 +135,7 @@ const InsightCard = ({ title, value, trend, trendValue, icon: Icon, insight }) =
             <div className="flex justify-between items-start">
                 <div>
                     <p className="text-sm font-medium text-slate-400">{title}</p>
-                    <h3 className="text-2xl font-bold text-white mt-2">{value}</h3>
+                    <h3 className="text-xl font-bold text-white mt-2">{value}</h3>
                 </div>
                 <div className="p-2 bg-slate-800 rounded-lg text-fuchsia-500">
                     <Icon className="w-5 h-5" />
@@ -768,7 +768,7 @@ const getCallSummary = async (fromDate, toDate) => {
                 />
                 <InsightCard
                     title="Top Source"
-                    value={FilteredData.topSources[0]._id}
+                    value={FilteredData.topSources.length > 0 ? FilteredData.topSources[0]._id:''}
                     trend="up"
                     // trendValue="+5.2%"
                     icon={Smartphone}
@@ -776,7 +776,7 @@ const getCallSummary = async (fromDate, toDate) => {
                 />
                 <InsightCard
                     title="Top Site"
-                    value={FilteredData.topSites[0]._id}
+                    value={FilteredData.topSites.length > 0 ? FilteredData.topSites[0]._id : ''}
                     trend="up"
                     // trendValue="+8.0%"
                     icon={MapPin}
