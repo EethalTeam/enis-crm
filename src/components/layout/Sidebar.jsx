@@ -120,6 +120,7 @@ const navItems = [
   // { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   // { icon: Users, label: 'Users', path: '/users' },
   { icon: Activity, label: 'Reports', path: '/reports' },
+  { icon: Activity, label: 'Report', path: '/report' },
   { icon: Settings, label: 'Settings', path: '/settings' },
   {
     icon: Shield, label: 'Admin Panel',

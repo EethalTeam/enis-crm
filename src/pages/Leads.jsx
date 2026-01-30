@@ -2486,6 +2486,21 @@ function LeadsContent() {
               <select
                 value={selectedStatusId}
                 onChange={(e) => setSelectedStatusId(e.target.value)}
+  //                onChange={(e) => {
+  //   const newStatusId = e.target.value;
+  //   setSelectedStatusId(newStatusId);
+
+  //   const status = leadStatuses.find(s => s._id === newStatusId);
+
+  //   // Reset dates based on status change
+  //   if (status?.leadStatustName !== "Follow Up") {
+  //     setFollowDate("");
+  //   }
+
+  //   if (status?.leadStatustName !== "Site Visit") {
+  //     setSiteVisitDate("");
+  //   }
+  // }}
                 className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"
               >
                 <option value="">Select Status</option>
@@ -2493,7 +2508,7 @@ function LeadsContent() {
                   <option key={s._id} value={s._id}>
                     {s.leadStatustName}
                   </option>
-                ))}
+                ))} 
               </select>
             </div>
 

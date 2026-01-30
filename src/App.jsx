@@ -17,6 +17,7 @@ import Analytics from '@/pages/Analytics';
 import Settings from '@/pages/Settings';
 import Users from '@/pages/Users';
 import Reports from '@/pages/Reports';
+import Report from '@/pages/Report';
 import PlotList from '@/pages/PlotList'
 import PlotView from '@/pages/PlotView'
 import Visitors from '@/pages/Visitors';
@@ -91,6 +92,8 @@ function App() {
             <Route path="/masters/leadsource" element={<LeadSource />} />
             <Route path="/masters/companies" element={<Companies />} />
             <Route path="/masters/visitorverient" element={<VisitorVerient />} />
+            <Route path="report" element={<Report/>}/>
+
 
             
           </Route>
