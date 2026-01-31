@@ -522,6 +522,10 @@ const LeadDialog = ({
         leadStatusId: value,
         leadNotes: '',
         leadStatusName: selectedStatus ? selectedStatus.leadStatustName : "",
+
+        // 🔥 CLEAR IRRELEVANT DATES
+    FollowDate: statusName === "Follow Up" ? prev.FollowDate : "",
+    SiteVisitDate: statusName === "Site Visit" ? prev.SiteVisitDate : "",
       }));
       return;
     }
@@ -1500,7 +1504,7 @@ function LeadsContent() {
     };
   }, []);
 
-  const handleInitiateCall = (rawNumber,name= "") => {
+  const handleInitiateCall = (rawNumber, name = "") => {
     if (!isLoggedIn)
       return toast({
         title: "Connecting",
@@ -1519,7 +1523,7 @@ function LeadsContent() {
     if (!cleanNumber.startsWith("91")) cleanNumber = "91" + cleanNumber;
 
     setPhoneNumber(cleanNumber);
-    setLeadName(name); 
+    setLeadName(name);
 
     toast({
       title: "Calling...",
@@ -1930,11 +1934,11 @@ function LeadsContent() {
             <div style={popupStyles.status}>{callStatus}</div>
             {/* <div style={popupStyles.num}>{phoneNumber}</div> */}
             <div style={popupStyles.num}>
-  {leadname || "Unknown Lead"}
-</div>
-<div style={popupStyles.num}>
-  {phoneNumber}
-</div>
+              {leadname || "Unknown Lead"}
+            </div>
+            <div style={popupStyles.num}>
+              {phoneNumber}
+            </div>
             {callStatus === "Connected" && (
               <div style={popupStyles.btnGroup}>
                 <button onClick={toggleMute} style={popupStyles.btn}>
@@ -2246,12 +2250,12 @@ function LeadsContent() {
 
                 {/* ===== PHONE ===== */}
                 <div className="flex items-center gap-2 text-slate-300">
-                  <button  onClick={() =>
-                          handleInitiateCall(
-                            l.leadPhone,
-                            `${l.leadFirstName} ${l.leadLastName || ""}`
-                          )
-                        }>
+                  <button onClick={() =>
+                    handleInitiateCall(
+                      l.leadPhone,
+                      `${l.leadFirstName} ${l.leadLastName || ""}`
+                    )
+                  }>
                     <Phone size={18} className="text-green-400" />
                   </button>
                   <span>{l.leadPhone}</span>
@@ -2485,22 +2489,22 @@ function LeadsContent() {
               <Label>Lead Status</Label>
               <select
                 value={selectedStatusId}
-                onChange={(e) => setSelectedStatusId(e.target.value)}
-  //                onChange={(e) => {
-  //   const newStatusId = e.target.value;
-  //   setSelectedStatusId(newStatusId);
+                // onChange={(e) => setSelectedStatusId(e.target.value)}
+                onChange={(e) => {
+                  const newStatusId = e.target.value;
+                  setSelectedStatusId(newStatusId);
 
-  //   const status = leadStatuses.find(s => s._id === newStatusId);
+                  const status = leadStatuses.find(s => s._id === newStatusId);
 
-  //   // Reset dates based on status change
-  //   if (status?.leadStatustName !== "Follow Up") {
-  //     setFollowDate("");
-  //   }
+                  // Reset dates based on status change
+                  if (status?.leadStatustName !== "Follow Up") {
+                    setFollowDate("");
+                  }
 
-  //   if (status?.leadStatustName !== "Site Visit") {
-  //     setSiteVisitDate("");
-  //   }
-  // }}
+                  if (status?.leadStatustName !== "Site Visit") {
+                    setSiteVisitDate("");
+                  }
+                }}
                 className="w-full h-10 bg-slate-900 border border-slate-700 rounded-md px-3 text-white"
               >
                 <option value="">Select Status</option>
@@ -2508,7 +2512,7 @@ function LeadsContent() {
                   <option key={s._id} value={s._id}>
                     {s.leadStatustName}
                   </option>
-                ))} 
+                ))}
               </select>
             </div>
 

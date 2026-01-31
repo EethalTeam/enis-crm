@@ -4,9 +4,10 @@ import {
     PieChart, Pie, Cell, LineChart, Line, AreaChart, Area, ComposedChart
 } from 'recharts';
 import {
-    Download, Calendar, Filter, Brain, TrendingUp, Users, MapPin,
-    Smartphone, AlertCircle, ArrowUpRight, ArrowDownRight, Loader2, ChevronDown
+    Upload, Calendar, Filter, Brain, TrendingUp, Users, MapPin,
+    Smartphone, AlertCircle, ArrowUpRight, ArrowDownRight, Loader2, ChevronDown, BarChart3
 } from 'lucide-react';
+
 import { config } from "@/components/CustomComponents/config.js";
 import dayjs from "dayjs";
 
@@ -14,23 +15,42 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { IconButton, Popover, Box } from "@mui/material";
+import * as XLSX from "xlsx";
 const decode = (value) => {
-  if (!value) return "";
-  try {
-    return atob(value);
-  } catch (err) {
-    console.error("Decode failed:", err);
-    return "";
-  }
+    if (!value) return "";
+    try {
+        return atob(value);
+    } catch (err) {
+        console.error("Decode failed:", err);
+        return "";
+    }
 };
 
 // --- INLINE UI COMPONENTS ---
 
+// const Card = ({ className, children }) => (
+//     <div className={`rounded-lg border bg-slate-900 border-slate-800 shadow-sm ${className}`}>
+//         {children}
+//     </div>
+// );
+
 const Card = ({ className, children }) => (
-    <div className={`rounded-lg border bg-slate-900 border-slate-800 shadow-sm ${className}`}>
+    <div
+        className={`
+      rounded-xl
+      bg-gradient-to-br from-slate-900/90 to-slate-800/70
+      border border-slate-700/40
+      backdrop-blur-md
+      shadow-lg
+      hover:shadow-xl
+      transition-all duration-300
+      ${className}
+    `}
+    >
         {children}
     </div>
 );
+
 
 const CardContent = ({ className, children }) => (
     <div className={className}>
@@ -126,22 +146,22 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 // --- AI INSIGHT CARD ---
-const InsightCard = ({ title, value, trend, trendValue, icon: Icon, insight }) =>
-   {  
-    
+const InsightCard = ({ title, value, trend, trendValue, icon: Icon, insight }) => {
+
     return (
-    <Card>
-        <CardContent className="p-6">
-            <div className="flex justify-between items-start">
-                <div>
-                    <p className="text-sm font-medium text-slate-400">{title}</p>
-                    <h3 className="text-xl font-bold text-white mt-2">{value}</h3>
+        <Card>
+            <CardContent className="p-6">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <p className="text-sm font-medium text-slate-400">{title}</p>
+                        {/* <h3 className="text-xl font-bold text-white mt-2">{value}</h3> */}
+                        <h3 className="text-xl font-bold text-white mt-2 ">{value}</h3>
+                    </div>
+                    <div className="p-2 bg-slate-800 rounded-lg text-fuchsia-500">
+                        <Icon className="w-5 h-5" />
+                    </div>
                 </div>
-                <div className="p-2 bg-slate-800 rounded-lg text-fuchsia-500">
-                    <Icon className="w-5 h-5" />
-                </div>
-            </div>
-            {/* <div className="mt-4 flex items-center gap-2">
+                {/* <div className="mt-4 flex items-center gap-2">
         {trend === 'up' ? (
           <span className="text-green-500 text-xs flex items-center font-medium">
             <ArrowUpRight className="w-3 h-3 mr-1" /> {trendValue}
@@ -153,15 +173,16 @@ const InsightCard = ({ title, value, trend, trendValue, icon: Icon, insight }) =
         )}
         <span className="text-slate-500 text-xs">vs last month</span>
       </div> */}
-            <div className="mt-4 pt-4 border-t border-slate-800">
-                <div className="flex gap-2 items-start">
-                    <Brain className="w-3 h-3 text-fuchsia-500 mt-1 shrink-0" />
-                    <p className="text-xs text-slate-400 italic leading-relaxed">"{insight}"</p>
+                <div className="mt-4 pt-4 border-t border-slate-800">
+                    <div className="flex gap-2 items-start">
+                        <Brain className="w-3 h-3 text-fuchsia-500 mt-1 shrink-0" />
+                        <p className="text-xs text-slate-400 italic leading-relaxed">"{insight}"</p>
+                    </div>
                 </div>
-            </div>
-        </CardContent>
-    </Card>
-)};
+            </CardContent>
+        </Card>
+    )
+};
 
 export default function Report() {
     const [loading, setLoading] = useState(true);
@@ -169,7 +190,7 @@ export default function Report() {
     // --- STATE FOR AGENT PERFORMANCE ---
     // const [selectedAgent, setSelectedAgent] = useState(decode(localStorage.getItem("EmployeeId")));
     const [selectedAgent, setSelectedAgent] = useState("");
-    const [selectedAgentName,setSelectedAgentName] = useState('')
+    const [selectedAgentName, setSelectedAgentName] = useState('')
     // const [selectedMonth, setSelectedMonth] = useState('Nov 2025');
     const [selectedMonth, setSelectedMonth] = useState(dayjs());
     const [anchorEl, setAnchorEl] = useState(null);
@@ -181,6 +202,7 @@ export default function Report() {
         totalLeads: '',
         followUpCount: '',
         siteVisitCount: '',
+        newCount:'',
         conversionRate: '',
         topSources: '',
         topSites: '',
@@ -189,7 +211,7 @@ export default function Report() {
 
     })
 
-    console.log(FilteredData,"FilteredData")
+    console.log(FilteredData, "FilteredData")
     const [leads, setLeads] = useState([])
     const [agents, setAgents] = useState([]);
     const [leadSources, setLeadSources] = useState([])
@@ -197,23 +219,29 @@ export default function Report() {
     const [sourceLoading, setSourceLoading] = useState(false);
     const [siteData, setSiteData] = useState([]);
     const [sites, setSites] = useState([]);
-    console.log(sites,"sites")
+    console.log(sites, "sites")
     const [siteLoading, setSiteLoading] = useState(false);
     const [weeklyTrend, setWeeklyTrend] = useState([]);
     const [weeklyLoading, setWeeklyLoading] = useState(false);
     const [selectedDate, setSelectedDate] = useState("");
     const [availablePlots, setAvailablePlots] = useState([]);
-const [plotLoading, setPlotLoading] = useState(false);
-const [callSummary, setCallSummary] = useState({
-  totalCalls: 0,
-  answeredCalls: 0,
-  missedCalls: 0
-});
+    const [plotLoading, setPlotLoading] = useState(false);
+    const [callSummary, setCallSummary] = useState({
+        totalCalls: 0,
+        answeredCalls: 0,
+        missedCalls: 0,
+        avgAnsweredDuration: 0,
+        avgMissedWaitTime: 0
+    });
 
- const [Visitor,setVisitor]=useState({
-    visitCompletedCount:0
- })
-
+    const [Visitor, setVisitor] = useState({
+        totalVisitors: 0,
+        visitCompletedCount: 0,
+        visitPendingCount: 0,
+        completionRate: "0%"
+    })
+    const [units, setUnits] = useState([]);
+    const [selectedUnit, setSelectedUnit] = useState("");
 
     // const [chartData, setChartData] = useState([]);
     const [fromDate, setFromDate] = useState(
@@ -256,67 +284,67 @@ const [callSummary, setCallSummary] = useState({
     //   init();
     // }, []);
 
-  useEffect(() => {
-  applyMonthFilter();
-}, [selectedSite, selectedAgent]);
+    useEffect(() => {
+        applyMonthFilter();
+    }, [selectedSite, selectedAgent, selectedUnit]);
 
     // useEffect(() => {
     //     getWeeklyLeadVelocity();
     // }, [selectedMonth]);
 
 
-
-
-  const buildPayload = (fromDate, toDate) => {
-  const payload = { fromDate, toDate };
-
-  if (selectedSite) {
-    payload.siteId = selectedSite;
-  }
-
-  if (selectedAgent) {
-    payload.EmployeeId = selectedAgent;
-  }
-
-  return payload;
-};
+    useEffect(() => {
+        setSelectedUnit("");
+    }, [selectedSite]);
 
 
 
-const getCallSummary = async (fromDate, toDate) => {
-    const payload = buildPayload(fromDate, toDate);
-  try {
-    // const payload = { fromDate, toDate };
+    const buildPayload = (fromDate, toDate) => {
+        const payload = { fromDate, toDate };
 
-    // if (selectedSite && selectedSite !== "All Sites") {
-    //   payload.siteId = selectedSite;
-    // }
+        if (selectedSite) {
+            payload.siteId = selectedSite;
+        }
 
-    // if (selectedAgent && selectedAgent !== "All Agents") {
-    //   payload.EmployeeId = selectedAgent;
-    // }
+        if (selectedAgent) {
+            payload.EmployeeId = selectedAgent;
+        }
+        if (selectedUnit) {
+            payload.unitId = selectedUnit;
+        }
+
+        return payload;
+    };
 
 
-    const res = await fetch(
-      config.Api + "Report/getCallSummary",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
 
-    const result = await res.json();
-    setCallSummary(result.data || {
-      totalCalls: 0,
-      answeredCalls: 0,
-      missedCalls: 0
-    });
+    const getCallSummary = async (fromDate, toDate) => {
 
-  } catch (err) {
-    console.error("TeleCMI call summary error", err);
-  }
-};
+        const payload = buildPayload(fromDate, toDate);
+        try {
+
+            const res = await fetch(
+                config.Api + "Report/getCallSummary",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                }
+            );
+
+            const result = await res.json();
+            setCallSummary(result.data || {
+                totalCalls: 0,
+                answeredCalls: 0,
+                missedCalls: 0,
+                avgAnsweredDuration: 0,
+                avgMissedWaitTime: 0
+            });
+
+        } catch (err) {
+            console.error("TeleCMI call summary error", err);
+        }
+    };
 
 
 
@@ -345,83 +373,93 @@ const getCallSummary = async (fromDate, toDate) => {
     // };
 
 
-   const getLeadReports = async (fromDate, toDate) => {
-  const payload = buildPayload(fromDate, toDate);
+    const getLeadReports = async (fromDate, toDate) => {
+        const payload = buildPayload(fromDate, toDate);
 
-  const res = await fetch(config.Api + "Report/getLeadReports", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+        const res = await fetch(config.Api + "Report/getLeadReports", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
 
-  const result = await res.json();
-// console.log(result,"result")
-  const normalized = {
-    totalLeads: result.summary?.totalLeads || 0,
-    followUpCount: result.summary?.followUpCount || 0,
-    siteVisitCount: result.summary?.siteVisitCount || 0,
-    conversionRate: result.summary?.conversionRate || "0%",
-    topSources: result.topSources || [],
-    topSites: result.topSites || [],
-    agentPerformance: result.agentPerformance?.map(a => ({
-      name: a.agentName,
-      leads: a.totalAssigned,
-      converted: a.agentSiteVisits
-    })) || [],
-    weeklyVelocity: result.weeklyVelocity?.map(w => ({
-      name: `Week ${w._id}`,
-      leads: w.count,
-      sales: Math.round(w.count * 0.2) // optional
-    })) || []
-  };
+        const result = await res.json();
+        // console.log(result,"result")
+        const normalized = {
+            totalLeads: result.summary?.totalLeads || 0,
+            followUpCount: result.summary?.followUpCount || 0,
+            siteVisitCount: result.summary?.siteVisitCount || 0,
+            newCount: result.summary?.newCount || 0,
+            conversionRate: result.summary?.conversionRate || "0%",
+            topSources: result.topSources || [],
+            topSites: result.topSites || [],
+            agentPerformance: result.agentPerformance?.map(a => ({
+                name: a.agentName,
+                leads: a.totalAssigned,
+                converted: a.agentSiteVisits
+            })) || [],
+            weeklyVelocity: result.weeklyVelocity?.map(w => ({
+                name: `Week ${w._id}`,
+                leads: w.count,
+                sales: Math.round(w.count * 0.2) // optional
+            })) || []
+        };
 
-  setFilteredData(normalized);
-};
+        setFilteredData(normalized);
+    };
 
-  const getVisitorReports = async (fromDate, toDate) => {
-  const payload = buildPayload(fromDate, toDate);
+    const getVisitorReports = async (fromDate, toDate) => {
+        const payload = buildPayload(fromDate, toDate);
 
-  const res = await fetch(config.Api + "Report/getVisitorReports", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+        const res = await fetch(config.Api + "Report/getVisitorReports", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
 
-  const result = await res.json();
-// console.log(result,"result")
-  const normalized = {
-    visitCompletedCount: result.summary?.visitCompletedCount || 0,
-  
-  };
+        const result = await res.json();
+        // console.log(result,"result")
+        const normalized = {
+            visitCompletedCount: result.summary?.visitCompletedCount || 0,
+            totalVisitors: result.summary?.totalVisitors || 0,
+            visitPendingCount: result.summary?.visitPendingCount || 0,
+            completionRate: result.summary?.completionRate || "0%"
 
-  setVisitor(normalized);
-};
+        };
+
+        setVisitor(normalized);
+    };
 
 
 
     const getAvailablePlots = async () => {
         const payload = buildPayload(fromDate, toDate);
-  try {
-    setPlotLoading(true);
+        try {
+            setPlotLoading(true);
 
-    const res = await fetch(
-      config.Api + "Report/getAllAvailablePlots",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
+            const res = await fetch(
+                config.Api + "Report/getAllAvailablePlots",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                }
+            );
 
-    const result = await res.json();
-    setAvailablePlots(result.data || []);
+            const result = await res.json();
+            setAvailablePlots(result.data || []);
 
-  } catch (err) {
-    console.error("Available plot error", err);
-  } finally {
-    setPlotLoading(false);
-  }
-};
+        } catch (err) {
+            console.error("Available plot error", err);
+        } finally {
+            setPlotLoading(false);
+        }
+    };
+
+    const plotStatusSummary = availablePlots.reduce((acc, plot) => {
+        const status = plot.statusId?.statusName || "Unknown";
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+    }, {});
 
 
     const getAllSite = async () => {
@@ -446,6 +484,23 @@ const getCallSummary = async (fromDate, toDate) => {
                 description: "Could not fetch Report total lead",
                 variant: "destructive",
             });
+        }
+    };
+
+
+    const getAllUnits = async () => {
+        try {
+            const res = await fetch(config.Api + "Unit/getAllUnits", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({}),
+            });
+
+            const result = await res.json();
+            const data = result.data || result;
+            setUnits(data);
+        } catch (err) {
+            console.error("Unit fetch error", err);
         }
     };
 
@@ -621,7 +676,78 @@ const getCallSummary = async (fromDate, toDate) => {
         getAvailablePlots(start, end)
         getCallSummary(start, end)
         getVisitorReports(start, end)
+        getAllUnits(start, end)
     };
+
+    const handleExport = () => {
+        // -------- Sheet 1: Summary --------
+        const summarySheet = [
+            { Metric: "Total Leads", Value: FilteredData.totalLeads },
+            { Metric: "Follow Ups", Value: FilteredData.followUpCount },
+            { Metric: "Site Visits", Value: FilteredData.siteVisitCount },
+            { Metric: "Conversion Rate", Value: FilteredData.conversionRate },
+            { Metric: "Visit Completed", Value: Visitor.visitCompletedCount },
+            { Metric: "Available Plots", Value: availablePlots.length },
+            { Metric: "Total Calls", Value: callSummary.totalCalls },
+            { Metric: "Answered Calls", Value: callSummary.answeredCalls },
+            { Metric: "Missed Calls", Value: callSummary.missedCalls },
+        ];
+
+        // -------- Sheet 2: Agent Performance --------
+        const agentSheet = FilteredData.agentPerformance.map(a => ({
+            Agent: a.name,
+            Leads_Assigned: a.leads,
+            Converted: a.converted,
+        }));
+
+        // -------- Sheet 3: Lead Sources --------
+        const sourceSheet = leadSources.map(s => ({
+            Source: s.name,
+            Leads: s.value,
+        }));
+
+        // -------- Sheet 4: Site Distribution --------
+        const siteSheet = siteData.map(s => ({
+            Site: s.name,
+            Leads: s.value,
+        }));
+
+        // -------- Sheet 5: Available Plots --------
+        const plotSheet = availablePlots.map(p => ({
+            Plot_No: p.plotNumber,
+            Site: p.siteId?.sitename || "",
+            Unit: p.unitId?.UnitName || "",
+            SqFt: p.areaInSqFt,
+            Facing: p.facing,
+            Status: p.statusId?.statusName,
+        }));
+
+        // Create workbook
+        const wb = XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summarySheet), "Summary");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(agentSheet), "Agent Performance");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sourceSheet), "Lead Sources");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(siteSheet), "Site Distribution");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plotSheet), "Available Plots");
+
+        //  Direct browser download (NO file-saver)
+        XLSX.writeFile(
+            wb,
+            `Report_${selectedMonth.format("MMMM_YYYY")}.xlsx`
+        );
+    };
+
+
+    const funnelData = [
+        { label: "New Lead", value: FilteredData.newCount, trend: "up" },
+        { label: "Lead Followup", value: FilteredData.followUpCount, trend: "up" },
+        { label: "Lead Site Visit", value: FilteredData.siteVisitCount, trend: "up" },
+        { label: "Visit Completed", value: FilteredData.visitCompletedCount || 0, trend: "up" },
+        // { label: "Plot Available", value: availablePlots.length, trend: "down" },
+
+    ];
+
 
 
 
@@ -638,23 +764,23 @@ const getCallSummary = async (fromDate, toDate) => {
 
 
     return (
-        <div className="space-y-6 bg-slate-950 min-h-screen p-4 text-slate-100">
+        <div className="space-y-6  min-h-screen p-4 text-slate-100  bg-gradient-to-br from-[#0b0f1a] via-[#0f172a] to-[#140b2d]">
 
             {/* HEADER */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className=" flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-xl p-5 bg-gradient-to-r from-slate-900/80 to-slate-800/60 border border-slate-700/40 backdrop-blur-md shadow-lg">
                 <div>
-                    <h1 className="md:text-3xl text-xl font-bold text-white flex items-center gap-2">
+                    <h1 className=" md:text-3xl text-xl font-bold  bg-gradient-to-r from-fuchsia-400 to-purple-400 bg-clip-text text-transparent flex items-center gap-2">
                         <TrendingUp className="text-fuchsia-600 w-8 h-8" />
                         Reports
                     </h1>
-                    <p className="text-slate-400 text-sm mt-1">AI-powered insights and performance metrics.</p>
+                    <p className="text-slate-400 text-xs mt-1 tracking-wide">AI-powered insights and performance metrics.</p>
                 </div>
 
-                <div className='flex gap-3 md:flex-row flex-col items-start'>
+                <div className='flex gap-3 md:flex-row flex-col items-start md:ps-40'>
 
-                     <div className="relative w-full sm:w-auto">
+                    <div className="relative w-full sm:w-auto">
                         <select
-                            className="w-full sm:w-auto h-9 rounded-md border border-slate-700 bg-slate-800 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer"
+                            className="w-full sm:w-auto h-9 rounded-md border bg-slate-900/80 border-slate-700/50 hover:border-fuchsia-500 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer"
                             value={selectedSite}
                             onChange={(e) => setSelectedSite(e.target.value)}
                         >
@@ -671,18 +797,19 @@ const getCallSummary = async (fromDate, toDate) => {
 
                     <div className="relative">
                         <select
-                            className="h-9 rounded-md border border-slate-700 bg-slate-800 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer"
+                            className="w-full sm:w-auto h-9 rounded-md border bg-slate-900/80 border-slate-700/50 hover:border-fuchsia-500 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer"
                             value={selectedAgent}
-                            onChange={(e) =>{
-                                const agentId=e.target.value
-                                const agentName=agents.find(e=>e._id === agentId)
+                            onChange={(e) => {
+                                const agentId = e.target.value
+                                const agentName = agents.find(e => e._id === agentId)
                                 // console.log(agentName.EmployeeName,"agentName")
-                                if(agentName){
-                                   setSelectedAgentName(agentName.EmployeeName)
-                                }else{
+                                if (agentName) {
+                                    setSelectedAgentName(agentName.EmployeeName)
+                                } else {
                                     setSelectedAgentName('')
                                 }
-                                setSelectedAgent(agentId)}}
+                                setSelectedAgent(agentId)
+                            }}
                         >
                             <option value="">All Agents</option>
                             {agents.map((agent) => (
@@ -693,12 +820,12 @@ const getCallSummary = async (fromDate, toDate) => {
                         </select>
                         <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
                     </div>
-                 
+
 
                 </div>
 
                 <div className="flex gap-3 md:flex-row flex-col items-start">
-                    <Button variant="outline" className="text-slate-300">
+                    <Button variant="outline" className="w-full sm:w-auto h-9 rounded-md border bg-slate-900/80 border-slate-700/50 hover:border-fuchsia-500 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer">
                         <Calendar className="w-4 h-4 mr-2" />
                         {selectedMonth.format("MMMM YYYY")}
                         <IconButton
@@ -741,11 +868,137 @@ const getCallSummary = async (fromDate, toDate) => {
 
 
 
-                    <Button>
-                        <Download className="w-4 h-4 mr-2" />
-                        Export PDF
+                    <Button onClick={handleExport} className={`  className="
+    bg-gradient-to-r from-fuchsia-600 to-purple-600
+    text-white
+    shadow-lg
+    hover:opacity-90
+  "`}>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Export
                     </Button>
                 </div>
+            </div>
+
+
+
+            <div>
+                <Card>
+                    <CardContent className="p-6">
+
+                        {/* Header */}
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 className="text-lg font-bold text-white">
+                                    Call Health Overview
+                                </h3>
+                                <p className="text-xs text-slate-400">
+                                    Telephony performance during selected period
+                                </p>
+                            </div>
+                            <Smartphone className="w-6 h-6 text-fuchsia-500" />
+                        </div>
+
+                        {/* TOP METRICS */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                            {/* TOTAL CALLS */}
+                            <div className="p-5 rounded-xl bg-gradient-to-br from-indigo-900/40 to-slate-900/70
+                      border border-indigo-500/20">
+                                <p className="text-xs text-slate-400">Total Calls</p>
+                                <h3 className="text-3xl font-bold text-white mt-1">
+                                    {callSummary.totalCalls}
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-2">
+                                    Inbound + Outbound
+                                </p>
+                            </div>
+
+                            {/* ANSWERED */}
+                            <div className="p-5 rounded-xl bg-gradient-to-br from-green-900/30 to-slate-900/70
+                      border border-green-500/20">
+                                <div className="flex items-center justify-between">
+                                    <p className="text-xs text-slate-400">Answered</p>
+                                    <ArrowUpRight className="w-4 h-4 text-green-400" />
+                                </div>
+
+                                <h3 className="text-3xl font-bold text-green-400 mt-1">
+                                    {callSummary.answeredCalls}
+                                </h3>
+
+                                <p className="text-xs text-slate-500 mt-2">
+                                    {callSummary.totalCalls
+                                        ? Math.round(
+                                            (callSummary.answeredCalls / callSummary.totalCalls) * 100
+                                        )
+                                        : 0}% success rate
+                                </p>
+                            </div>
+
+                            {/* MISSED */}
+                            <div className="p-5 rounded-xl bg-gradient-to-br from-red-900/30 to-slate-900/70
+                      border border-red-500/20">
+                                <div className="flex items-center justify-between">
+                                    <p className="text-xs text-slate-400">Missed</p>
+                                    <AlertCircle className="w-4 h-4 text-red-400" />
+                                </div>
+
+                                <h3 className="text-3xl font-bold text-red-400 mt-1">
+                                    {callSummary.missedCalls}
+                                </h3>
+
+                                <p className="text-xs text-slate-500 mt-2">
+                                    {callSummary.totalCalls
+                                        ? Math.round(
+                                            (callSummary.missedCalls / callSummary.totalCalls) * 100
+                                        )
+                                        : 0}% drop rate
+                                </p>
+                            </div>
+
+                        </div>
+
+                        {/* SECONDARY METRICS */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+
+                            {/* AVG ANSWER DURATION */}
+                            <div className="p-4 rounded-lg bg-slate-900/60 border border-slate-800">
+                                <p className="text-xs text-slate-400">Avg Answer Duration</p>
+                                <h3 className="text-xl font-bold text-white mt-1">
+                                    {Math.floor(callSummary.avgAnsweredDuration / 60)}m{" "}
+                                    {callSummary.avgAnsweredDuration % 60}s
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-1">
+                                    Talk time per answered call
+                                </p>
+                            </div>
+
+                            {/* AVG MISSED WAIT */}
+                            <div className="p-4 rounded-lg bg-slate-900/60 border border-slate-800">
+                                <p className="text-xs text-slate-400">Avg Missed Wait Time</p>
+                                <h3 className="text-xl font-bold text-yellow-400 mt-1">
+                                    {callSummary.avgMissedWaitTime}s
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-1">
+                                    Caller wait before drop
+                                </p>
+                            </div>
+
+                        </div>
+
+                        {/* AI INSIGHT */}
+                        <div className="mt-6 p-4 rounded-lg bg-slate-950/60 border border-slate-800 flex gap-2">
+                            <Brain className="w-4 h-4 text-fuchsia-500 mt-0.5 shrink-0" />
+                            <p className="text-xs text-slate-300 leading-relaxed">
+                                <span className="font-semibold text-fuchsia-400">AI Insight:</span>{" "}
+                                {callSummary.missedCalls > callSummary.answeredCalls * 0.3
+                                    ? "Missed calls are high. Consider adding callback automation or increasing agent coverage during peak hours."
+                                    : "Call handling efficiency is healthy. Current staffing levels appear sufficient."}
+                            </p>
+                        </div>
+
+                    </CardContent>
+                </Card>
             </div>
 
             {/* KPI & AI INSIGHTS ROW */}
@@ -756,7 +1009,7 @@ const getCallSummary = async (fromDate, toDate) => {
                     trend="up"
                     // trendValue="+12.5%"
                     icon={Users}
-                    insight="Lead volume is surging. Sundays generate 20% more inquiries than weekdays."
+                    insight="Total number of leads received from all sources during the selected period.."
                 />
                 <InsightCard
                     title="Conversion Rate"
@@ -764,15 +1017,15 @@ const getCallSummary = async (fromDate, toDate) => {
                     trend="down"
                     // trendValue="-1.4%"
                     icon={TrendingUp}
-                    insight="Conversions dropped slightly. Consider retraining agents on 'Follow-up' scripts."
+                    insight="Shows how many leads were converted compared to the total leads received."
                 />
                 <InsightCard
                     title="Top Source"
-                    value={FilteredData.topSources.length > 0 ? FilteredData.topSources[0]._id:''}
+                    value={FilteredData.topSources.length > 0 ? FilteredData.topSources[0]._id : ''}
                     trend="up"
                     // trendValue="+5.2%"
                     icon={Smartphone}
-                    insight="Facebook Luxury Villa campaign has the highest ROI this month."
+                    insight="Shows which marketing source contributed the most leads.."
                 />
                 <InsightCard
                     title="Top Site"
@@ -780,146 +1033,269 @@ const getCallSummary = async (fromDate, toDate) => {
                     trend="up"
                     // trendValue="+8.0%"
                     icon={MapPin}
-                    insight="Spring Fields site visits have doubled after the recent open house event."
+                    insight="Shows which site received the most leads."
                 />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <InsightCard
-                    title="Lead Followup"
-                    value={FilteredData.followUpCount}
-                    trend="up"
-                    // trendValue="+12.5%"
-                    icon={Users}
-                    insight="Lead volume is surging. Sundays generate 20% more inquiries than weekdays."
-                />
-                <InsightCard
-                    title="Lead Site Visit"
-                    value={FilteredData.siteVisitCount}
-                    trend="down"
-                    // trendValue="-1.4%"
-                    icon={TrendingUp}
-                    insight="Conversions dropped slightly. Consider retraining agents on 'Follow-up' scripts."
-                />
-                <InsightCard
-                    title="Visit Completed"
-                    value={Visitor.visitCompletedCount}
-                    trend="up"
-                    // trendValue="+5.2%"
-                    icon={Smartphone}
-                    insight="Facebook Luxury Villa campaign has the highest ROI this month."
-                />
-                <InsightCard
-                    title="Plot Available"
-                    value={availablePlots.length}
-                    trend="up"
-                    // trendValue="+8.0%"
-                    icon={MapPin}
-                    insight="Spring Fields site visits have doubled after the recent open house event."
-                />
+
+
+
+            <div className="bg-slate-900 rounded-xl p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                {/* Funnel */}
+                <div className="flex flex-col gap-3">
+                    {funnelData.map((item, index) => (
+                        <div
+                            key={index}
+                            className="relative bg-gradient-to-r from-indigo-600 to-indigo-500 
+                       text-white py-3 px-4 rounded-md 
+                       flex items-center justify-between"
+                            style={{
+                                width: `${100 - index * 10}%`
+                            }}
+                        >
+                            <span className="text-sm font-medium">{item.label}</span>
+
+                            {item.trend === "up" ? (
+                                <ArrowUpRight className="text-green-300" size={18} />
+                            ) : (
+                                <ArrowDownRight className="text-yellow-300" size={18} />
+                            )}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Counts */}
+                <div className="bg-slate-800 rounded-lg p-4">
+                    <div className="grid grid-cols-3 text-xs text-slate-400 pb-2 border-b border-slate-700">
+                        <span>Stage</span>
+                        <span className="text-center">Count</span>
+                        <span className="text-right">Trend</span>
+                    </div>
+
+                    {funnelData.map((item, index) => (
+                        <div
+                            key={index}
+                            className="grid grid-cols-3 items-center py-3 text-sm border-b border-slate-700 last:border-none"
+                        >
+                            <span className="text-slate-200">{item.label}</span>
+                            <span className="text-center font-semibold text-white">
+                                {item.value}
+                            </span>
+                            <span className="flex justify-end">
+                                {item.trend === "up" ? (
+                                    <ArrowUpRight className="text-green-400" size={16} />
+                                ) : (
+                                    <ArrowDownRight className="text-yellow-400" size={16} />
+                                )}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
             </div>
+
+
+            <Card>
+                <CardContent className="p-6">
+
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-5">
+                        <div>
+                            <h3 className="text-lg font-bold text-white">
+                                Visitor Engagement Details
+                            </h3>
+                            <p className="text-xs text-slate-400">
+                                Breakdown of scheduled vs completed site visits
+                            </p>
+                        </div>
+                        <Users className="w-6 h-6 text-fuchsia-500" />
+                    </div>
+
+                    {/* STAT GRID */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-lg">
+                            <p className="text-xs text-slate-400">Total Visits</p>
+                            <h4 className="text-xl font-bold text-white mt-1">
+                                {Visitor.totalVisitors}
+                            </h4>
+                        </div>
+
+                        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-lg">
+                            <p className="text-xs text-slate-400">Completed</p>
+                            <h4 className="text-xl font-bold text-green-400 mt-1">
+                                {Visitor.visitCompletedCount}
+                            </h4>
+                        </div>
+
+                        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-lg">
+                            <p className="text-xs text-slate-400">Pending</p>
+                            <h4 className="text-xl font-bold text-yellow-400 mt-1">
+                                {Visitor.visitPendingCount}
+                            </h4>
+                        </div>
+
+                        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-lg">
+                            <p className="text-xs text-slate-400">Completion Rate</p>
+                            <h4 className="text-xl font-bold text-fuchsia-400 mt-1">
+                                {Visitor.completionRate}
+                            </h4>
+                        </div>
+
+                    </div>
+
+                    {/* PROGRESS + CONTEXT */}
+                    <div className="mt-6 grid md:grid-cols-3 gap-6">
+
+                        {/* Progress */}
+                        <div className="md:col-span-2">
+                            <p className="text-xs text-slate-400 mb-2">
+                                Visit Conversion Progress
+                            </p>
+
+                            <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-gradient-to-r from-green-400 to-fuchsia-500"
+                                    style={{ width: Visitor.completionRate }}
+                                />
+                            </div>
+
+                            <p className="text-xs text-slate-500 mt-2">
+                                Higher completion rates indicate better agent follow-up discipline.
+                            </p>
+                        </div>
+
+                        {/* AI Insight */}
+                        <div className="p-4 bg-slate-950/60 border border-slate-800 rounded-lg">
+                            <p className="text-xs text-slate-400 mb-1">AI Insight</p>
+                            <p className="text-xs text-slate-300 leading-relaxed">
+                                {parseFloat(Visitor.completionRate) < 50
+                                    ? "Pending visits are high. Introduce reminder automation or tighter scheduling windows."
+                                    : "Visit follow-up flow is optimized. Maintain current engagement strategy."}
+                            </p>
+                        </div>
+
+                    </div>
+
+                </CardContent>
+            </Card>
 
             <Card className="lg:col-span-4">
-  <CardContent className="p-6">
-    <div className="flex justify-between items-center mb-4">
-      <h3 className="text-lg font-bold text-white">
-        Available Plot List
-      </h3>
+                <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
 
-      <span className="text-xs text-slate-400">
-        Total: {availablePlots.length}
-      </span>
-    </div>
+                        {/* Title */}
+                        <div>
+                            <h3 className="text-lg font-bold text-white">
+                                Site-wise Plot Availability
+                            </h3>
+                            <p className="text-xs text-slate-400 mt-1">
+                                Inventory distribution across sites & units
+                            </p>
+                        </div>
 
-    {plotLoading ? (
-      <div className="text-slate-400 text-center py-10">
-        Loading available plots...
-      </div>
-    ) : (
-     <div className="overflow-x-auto max-h-[420px] overflow-y-auto border border-slate-800 rounded-md">
-  <table className="w-full text-sm">
-    
-    {/* TABLE HEADER */}
-    <thead className="bg-slate-800 text-slate-300 sticky top-0 z-10">
-      <tr>
-        <th className="p-2 text-left">Plot No</th>
-        <th className="p-2 text-left">Site</th>
-        <th className="p-2 text-left">Unit</th>
-        <th className="p-2 text-left">Sq Ft</th>
-        <th className="p-2 text-left">Facing</th>
-        <th className="p-2 text-left">Status</th>
-      </tr>
-    </thead>
+                        {/* Unit Filter */}
+                        {/* <div className="relative">
+                            <div className="flex items-center gap-2 px-4 py-2 rounded-full
+                    bg-slate-900/70 border border-slate-700/5
+                    hover:border-fuchsia-500 transition cursor-pointer">
+                                <MapPin className="w-4 h-4 text-fuchsia-400" />
+                                <select
+                                    value={selectedUnit}
+                                    onChange={(e) => setSelectedUnit(e.target.value)}
+                                    className="bg-transparent text-sm text-slate-200 focus:outline-none cursor-pointer"
+                                >
+                                    <option value="" className="bg-slate-900 text-slate-100">All Units</option>
+                                    {units.map((unit) => (
+                                        <option key={unit._id} value={unit._id} className="bg-slate-900 text-slate-100"
+                                        >
+                                            {unit.UnitName}
+                                        </option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="w-4 h-4 text-slate-400" />
+                            </div>
+                        </div> */}
 
-    {/* TABLE BODY */}
-    <tbody>
-      {availablePlots.length === 0 ? (
-        <tr>
-          <td colSpan="6" className="text-center p-4 text-slate-400">
-            No plots available
-          </td>
-        </tr>
-      ) : (
-        availablePlots.map((plot) => (
-          <tr
-            key={plot._id}
-            className="border-t border-slate-800 hover:bg-slate-900 transition"
-          >
-            <td className="p-2">{plot.plotNumber}</td>
-            <td className="p-2">{plot.siteId?.sitename}</td>
-            <td className="p-2">{plot.unitId?.UnitName || "-"}</td>
-            <td className="p-2">{plot.areaInSqFt}</td>
-            <td className="p-2">{plot.facing}</td>
-            <td className="p-2">
-              <span
-                className="px-2 py-0.5 rounded text-xs font-semibold"
-                style={{
-                  backgroundColor: plot.statusId?.colorCode,
-                  color: "#000",
-                }}
-              >
-                {plot.statusId?.statusName}
-              </span>
-            </td>
-          </tr>
-        ))
-      )}
-    </tbody>
-  </table>
-</div>
-
-    )}
-  </CardContent>
-</Card>
-
-<div >
-<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-
-  <InsightCard
-    title="Total Calls"
-    value={callSummary.totalCalls}
-    icon={Smartphone}
-    insight="Total inbound & outbound calls during selected period."
-  />
-
-  <InsightCard
-    title="Answered Calls"
-    value={callSummary.answeredCalls}
-    icon={ArrowUpRight}
-    insight="Good response rate. Agents are attending calls effectively."
-  />
-
-  <InsightCard
-    title="Missed Calls"
-    value={callSummary.missedCalls}
-    icon={AlertCircle}
-    insight="Missed calls indicate potential lost leads. Improve call handling."
-  />
-
-</div>
-</div>
+                    </div>
 
 
+
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                        {Object.entries(
+                            availablePlots.reduce((acc, plot) => {
+                                const site = plot.siteId?.sitename || "Unknown Site";
+                                const status = plot.statusId?.statusName;
+
+                                if (!acc[site]) {
+                                    acc[site] = { Available: 0, Interested: 0, Booked: 0, Sold: 0 };
+                                }
+                                if (status) acc[site][status]++;
+                                return acc;
+                            }, {})
+                        ).map(([site, stats]) => (
+                            <div
+                                key={site}
+                                className="rounded-lg border border-slate-800 p-4 bg-slate-900/60 hover:border-fuchsia-500 transition"
+                            >
+                                <h4 className="font-semibold text-white mb-3">{site}</h4>
+
+                                <div className="grid grid-cols-4 gap-2 text-xs text-center">
+                                    <div className="bg-green-500/10 text-green-400 rounded p-2">
+                                        Avl<br /><b>{stats.Available}</b>
+                                    </div>
+                                    <div className="bg-blue-500/10 text-blue-400 rounded p-2">
+                                        Interested<br /><b>{stats.Interested}</b>
+                                    </div>
+                                    <div className="bg-yellow-500/10 text-yellow-400 rounded p-2">
+                                        Book<br /><b>{stats.Booked}</b>
+                                    </div>
+                                    <div className="bg-red-500/10 text-red-400 rounded p-2">
+                                        Sold<br /><b>{stats.Sold}</b>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                        <div className="grid grid-cols-2 gap-4 h-full">
+
+                            <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-4">
+                                <p className="text-xs text-slate-400">Total Inventory</p>
+                                <h3 className="text-2xl font-bold text-white">
+                                    {Object.values(plotStatusSummary).reduce((a, b) => a + b, 0)}
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-1">All plots combined</p>
+                            </div>
+
+                            <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-4">
+                                <p className="text-xs text-slate-400">Sell Through</p>
+                                <h3 className="text-2xl font-bold text-green-400">
+                                    {plotStatusSummary.Sold
+                                        ? Math.round(
+                                            (plotStatusSummary.Sold /
+                                                Object.values(plotStatusSummary).reduce((a, b) => a + b, 0)) * 100
+                                        )
+                                        : 0}%
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-1">Sold vs inventory</p>
+                            </div>
+
+                            <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-4 col-span-2">
+                                <p className="text-xs text-slate-400 mb-2">AI Insight</p>
+                                <p className="text-sm text-slate-200">
+                                    📊 Inventory is heavily skewed towards
+                                    <span className="text-fuchsia-400 font-semibold"> Available plots</span>.
+                                    Recommend sales push or price incentives.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </CardContent>
+            </Card>
 
 
             {/* MAIN CHARTS SECTION */}
@@ -929,117 +1305,76 @@ const getCallSummary = async (fromDate, toDate) => {
                 <Card className="lg:col-span-2">
                     <CardContent className="p-6">
 
-                        {/* --- CONTROLS HEADER --- */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                            <div>
-                                <h3 className="text-lg font-bold text-white">
-                                    {selectedAgentName === '' ? 'Agent Comparison' : `${selectedAgentName}'s Progress`}
+                        <h3 className="text-lg font-bold text-white mb-1">
+                            Agent Effectiveness Scorecard
+                        </h3>
+                        <p className="text-xs text-slate-400 mb-6">
+                            Performance quality & conversion strength
+                        </p>
+
+                        {/* SCORECARDS */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+
+                            <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-lg">
+                                <p className="text-xs text-slate-400">Agents</p>
+                                <h3 className="text-xl font-bold text-white">
+                                    {FilteredData.agentPerformance.length}
                                 </h3>
-                                <p className="text-xs text-slate-400">
-                                    {selectedAgent === 'All Agents' ? 'Leads Assigned vs. Converted' : `Weekly performance for ${selectedMonth}`}
-                                </p>
                             </div>
 
-                            <div className="flex gap-2 ">
-                                {/* Agent Selector */}
-                                {/* <div className="relative">
-                  <select
-                    className="h-9 rounded-md border border-slate-700 bg-slate-800 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer"
-                    value={selectedAgent}
-                    onChange={(e) => setSelectedAgent(e.target.value)}
-                  >
-                    <option value="All Agents">All Agents</option>
-                    {agents.map((agent) => (
-                      <option key={agent._id} value={agent.EmployeeName}>
-                        {agent.EmployeeName}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
-                </div>
-                <div className="relative w-full sm:w-auto">
-                  <select
-                    className="w-full sm:w-auto h-9 rounded-md border border-slate-700 bg-slate-800 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer"
-                    value={selectedSite}
-                    onChange={(e) => setSelectedSite(e.target.value)}
-                  >
-                    <option value="All">All Sites</option>
-                    {sites.map((site) => (
-                      <option key={site._id} value={site._id}>
-                        {site.sitename}
-                      </option>
-                    ))}
-                  </select>
-
-                  <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
-                </div> */}
-
-
-                                {/* Month Selector */}
-                                {/* <div className="relative"> */}
-                                {/* <select
-                    className="h-9 rounded-md border border-slate-700 bg-slate-800 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer"
-                    value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(e.target.value)}
-                  >
-                    {MONTHS_LIST.map(m => (
-                      <option key={m} value={m}>{m}</option>
-                    ))}
-                  </select> */}
-                                {/* <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" /> */}
-                                {/* </div> */}
+                            <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-lg">
+                                <p className="text-xs text-slate-400">Total Leads</p>
+                                <h3 className="text-xl font-bold text-white">
+                                    {FilteredData.agentPerformance.reduce((a, b) => a + b.leads, 0)}
+                                </h3>
                             </div>
+
+                            <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-lg">
+                                <p className="text-xs text-slate-400">Conversions</p>
+                                <h3 className="text-xl font-bold text-green-400">
+                                    {FilteredData.agentPerformance.reduce((a, b) => a + b.converted, 0)}
+                                </h3>
+                            </div>
+
+                            <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-lg">
+                                <p className="text-xs text-slate-400">Avg Conversion</p>
+                                <h3 className="text-xl font-bold text-fuchsia-400">
+                                    {FilteredData.agentPerformance.length
+                                        ? Math.round(
+                                            (FilteredData.agentPerformance.reduce(
+                                                (a, b) => a + b.converted,
+                                                0
+                                            ) /
+                                                FilteredData.agentPerformance.reduce(
+                                                    (a, b) => a + b.leads,
+                                                    0
+                                                )) *
+                                            100
+                                        )
+                                        : 0}%
+                                </h3>
+                            </div>
+
                         </div>
 
-                        {/* --- CHART AREA --- */}
-                        <div className="h-[300px] w-full transition-all duration-500">
+                        {/* CHART */}
+                        <div className="h-[260px]">
                             <ResponsiveContainer width="100%" height="100%">
-                                {selectedAgent === 'All Agents' ? (
-                                    // VIEW 1: All Agents (Bar Chart)
-                                    <BarChart data={FilteredData.agentPerformance} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                                        <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 12 }} />
-                                        <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
-                                        <Tooltip content={<CustomTooltip />} />
-                                        <Legend />
-                                        <Bar dataKey="leads" fill="#334155" name="Assigned" radius={[4, 4, 0, 0]} />
-                                        <Bar dataKey="converted" fill="#d946ef" name="Converted" radius={[4, 4, 0, 0]} />
-                                    </BarChart>
-                                ) : (
-                                    // VIEW 2: Individual Agent (Trend Chart)
-                                    <ComposedChart data={FilteredData.agentPerformance} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                        <defs>
-                                            <linearGradient id="colorLeads" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#d946ef" stopOpacity={0.5} />
-                                                <stop offset="95%" stopColor="#d946ef" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                                        <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 12 }} />
-                                        <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
-                                        <Tooltip content={<CustomTooltip />} />
-                                        <Legend />
-                                        <Area type="monotone" dataKey="leads" name="Leads Assigned" stroke="#d946ef" fillOpacity={1} fill="url(#colorLeads)" />
-                                        <Line type="monotone" dataKey="converted" name="Converted" stroke="#10b981" strokeWidth={3} dot={{ r: 4 }} />
-                                    </ComposedChart>
-                                )}
+                                <BarChart data={FilteredData.agentPerformance}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                                    <XAxis dataKey="name" stroke="#94a3b8" />
+                                    <YAxis stroke="#94a3b8" />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Bar dataKey="leads" fill="#334155" name="Assigned" />
+                                    <Bar dataKey="converted" fill="#10b981" name="Converted" />
+                                </BarChart>
                             </ResponsiveContainer>
-                        </div>
-
-                        {/* AI Insight Footer */}
-                        <div className="mt-4 p-3 bg-slate-950/50 rounded border border-slate-800 flex gap-2">
-                            <AlertCircle className="w-4 h-4 text-fuchsia-500 mt-0.5 shrink-0" />
-                            <p className="text-xs text-slate-300">
-                                <span className="font-bold text-fuchsia-400">AI Insight:</span>
-                                {selectedAgent === 'All Agents'
-                                    ? " Sundhar has the highest conversion ratio (28%). Consider assigning high-value leads to him."
-                                    : ` ${selectedAgent} showed a 15% increase in conversions during Week 3 of ${selectedMonth}. Consistency is improving.`
-                                }
-                            </p>
                         </div>
 
                     </CardContent>
                 </Card>
+
+
 
                 {/* 2. SITE WISE DISTRIBUTION (Pie Chart) */}
                 <Card>
@@ -1082,7 +1417,7 @@ const getCallSummary = async (fromDate, toDate) => {
                                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index] }}></div>
                                         <span className="text-slate-300">{entry.name}</span>
                                     </div>
-                                    <span className="font-medium text-white">{(siteData.length/sites.length)*100}%</span>
+                                    <span className="font-medium text-white">{(siteData.length / sites.length) * 100}%</span>
                                 </div>
                             ))}
                         </div>
@@ -1096,70 +1431,151 @@ const getCallSummary = async (fromDate, toDate) => {
 
                 {/* 3. LEAD SOURCE ANALYSIS (Area Chart) */}
                 <Card>
-
                     <CardContent className="p-6">
-                        <h3 className="text-lg font-bold text-white mb-6">Lead Sources Overview</h3>
-                        <div className="h-[250px] w-full">
-                            {sourceLoading ? (
-                                <div className="h-[250px] flex items-center justify-center text-slate-400">
-                                    Loading lead sources...
-                                </div>) : (
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={leadSources} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
-                                        <XAxis type="number" stroke="#94a3b8" hide />
-                                        <YAxis dataKey="name" type="category" stroke="#94a3b8" tick={{ fontSize: 12 }} width={70} />
-                                        <Tooltip content={<CustomTooltip />} />
-                                        <Bar dataKey="value" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20}>
-                                            {leadSources.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            )}
+                        <h3 className="text-lg font-bold text-white mb-6">
+                            Lead Source Funnel Impact
+                        </h3>
+
+                        <div className="space-y-3">
+                            {leadSources.map((src, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center justify-between p-4 rounded-lg
+                     bg-slate-900/70 border border-slate-800"
+                                >
+                                    <div>
+                                        <p className="text-sm font-semibold text-white">
+                                            {src.name}
+                                        </p>
+                                        <p className="text-xs text-slate-400">
+                                            Source contribution
+                                        </p>
+                                    </div>
+
+                                    <div className="text-right">
+                                        <p className="text-xl font-bold text-fuchsia-400">
+                                            {src.value}
+                                        </p>
+                                        <p className="text-xs text-slate-500">
+                                            leads
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                        <div className="mt-4 p-3 bg-slate-950/50 rounded border border-slate-800 flex gap-2">
-                            <Brain className="w-4 h-4 text-fuchsia-500 mt-0.5 shrink-0" />
+
+                        <div className="mt-6 p-3 bg-slate-950/60 border border-slate-800 rounded-lg">
                             <p className="text-xs text-slate-300">
-                                <span className="font-bold text-fuchsia-400">Strategy:</span> Digital ads (FB/Insta) account for 60% of leads. Walk-ins are low. Recommend launching a local 'Open House' event to boost physical visits.
+                                💡 <span className="text-fuchsia-400 font-semibold">Recommendation:</span>{" "}
+                                Invest more in top 2 sources and de-prioritize low-yield channels.
                             </p>
                         </div>
                     </CardContent>
                 </Card>
 
+
+
+
                 {/* 4. WEEKLY TREND (Line Chart) */}
                 <Card>
                     <CardContent className="p-6">
-                        <h3 className="text-lg font-bold text-white mb-6">Weekly Lead Velocity</h3>
-                        <div className="h-[250px] w-full">
+
+                        {/* HEADER */}
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 className="text-lg font-bold text-white">
+                                    Weekly Lead Velocity
+                                </h3>
+                                <p className="text-xs text-slate-400">
+                                    Lead inflow trend & source contribution
+                                </p>
+                            </div>
+                            <TrendingUp className="w-5 h-5 text-fuchsia-500" />
+                        </div>
+
+                        {/* CHART */}
+                        <div className="h-[260px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={FilteredData.weeklyVelocity} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                <AreaChart data={FilteredData.weeklyVelocity}>
                                     <defs>
-                                        <linearGradient id="colorLeads" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#d946ef" stopOpacity={0.8} />
+                                        <linearGradient id="leadsGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#d946ef" stopOpacity={0.7} />
                                             <stop offset="95%" stopColor="#d946ef" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
-                                    <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 12 }} />
-                                    <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
+
                                     <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                                    <XAxis dataKey="name" stroke="#94a3b8" />
+                                    <YAxis stroke="#94a3b8" />
                                     <Tooltip content={<CustomTooltip />} />
-                                    <Area type="monotone" dataKey="leads" stroke="#d946ef" fillOpacity={1} fill="url(#colorLeads)" />
-                                    <Line type="monotone" dataKey="sales" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} />
+
+                                    <Area
+                                        type="monotone"
+                                        dataKey="leads"
+                                        name="Leads"
+                                        stroke="#d946ef"
+                                        fill="url(#leadsGradient)"
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="sales"
+                                        name="Conversions"
+                                        stroke="#10b981"
+                                        strokeWidth={3}
+                                        dot={{ r: 4 }}
+                                    />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
-                        <div className="mt-4 flex justify-between items-center text-xs text-slate-400 px-2">
-                            <div className="flex items-center gap-2">
-                                <span className="w-3 h-3 bg-fuchsia-500 rounded-sm inline-block"></span> Leads Received
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-3 h-3 bg-emerald-500 rounded-full inline-block"></span> Sales Closed
+
+                        {/* SOURCE CONTRIBUTION */}
+                        <div className="mt-5">
+                            <p className="text-xs text-slate-400 mb-2">
+                                Lead Source Contribution
+                            </p>
+
+                            <div className="flex flex-wrap gap-2">
+                                {leadSources.slice(0, 4).map((src, i) => (
+                                    <div
+                                        key={i}
+                                        className="px-3 py-1.5 rounded-full text-xs font-medium
+                       bg-slate-900/70 border border-slate-800
+                       text-slate-200"
+                                    >
+                                        {src.name} ·{" "}
+                                        <span className="text-fuchsia-400 font-semibold">
+                                            {src.value}
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
+
+                        {/* LEGEND */}
+                        {/* <div className="mt-4 flex justify-between items-center text-xs text-slate-400">
+                            <div className="flex items-center gap-2">
+                                <span className="w-3 h-3 bg-fuchsia-500 rounded-sm"></span>
+                                Leads Received
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="w-3 h-3 bg-emerald-500 rounded-full"></span>
+                                Conversions
+                            </div>
+                        </div> */}
+
+                        {/* INSIGHT */}
+                        <div className="mt-4 p-3 bg-slate-950/60 border border-slate-800 rounded-lg">
+                            <p className="text-xs text-slate-300">
+                                💡 <span className="text-fuchsia-400 font-semibold">Insight:</span>{" "}
+                                Lead momentum is strongest in recent weeks. WhatsApp and Facebook
+                                continue to dominate acquisition — consider reallocating budget
+                                towards the top 2 sources.
+                            </p>
+                        </div>
+
                     </CardContent>
                 </Card>
+
 
             </div>
         </div>
