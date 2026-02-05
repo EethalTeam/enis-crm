@@ -881,7 +881,7 @@ function CallLogsContent() {
                     onClick={() =>
                       handleInitiateCall(
                         targetNumber,
-                        call.leadName || targetNumber
+                        call.leadName 
                       )
                     }
                     className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold"

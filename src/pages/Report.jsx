@@ -202,7 +202,7 @@ export default function Report() {
         totalLeads: '',
         followUpCount: '',
         siteVisitCount: '',
-        newCount:'',
+        newCount: '',
         conversionRate: '',
         topSources: '',
         topSites: '',
@@ -384,6 +384,13 @@ export default function Report() {
 
         const result = await res.json();
         // console.log(result,"result")
+
+        const weeklyVelocity = (result.weeklyVelocity || []).map(item => ({
+            name: `Week ${item.week}`,
+            totalLeads: item.totalLeads,
+            topSource: item.topSource,
+            topSourceCount: item.topSourceCount
+        }));
         const normalized = {
             totalLeads: result.summary?.totalLeads || 0,
             followUpCount: result.summary?.followUpCount || 0,
@@ -397,15 +404,37 @@ export default function Report() {
                 leads: a.totalAssigned,
                 converted: a.agentSiteVisits
             })) || [],
-            weeklyVelocity: result.weeklyVelocity?.map(w => ({
-                name: `Week ${w._id}`,
-                leads: w.count,
-                sales: Math.round(w.count * 0.2) // optional
-            })) || []
+            weeklyVelocity
         };
 
         setFilteredData(normalized);
     };
+
+    const WeeklyVelocityTooltip = ({ active, payload, label }) => {
+        if (active && payload && payload.length) {
+            const data = payload[0].payload;
+
+            return (
+                <div className="rounded-md border border-slate-700 bg-slate-900 p-3 text-xs text-slate-100">
+                    <p className="font-semibold text-fuchsia-400">{label}</p>
+
+                    <p>Total Leads: <span className="font-medium">{data.totalLeads}</span></p>
+
+                    {data.topSource && (
+                        <p>
+                            Top Source:{" "}
+                            <span className="font-medium text-sky-400">
+                                {data.topSource} ({data.topSourceCount})
+                            </span>
+                        </p>
+                    )}
+                </div>
+            );
+        }
+
+        return null;
+    };
+
 
     const getVisitorReports = async (fromDate, toDate) => {
         const payload = buildPayload(fromDate, toDate);
@@ -739,14 +768,26 @@ export default function Report() {
     };
 
 
-    const funnelData = [
-        { label: "New Lead", value: FilteredData.newCount, trend: "up" },
-        { label: "Lead Followup", value: FilteredData.followUpCount, trend: "up" },
-        { label: "Lead Site Visit", value: FilteredData.siteVisitCount, trend: "up" },
-        { label: "Visit Completed", value: FilteredData.visitCompletedCount || 0, trend: "up" },
-        // { label: "Plot Available", value: availablePlots.length, trend: "down" },
-
+    const rawFunnel = [
+        { label: "New Lead", value: FilteredData.newCount },
+        { label: "Lead Followup", value: FilteredData.followUpCount },
+        { label: "Lead Site Visit", value: FilteredData.siteVisitCount },
+        { label: "Visit Completed", value: FilteredData.visitCompletedCount || 0 },
     ];
+
+    const funnelData = rawFunnel.map((item, index) => {
+        if (index === 0) {
+            return { ...item, trend: "up" }; // first stage baseline
+        }
+
+        const prevValue = rawFunnel[index - 1].value;
+
+        let trend = "down";
+        if (item.value >= prevValue * 0.9) trend = "up"; // healthy conversion
+
+        return { ...item, trend };
+    });
+
 
 
 
@@ -1477,20 +1518,23 @@ export default function Report() {
 
 
                 {/* 4. WEEKLY TREND (Line Chart) */}
+                {/* <Card className="relative overflow-hidden border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-black shadow-xl"> */}
                 <Card>
-                    <CardContent className="p-6">
+                    {/* subtle glow */}
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(217,70,239,0.15),transparent_60%)]" />
+
+                    <CardContent className="relative p-6">
 
                         {/* HEADER */}
-                        <div className="flex items-center justify-between mb-4">
-                            <div>
-                                <h3 className="text-lg font-bold text-white">
+                        <div className="flex items-center justify-between mb-5">
+                            <div className="space-y-1">
+                                <h3 className="text-lg font-semibold tracking-tight text-white">
                                     Weekly Lead Velocity
                                 </h3>
                                 <p className="text-xs text-slate-400">
-                                    Lead inflow trend & source contribution
+                                    Lead inflow momentum & dominant acquisition source
                                 </p>
                             </div>
-                            <TrendingUp className="w-5 h-5 text-fuchsia-500" />
                         </div>
 
                         {/* CHART */}
@@ -1499,82 +1543,58 @@ export default function Report() {
                                 <AreaChart data={FilteredData.weeklyVelocity}>
                                     <defs>
                                         <linearGradient id="leadsGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#d946ef" stopOpacity={0.7} />
+                                            <stop offset="5%" stopColor="#d946ef" stopOpacity={0.65} />
                                             <stop offset="95%" stopColor="#d946ef" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
 
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                                    <XAxis dataKey="name" stroke="#94a3b8" />
-                                    <YAxis stroke="#94a3b8" />
-                                    <Tooltip content={<CustomTooltip />} />
+                                    <CartesianGrid
+                                        strokeDasharray="3 3"
+                                        stroke="#1e293b"
+                                        vertical={false}
+                                    />
+
+                                    <XAxis
+                                        dataKey="name"
+                                        stroke="#94a3b8"
+                                        tickLine={false}
+                                        axisLine={false}
+                                        fontSize={11}
+                                    />
+
+                                    <YAxis
+                                        stroke="#94a3b8"
+                                        tickLine={false}
+                                        axisLine={false}
+                                        fontSize={11}
+                                    />
+
+                                    <Tooltip content={<WeeklyVelocityTooltip />} />
 
                                     <Area
                                         type="monotone"
-                                        dataKey="leads"
-                                        name="Leads"
+                                        dataKey="totalLeads"
+                                        name="Total Leads"
                                         stroke="#d946ef"
+                                        strokeWidth={2.5}
                                         fill="url(#leadsGradient)"
-                                    />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="sales"
-                                        name="Conversions"
-                                        stroke="#10b981"
-                                        strokeWidth={3}
-                                        dot={{ r: 4 }}
+                                        dot={{ r: 3, fill: "#d946ef" }}
+                                        activeDot={{ r: 6 }}
                                     />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
 
-                        {/* SOURCE CONTRIBUTION */}
-                        <div className="mt-5">
-                            <p className="text-xs text-slate-400 mb-2">
-                                Lead Source Contribution
-                            </p>
-
-                            <div className="flex flex-wrap gap-2">
-                                {leadSources.slice(0, 4).map((src, i) => (
-                                    <div
-                                        key={i}
-                                        className="px-3 py-1.5 rounded-full text-xs font-medium
-                       bg-slate-900/70 border border-slate-800
-                       text-slate-200"
-                                    >
-                                        {src.name} ·{" "}
-                                        <span className="text-fuchsia-400 font-semibold">
-                                            {src.value}
-                                        </span>
-                                    </div>
-                                ))}
+                        {/* LEGEND (Modern Pills) */}
+                        <div className="mt-4 flex items-center gap-4 text-xs text-slate-300">
+                            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/60 border border-slate-700">
+                                <span className="w-2.5 h-2.5 rounded-full bg-fuchsia-500" />
+                                Total Leads
                             </div>
                         </div>
-
-                        {/* LEGEND */}
-                        {/* <div className="mt-4 flex justify-between items-center text-xs text-slate-400">
-                            <div className="flex items-center gap-2">
-                                <span className="w-3 h-3 bg-fuchsia-500 rounded-sm"></span>
-                                Leads Received
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-3 h-3 bg-emerald-500 rounded-full"></span>
-                                Conversions
-                            </div>
-                        </div> */}
-
-                        {/* INSIGHT */}
-                        <div className="mt-4 p-3 bg-slate-950/60 border border-slate-800 rounded-lg">
-                            <p className="text-xs text-slate-300">
-                                💡 <span className="text-fuchsia-400 font-semibold">Insight:</span>{" "}
-                                Lead momentum is strongest in recent weeks. WhatsApp and Facebook
-                                continue to dominate acquisition — consider reallocating budget
-                                towards the top 2 sources.
-                            </p>
-                        </div>
-
                     </CardContent>
                 </Card>
+
 
 
             </div>
