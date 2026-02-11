@@ -706,7 +706,7 @@ function CallLogsContent() {
                         key={call._id || index}
                         className="border-b border-slate-800 hover:bg-slate-800/50"
                       >
-                        <td className="py-3 px-4">
+                        {/* <td className="py-3 px-4">
                           {call.status === "missed" ? (
                             <button   onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)}><PhoneMissed className="w-5 h-5 text-red-400 hover:text-red-600" /></button>
                           ) : call.direction === "inbound" ||
@@ -715,7 +715,21 @@ function CallLogsContent() {
                           ) : (
                             <button onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)} > <PhoneOutgoing className="w-5 h-5 text-blue-400 hover:text-blue-600" /> </button>
                           )}
+                        </td> */}
+                         <td className="py-3 px-4">
+                          {call.status === "missed" && call.direction === "inbound" ||  call.direction === "incoming" ? (
+                            <button   onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)}><PhoneIncoming className="w-5 h-5 text-red-400 hover:text-red-600" /></button>
+                          ):call.status === "missed" ? (
+                            <button   onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)}><PhoneMissed className="w-5 h-5 text-red-400 hover:text-red-600" /></button>
+                          ) : call.direction === "inbound" ||
+                            call.direction === "incoming" ? (
+                            <button onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)}> <PhoneIncoming className="w-5 h-5 text-green-400 hover:text-green-600" /></button>
+                          ) : (
+                            <button onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)} > <PhoneOutgoing className="w-5 h-5 text-blue-400 hover:text-blue-600" /> </button>
+                          )
+                        }
                         </td>
+
                         {/* <td className="py-3 px-4 font-medium text-white">{targetNumber || "Unknown"}</td> */}
                         <td className="py-3 px-4 font-medium">
                           {call.leadName ? (

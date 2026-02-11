@@ -523,9 +523,9 @@ const LeadDialog = ({
         leadNotes: '',
         leadStatusName: selectedStatus ? selectedStatus.leadStatustName : "",
 
-        // 🔥 CLEAR IRRELEVANT DATES
-    FollowDate: statusName === "Follow Up" ? prev.FollowDate : "",
-    SiteVisitDate: statusName === "Site Visit" ? prev.SiteVisitDate : "",
+        //  CLEAR IRRELEVANT DATES
+        FollowDate: selectedStatus && selectedStatus.leadStatustName === "Follow Up" ? prev.FollowDate : "",
+        SiteVisitDate: selectedStatus && selectedStatus.leadStatustName === "Site Visit" ? prev.SiteVisitDate : "",
       }));
       return;
     }
@@ -559,6 +559,10 @@ const LeadDialog = ({
   // const handleFileChange = (index, file) => {
   //      const updated = [...docRows]; updated[index].file = file; setDocRows(updated);
   // };
+
+
+
+  
 
   const handleFileChange = (index, e) => {
     const file = e.target.files[0];
@@ -1601,6 +1605,11 @@ function LeadsContent() {
     }
   };
 
+
+   
+
+
+
   useEffect(() => {
     getPermissionsByPath(window.location.pathname).then((res) => {
       if (res) {
@@ -1609,6 +1618,44 @@ function LeadsContent() {
       } else navigate("/dashboard");
     });
   }, []);
+
+
+  const handleDelete = async (_id) => {
+  
+  try {
+    const res = await fetch(config.Api + "Lead/deleteLeads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({_id}),
+    });
+
+    const result = await res.json();
+
+    if (result.success) {
+      toast({
+        title: "Lead Deleted",
+        description: "The lead has been removed successfully",
+        variant: "success",
+      });
+
+      fetchLeads(); // refresh list
+    } else {
+      toast({
+        title: "Delete Failed",
+        description: result.message || "Unable to delete lead",
+        variant: "destructive",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    toast({
+      title: "Error",
+      description: "Something went wrong while deleting",
+      variant: "destructive",
+    });
+  }
+};
+
 
   const handleSaveNote = async () => {
     if (!selectedStatusId) {
@@ -2181,6 +2228,18 @@ function LeadsContent() {
                           <Pencil className="w-4 h-4" />
                         </Button>
                       )}
+
+                      {
+                        Permissions.isDelete &&
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleDelete(l._id)}
+                          className="text-red-400 hover:bg-red-900/20"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </Button>
+                      }
 
                       <Button
                         variant="icon"

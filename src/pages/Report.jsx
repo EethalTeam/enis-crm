@@ -817,108 +817,84 @@ export default function Report() {
                     <p className="text-slate-400 text-xs mt-1 tracking-wide">AI-powered insights and performance metrics.</p>
                 </div>
 
-                <div className='flex gap-3 md:flex-row flex-col items-start md:ps-40'>
+               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 w-full">
 
-                    <div className="relative w-full sm:w-auto">
-                        <select
-                            className="w-full sm:w-auto h-9 rounded-md border bg-slate-900/80 border-slate-700/50 hover:border-fuchsia-500 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer"
-                            value={selectedSite}
-                            onChange={(e) => setSelectedSite(e.target.value)}
-                        >
-                            <option value="">All Sites</option>
-                            {sites.map((site) => (
-                                <option key={site._id} value={site._id}>
-                                    {site.sitename}
-                                </option>
-                            ))}
-                        </select>
+  {/* LEFT SECTION (Site + Agent) */}
+  <div className="flex flex-col sm:flex-row gap-3 w-full md:ps-40  lg:w-auto">
 
-                        <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
-                    </div>
+    {/* Site Select */}
+    <div className="relative w-full sm:w-48">
+      <select
+        className="w-full h-9 rounded-md border bg-slate-900/80 border-slate-700/50 hover:border-fuchsia-500 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer"
+        value={selectedSite}
+        onChange={(e) => setSelectedSite(e.target.value)}
+      >
+        <option value="">All Sites</option>
+        {sites.map((site) => (
+          <option key={site._id} value={site._id}>
+            {site.sitename}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
+    </div>
 
-                    <div className="relative">
-                        <select
-                            className="w-full sm:w-auto h-9 rounded-md border bg-slate-900/80 border-slate-700/50 hover:border-fuchsia-500 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer"
-                            value={selectedAgent}
-                            onChange={(e) => {
-                                const agentId = e.target.value
-                                const agentName = agents.find(e => e._id === agentId)
-                                // console.log(agentName.EmployeeName,"agentName")
-                                if (agentName) {
-                                    setSelectedAgentName(agentName.EmployeeName)
-                                } else {
-                                    setSelectedAgentName('')
-                                }
-                                setSelectedAgent(agentId)
-                            }}
-                        >
-                            <option value="">All Agents</option>
-                            {agents.map((agent) => (
-                                <option key={agent._id} value={agent._id}>
-                                    {agent.EmployeeName}
-                                </option>
-                            ))}
-                        </select>
-                        <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
-                    </div>
+    {/* Agent Select */}
+    <div className="relative w-full sm:w-48">
+      <select
+        className="w-full h-9 rounded-md border bg-slate-900/80 border-slate-700/50 hover:border-fuchsia-500 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer"
+        value={selectedAgent}
+        onChange={(e) => {
+          const agentId = e.target.value
+          const agentName = agents.find(a => a._id === agentId)
 
+          setSelectedAgentName(agentName ? agentName.EmployeeName : '')
+          setSelectedAgent(agentId)
+        }}
+      >
+        <option value="">All Agents</option>
+        {agents.map((agent) => (
+          <option key={agent._id} value={agent._id}>
+            {agent.EmployeeName}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
+    </div>
 
-                </div>
+  </div>
 
-                <div className="flex gap-3 md:flex-row flex-col items-start">
-                    <Button variant="outline" className="w-full sm:w-auto h-9 rounded-md border bg-slate-900/80 border-slate-700/50 hover:border-fuchsia-500 pl-3 pr-8 text-xs text-slate-100 focus:border-fuchsia-500 focus:outline-none appearance-none cursor-pointer">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        {selectedMonth.format("MMMM YYYY")}
-                        <IconButton
-                            onClick={(e) => setAnchorEl(e.currentTarget)}
-                            sx={{ color: "white" }}
-                        >
-                            <Filter />
-                        </IconButton>
-                    </Button>
+  {/* RIGHT SECTION (Month + Export) */}
+  <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
 
+    {/* Month Button */}
+    <Button
+      variant="outline"
+      className="w-full sm:w-auto h-9 rounded-md border bg-slate-900/80 border-slate-700/50 hover:border-fuchsia-500 text-xs text-slate-100"
+    >
+      <Calendar className="w-4 h-4 mr-2" />
+      {selectedMonth.format("MMMM YYYY")}
+      <IconButton
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        sx={{ color: "white" }}
+      >
+        <Filter />
+      </IconButton>
+    </Button>
 
+    {/* Export Button */}
+    <Button
+      onClick={handleExport}
+      className="w-full sm:w-auto h-9 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white shadow-lg hover:opacity-90"
+    >
+      <Upload className="w-4 h-4 mr-2" />
+      Export
+    </Button>
 
-                    <Popover
-                        open={open}
-                        anchorEl={anchorEl}
-                        onClose={() => setAnchorEl(null)}
-                        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                    >
-                        <Box sx={{ p: 2, width: 260 }}>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
-                                    views={["year", "month"]}
-                                    label="Select Month"
-                                    value={selectedMonth}
-                                    onChange={(newValue) => setSelectedMonth(newValue)}
-                                />
-                            </LocalizationProvider>
+  </div>
 
-                            <Button
-                                className="mt-3 w-full"
-                                onClick={() => {
-                                    applyMonthFilter();
-                                    setAnchorEl(null);
-                                }}
-                            >
-                                Apply
-                            </Button>
-                        </Box>
-                    </Popover>
+</div>
 
-
-
-                    <Button onClick={handleExport} className={`  className="
-    bg-gradient-to-r from-fuchsia-600 to-purple-600
-    text-white
-    shadow-lg
-    hover:opacity-90
-  "`}>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Export
-                    </Button>
-                </div>
             </div>
 
 
