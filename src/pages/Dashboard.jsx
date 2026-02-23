@@ -149,8 +149,12 @@ export default function Dashboard() {
   useEffect(() => {
     const from = dateRange[0].toDate();
     const to = dateRange[1].toDate();
+    const today = new Date().toISOString()
+    const From = today.split("T")[0]
+    console.log(today,"today ")
 
-    getAllDashBoard(from, to);
+
+    getAllDashBoard(From, From);
     getDayWiseAnsweredCalls(from, to);
     getLeadsBySource(from, to);
     getCallReport(from, to);
@@ -379,6 +383,45 @@ export default function Dashboard() {
     }
   };
 
+  // const applyPreset = (type) => {
+  //   let from, to;
+
+  //   switch (type) {
+  //     case "today":
+  //       from = dayjs().startOf("day");
+  //       to = dayjs().endOf("day");
+  //       break;
+
+  //     case "yesterday":
+  //       from = dayjs().subtract(1, "day").startOf("day");
+  //       to = dayjs().subtract(1, "day").endOf("day");
+  //       break;
+
+  //     case "last7":
+  //       from = dayjs().subtract(6, "day").startOf("day");
+  //       to = dayjs().endOf("day");
+  //       break;
+
+  //     case "last30":
+  //       from = dayjs().subtract(29, "day").startOf("day");
+  //       to = dayjs().endOf("day");
+  //       break;
+
+  //     default:
+  //       return;
+  //   }
+
+  //   setDateRange([from, to]);
+
+  //   getAllDashBoard(from.toDate(), to.toDate());
+  //   getDayWiseAnsweredCalls(from.toDate(), to.toDate());
+  //   getCallReport(from.toDate(), to.toDate());
+  //   getLeadsBySource(from.toDate(), to.toDate());
+
+  //   setAnchorEl(null);
+  // };
+
+
   const applyPreset = (type) => {
     let from, to;
 
@@ -409,16 +452,17 @@ export default function Dashboard() {
 
     setDateRange([from, to]);
 
-    getAllDashBoard(from.toDate(), to.toDate());
-    getDayWiseAnsweredCalls(from.toDate(), to.toDate());
-    getCallReport(from.toDate(), to.toDate());
-    getLeadsBySource(from.toDate(), to.toDate());
+    // FIX: Send as YYYY-MM-DD strings instead of Date objects
+    const fromStr = from.format("YYYY-MM-DD");
+    const toStr = to.format("YYYY-MM-DD");
+
+    getAllDashBoard(fromStr, toStr);
+    getDayWiseAnsweredCalls(fromStr, toStr);
+    getCallReport(fromStr, toStr);
+    getLeadsBySource(fromStr, toStr);
 
     setAnchorEl(null);
   };
-
-
-
 
 
 
@@ -794,7 +838,7 @@ export default function Dashboard() {
                     ))}
                   </Pie>
                   {/* <Tooltip contentStyle={{ backgroundColor: '#2a133b', border: 'none', borderRadius: '8px' }} /> */}
-                   <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={<CustomTooltip />} />
 
                 </PieChart>
               </ResponsiveContainer>
