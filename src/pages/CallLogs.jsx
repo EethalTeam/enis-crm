@@ -24,6 +24,7 @@ import {
   PhoneCall,
   ArrowUpFromLine,
   Search,
+  CalendarDays
 } from "lucide-react";
 import { config } from "@/components/CustomComponents/config.js";
 import { LeadDialogWrapper } from "@/pages/Leads";
@@ -215,6 +216,27 @@ const formatTime = (isoString) => {
   });
 };
 
+
+const formatDateTime = (isoString) => {
+  if (!isoString) return { time: "--:--", date: "--" };
+
+  const dateObj = new Date(isoString);
+
+  const time = dateObj.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  const date = dateObj.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+  return { time, date };
+};
+
 function CallLogsContent() {
   const { toast } = useToast();
   const [logs, setLogs] = useState([]);
@@ -241,6 +263,7 @@ function CallLogsContent() {
   const [DialogOpen, setDialogOpen] = useState(false)
   const [selectedRecording, setSelectedRecording] = useState(null);
   const [leadName, setLeadName] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
 
 
   const resetCallState = () => {
@@ -447,10 +470,27 @@ function CallLogsContent() {
       });
     }
 
+    if (selectedDate) {
+      const selected = new Date(selectedDate);
+
+      currentLogs = currentLogs.filter((log) => {
+        if (!log.callDate) return false;
+
+        const callDate = new Date(log.callDate);
+
+        return (
+          callDate.getFullYear() === selected.getFullYear() &&
+          callDate.getMonth() === selected.getMonth() &&
+          callDate.getDate() === selected.getDate()
+        );
+      });
+    }
+
     return currentLogs;
   };
 
   const filteredLogs = getFilteredLogs();
+  console.log(filteredLogs, "filteredLogs")
 
   const handlePlayRecording = (recordingUrl, id) => {
     if (!recordingUrl) return;
@@ -636,38 +676,73 @@ function CallLogsContent() {
           </div>
 
           {/* Mobile Select */}
-          <div className="md:hidden w-full">
-            <select
-              value={activeTab}
-              onChange={(e) => setActiveTab(e.target.value)}
-              className="w-full h-11 rounded-md bg-slate-900 border border-slate-700 text-white text-sm px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">All Calls</option>
-              <option value="incoming">Incoming</option>
-              <option value="outgoing">Outgoing</option>
-              <option value="rnr">RNR</option>
-            </select>
+
+          <div className="flex justify-between gap-4">
+            <div className="md:hidden w-md">
+              <select
+                value={activeTab}
+                onChange={(e) => setActiveTab(e.target.value)}
+                className="w-full h-11 rounded-md bg-slate-900 border border-slate-700 text-white text-sm px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Calls</option>
+                <option value="incoming">Incoming</option>
+                <option value="outgoing">Outgoing</option>
+                <option value="rnr">RNR</option>
+              </select>
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative w-sm md:w-64">
+
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search number..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-8 h-10 bg-slate-900 border border-slate-700 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder:text-slate-500"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
           </div>
 
-          {/* Search Bar */}
+
+
+
           <div className="relative w-full md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
-              type="text"
-              placeholder="Search number..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 h-10 bg-slate-900 border border-slate-700 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder:text-slate-500"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="w-full h-10 px-3 bg-slate-900 border border-slate-700 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
-            {searchQuery && (
+            <CalendarDays
+              size={18}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-white pointer-events-none"
+            />
+
+            {selectedDate && (
               <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                onClick={() => setSelectedDate("")}
+                className="text-xs text-red-400"
               >
-                <X className="w-4 h-4" />
+                Clear
               </button>
             )}
           </div>
+
+
+
+          
+
         </div>
       </div>
 
@@ -716,18 +791,18 @@ function CallLogsContent() {
                             <button onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)} > <PhoneOutgoing className="w-5 h-5 text-blue-400 hover:text-blue-600" /> </button>
                           )}
                         </td> */}
-                         <td className="py-3 px-4">
-                          {call.status === "missed" && call.direction === "inbound" ||  call.direction === "incoming" ? (
-                            <button   onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)}><PhoneIncoming className="w-5 h-5 text-red-400 hover:text-red-600" /></button>
-                          ):call.status === "missed" ? (
-                            <button   onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)}><PhoneMissed className="w-5 h-5 text-red-400 hover:text-red-600" /></button>
+                        <td className="py-3 px-4">
+                          {call.status === "missed" && call.direction === "inbound" || call.direction === "incoming" ? (
+                            <button onClick={() => handleInitiateCall(targetNumber, call.leadName || targetNumber)}><PhoneIncoming className="w-5 h-5 text-red-400 hover:text-red-600" /></button>
+                          ) : call.status === "missed" ? (
+                            <button onClick={() => handleInitiateCall(targetNumber, call.leadName || targetNumber)}><PhoneMissed className="w-5 h-5 text-red-400 hover:text-red-600" /></button>
                           ) : call.direction === "inbound" ||
                             call.direction === "incoming" ? (
-                            <button onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)}> <PhoneIncoming className="w-5 h-5 text-green-400 hover:text-green-600" /></button>
+                            <button onClick={() => handleInitiateCall(targetNumber, call.leadName || targetNumber)}> <PhoneIncoming className="w-5 h-5 text-green-400 hover:text-green-600" /></button>
                           ) : (
-                            <button onClick={() =>  handleInitiateCall(targetNumber,call.leadName || targetNumber)} > <PhoneOutgoing className="w-5 h-5 text-blue-400 hover:text-blue-600" /> </button>
+                            <button onClick={() => handleInitiateCall(targetNumber, call.leadName || targetNumber)} > <PhoneOutgoing className="w-5 h-5 text-blue-400 hover:text-blue-600" /> </button>
                           )
-                        }
+                          }
                         </td>
 
                         {/* <td className="py-3 px-4 font-medium text-white">{targetNumber || "Unknown"}</td> */}
@@ -759,9 +834,22 @@ function CallLogsContent() {
                             </button>
                           </div>
                         </td>
-                        <td className="py-3 px-4">
+                        {/* <td className="py-3 px-4">
                           {formatTime(call.callDate)}
+                        </td> */}
+
+                        <td className="py-3 px-4">
+                          {(() => {
+                            const { time, date } = formatDateTime(call.callDate);
+                            return (
+                              <div className="flex flex-col leading-tight">
+                                <span className="text-white font-medium">{time}</span>
+                                <span className="text-xs text-slate-400">{date}</span>
+                              </div>
+                            );
+                          })()}
                         </td>
+
                         <td className="py-3 px-4">
                           {formatDuration(call.answeredsec)}
                         </td>
@@ -895,7 +983,7 @@ function CallLogsContent() {
                     onClick={() =>
                       handleInitiateCall(
                         targetNumber,
-                        call.leadName 
+                        call.leadName
                       )
                     }
                     className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold"
@@ -903,11 +991,30 @@ function CallLogsContent() {
                     <PhoneCall size={12} /> Call
                   </button>
                 </div>
-                <div className="flex items-center gap-2 text-slate-300 text-xs mb-3">
+                {/* <div className="flex items-center gap-2 text-slate-300 text-xs mb-3">
                   <Clock className="w-4 h-4" /> {formatTime(call.callDate)} |{" "}
                   <Hourglass className="w-4 h-4" />{" "}
                   {formatDuration(call.answeredsec)}
+                </div> */}
+                <div className="flex items-center gap-2 text-slate-300 text-xs mb-3">
+                  <td className="">
+                    {(() => {
+                      const { time, date } = formatDateTime(call.callDate);
+                      return (
+                        <div className="flex gap-2">
+                          <Clock className="w-5 h-6" />
+                          <div className="flex flex-col leading-tight">
+                            <span className="text-white font-medium">{time}</span>
+                            <span className="text-xs text-slate-400">{date}</span>
+                          </div>
+
+                        </div>
+                      );
+                    })()}
+                  </td>|{" "} <Hourglass className="w-4 h-4" />{" "}
+                  {formatDuration(call.answeredsec)}
                 </div>
+
                 <div className="flex gap-2 border-t border-slate-700 pt-3">
 
                   <Button
