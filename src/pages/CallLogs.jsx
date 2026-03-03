@@ -741,7 +741,7 @@ function CallLogsContent() {
 
 
 
-          
+
 
         </div>
       </div>
@@ -807,17 +807,15 @@ function CallLogsContent() {
 
                         {/* <td className="py-3 px-4 font-medium text-white">{targetNumber || "Unknown"}</td> */}
                         <td className="py-3 px-4 font-medium">
-                          {call.leadName ? (
-                            <span className="text-white font-semibold">
-                              {call.leadName}
-                            </span>
-                          ) : (
-                            <span className="text-white">
-                              {targetNumber || "Unknown"}
-                            </span>
-                          )}
+                          <span className="text-white font-semibold"   title={call?.leadName || targetNumber || "Unknown"}>
+                            {call?.leadName
+                              ? call.leadName.length > 18
+                                ? call.leadName.slice(0, 18) + "..."
+                                : call.leadName
+                              : targetNumber || "Unknown"}
+                          </span>
+                          
                         </td>
-
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2 group">
                             <span>{targetNumber}</span>
