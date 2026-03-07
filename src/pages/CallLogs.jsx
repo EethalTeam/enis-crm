@@ -729,14 +729,14 @@ function CallLogsContent() {
               className="absolute right-3 top-1/2 -translate-y-1/2 text-white pointer-events-none"
             />
 
-            {selectedDate && (
+            {/* {selectedDate && (
               <button
                 onClick={() => setSelectedDate("")}
                 className="text-xs text-red-400"
               >
                 Clear
               </button>
-            )}
+            )} */}
           </div>
 
 
