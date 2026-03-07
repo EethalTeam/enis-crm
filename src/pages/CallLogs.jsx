@@ -717,32 +717,39 @@ function CallLogsContent() {
 
 
 
-          <div className="relative w-full md:w-64">
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full h-10 px-3 bg-slate-900 border border-slate-700 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-            <CalendarDays
-              size={18}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white pointer-events-none"
-            />
+          <div className="relative w-full md:w-64 flex gap-5">
 
-            {/* {selectedDate && (
-              <button
-                onClick={() => setSelectedDate("")}
-                className="text-xs text-red-400"
-              >
-                Clear
-              </button>
-            )} */}
+            <div className="relative w-full">
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="w-full h-10 px-3 pr-10 bg-slate-900 border border-slate-700 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+
+              <CalendarDays
+                size={18}
+                className="absolute right-10 top-1/2 -translate-y-1/2 text-white pointer-events-none"
+              />
+            </div>
+
+            <div>
+
+
+              {selectedDate && (
+                <button
+                  onClick={() => setSelectedDate("")}
+                  className="text-xs text-red-400"
+                >
+                  Clear
+                </button>
+              )}
+
+            </div>
+
           </div>
 
-
-
-
-
+ 
         </div>
       </div>
 
@@ -807,14 +814,14 @@ function CallLogsContent() {
 
                         {/* <td className="py-3 px-4 font-medium text-white">{targetNumber || "Unknown"}</td> */}
                         <td className="py-3 px-4 font-medium">
-                          <span className="text-white font-semibold"   title={call?.leadName || targetNumber || "Unknown"}>
+                          <span className="text-white font-semibold" title={call?.leadName || targetNumber || "Unknown"}>
                             {call?.leadName
                               ? call.leadName.length > 18
                                 ? call.leadName.slice(0, 18) + "..."
                                 : call.leadName
                               : targetNumber || "Unknown"}
                           </span>
-                          
+
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2 group">
