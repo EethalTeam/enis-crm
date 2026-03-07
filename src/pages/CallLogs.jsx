@@ -717,7 +717,7 @@ function CallLogsContent() {
 
 
 
-          <div className="relative w-full md:w-64 flex gap-5">
+          <div className="relative w-full md:w-64 flex gap-5 items-center ">
 
             <div className="relative w-full">
               <input
@@ -739,7 +739,7 @@ function CallLogsContent() {
               {selectedDate && (
                 <button
                   onClick={() => setSelectedDate("")}
-                  className="text-xs text-red-400"
+                  className="text-sm  text-red-600 border bg-slate-900 rounded-lg p-2"
                 >
                   Clear
                 </button>
