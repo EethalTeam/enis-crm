@@ -882,6 +882,37 @@ export default function Report() {
       </IconButton>
     </Button>
 
+
+    
+              <Popover
+                open={open}
+                anchorEl={anchorEl}
+                onClose={() => setAnchorEl(null)}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              >
+                <Box sx={{ p: 2, width: 260 }}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      views={["year", "month"]}
+                      label="Select Month"
+                      value={selectedMonth}
+                      onChange={(newValue) => setSelectedMonth(newValue)}
+                    />
+                  </LocalizationProvider>
+    
+                  <Button
+                    className="mt-3 w-full"
+                    onClick={() => {
+                      applyMonthFilter();
+                      setAnchorEl(null);
+                    }}
+                  >
+                    Apply
+                  </Button>
+                </Box>
+              </Popover>
+              
+
     {/* Export Button */}
     <Button
       onClick={handleExport}
