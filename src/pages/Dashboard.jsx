@@ -252,11 +252,11 @@ export default function Dashboard() {
         body: JSON.stringify(payload),
       });
 
-      const result = await res.json();
-      const data = result.data || result;
+      const data = await res.json();
+       
 
 
-      setCallDays(data)
+      setCallDays(data.result)
 
 
     } catch (err) {
@@ -276,7 +276,7 @@ export default function Dashboard() {
     });
 
     const data = await res.json();
-    setCallReport(data);
+    setCallReport(data.report);
   };
 
 
@@ -295,11 +295,11 @@ export default function Dashboard() {
         body: JSON.stringify(payload),
       });
 
-      const result = await res.json();
-      const data = result.data || result;
+      const data = await res.json();
+       
 
 
-      setLeadSource(data)
+      setLeadSource(data.result)
 
 
     } catch (err) {
@@ -377,7 +377,7 @@ export default function Dashboard() {
       );
 
       const data = await res.json();
-      setVisitorFollowups(data || []);
+      setVisitorFollowups(data.data);
     } catch (err) {
       console.log(err);
     }
