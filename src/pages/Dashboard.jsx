@@ -149,8 +149,12 @@ export default function Dashboard() {
   useEffect(() => {
     const from = dateRange[0].toDate();
     const to = dateRange[1].toDate();
+    const today = new Date().toISOString()
+    const From = today.split("T")[0]
+    console.log(today,"today ")
 
-    getAllDashBoard(from, to);
+
+    getAllDashBoard(From, From);
     getDayWiseAnsweredCalls(from, to);
     getLeadsBySource(from, to);
     getCallReport(from, to);
@@ -248,11 +252,16 @@ export default function Dashboard() {
         body: JSON.stringify(payload),
       });
 
+<<<<<<< HEAD
       const result = await res.json();
       const data = Array.isArray(result) ? result : result.result || [];
+=======
+      const data = await res.json();
+       
+>>>>>>> 5c4d38fa893b2c1d6faebb771e4085f7dd3b21ff
 
 
-      setCallDays(data)
+      setCallDays(data.result)
 
 
     } catch (err) {
@@ -271,9 +280,14 @@ export default function Dashboard() {
       body: JSON.stringify(payload)
     });
 
+<<<<<<< HEAD
     const result = await res.json();
     const data = Array.isArray(result) ? result : result.report || [];
     setCallReport(data);
+=======
+    const data = await res.json();
+    setCallReport(data.report);
+>>>>>>> 5c4d38fa893b2c1d6faebb771e4085f7dd3b21ff
   };
 
 
@@ -292,11 +306,16 @@ export default function Dashboard() {
         body: JSON.stringify(payload),
       });
 
+<<<<<<< HEAD
       const result = await res.json();
       const data = Array.isArray(result) ? result : result.result || [];
+=======
+      const data = await res.json();
+       
+>>>>>>> 5c4d38fa893b2c1d6faebb771e4085f7dd3b21ff
 
 
-      setLeadSource(data)
+      setLeadSource(data.result)
 
 
     } catch (err) {
@@ -374,13 +393,57 @@ export default function Dashboard() {
         }
       );
 
+<<<<<<< HEAD
       const result = await res.json();
       const data = Array.isArray(result) ? result : result.data || [];
       setVisitorFollowups(data);
+=======
+      const data = await res.json();
+      setVisitorFollowups(data.data);
+>>>>>>> 5c4d38fa893b2c1d6faebb771e4085f7dd3b21ff
     } catch (err) {
       console.log(err);
     }
   };
+
+  // const applyPreset = (type) => {
+  //   let from, to;
+
+  //   switch (type) {
+  //     case "today":
+  //       from = dayjs().startOf("day");
+  //       to = dayjs().endOf("day");
+  //       break;
+
+  //     case "yesterday":
+  //       from = dayjs().subtract(1, "day").startOf("day");
+  //       to = dayjs().subtract(1, "day").endOf("day");
+  //       break;
+
+  //     case "last7":
+  //       from = dayjs().subtract(6, "day").startOf("day");
+  //       to = dayjs().endOf("day");
+  //       break;
+
+  //     case "last30":
+  //       from = dayjs().subtract(29, "day").startOf("day");
+  //       to = dayjs().endOf("day");
+  //       break;
+
+  //     default:
+  //       return;
+  //   }
+
+  //   setDateRange([from, to]);
+
+  //   getAllDashBoard(from.toDate(), to.toDate());
+  //   getDayWiseAnsweredCalls(from.toDate(), to.toDate());
+  //   getCallReport(from.toDate(), to.toDate());
+  //   getLeadsBySource(from.toDate(), to.toDate());
+
+  //   setAnchorEl(null);
+  // };
+
 
   const applyPreset = (type) => {
     let from, to;
@@ -412,16 +475,17 @@ export default function Dashboard() {
 
     setDateRange([from, to]);
 
-    getAllDashBoard(from.toDate(), to.toDate());
-    getDayWiseAnsweredCalls(from.toDate(), to.toDate());
-    getCallReport(from.toDate(), to.toDate());
-    getLeadsBySource(from.toDate(), to.toDate());
+    // FIX: Send as YYYY-MM-DD strings instead of Date objects
+    const fromStr = from.format("YYYY-MM-DD");
+    const toStr = to.format("YYYY-MM-DD");
+
+    getAllDashBoard(fromStr, toStr);
+    getDayWiseAnsweredCalls(fromStr, toStr);
+    getCallReport(fromStr, toStr);
+    getLeadsBySource(fromStr, toStr);
 
     setAnchorEl(null);
   };
-
-
-
 
 
 
@@ -797,7 +861,7 @@ export default function Dashboard() {
                     ))}
                   </Pie>
                   {/* <Tooltip contentStyle={{ backgroundColor: '#2a133b', border: 'none', borderRadius: '8px' }} /> */}
-                   <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={<CustomTooltip />} />
 
                 </PieChart>
               </ResponsiveContainer>

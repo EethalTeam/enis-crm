@@ -2281,7 +2281,7 @@ function LeadsContent() {
       "
               >
                 {/* ===== HEADER ===== */}
-                <div className="flex justify-between items-start">
+                <div className="flex-col justify-end items-center">
                   <div
                     className="text-base font-semibold text-fuchsia-400 cursor-pointer"
                     onClick={() => handleViewClick(l)}
@@ -2292,7 +2292,7 @@ function LeadsContent() {
                   <Badge
                     className={
                       statusColors[l.leadStatusId?.leadStatusColor] ||
-                      "bg-slate-700"
+                      "bg-slate-700 mt-1"
                     }
                   >
                     {l.leadStatusId?.leadStatustName || "New"}
