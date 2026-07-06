@@ -34,7 +34,8 @@ import {
   SquareCode,
   Activity,
   X,
-  PhoneOutgoing
+  PhoneOutgoing,
+  DatabaseBackup
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -74,7 +75,8 @@ const iconMap = {
   TrendingUp,
   SquareCode,
   Activity,
-  PhoneOutgoing
+  PhoneOutgoing,
+  DatabaseBackup
 };
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -129,6 +131,7 @@ const navItems = [
       { icon: ShieldCheck, label: 'Role', path: '/masters/rolepages' },
       { icon: UserCog, label: 'user Rights', path: '/adminpanel/rights' },
       { icon: ArrowLeftRight, label: 'Transfer', path: '/adminpanel/transfer' },
+      { icon: DatabaseBackup, label: 'Backup', path: '/adminpanel/backup' },
     ]
   },
 ];

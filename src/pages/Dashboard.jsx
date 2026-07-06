@@ -249,7 +249,7 @@ export default function Dashboard() {
       });
 
       const result = await res.json();
-      const data = result.data || result;
+      const data = Array.isArray(result) ? result : result.result || [];
 
 
       setCallDays(data)
@@ -271,7 +271,8 @@ export default function Dashboard() {
       body: JSON.stringify(payload)
     });
 
-    const data = await res.json();
+    const result = await res.json();
+    const data = Array.isArray(result) ? result : result.report || [];
     setCallReport(data);
   };
 
@@ -292,7 +293,7 @@ export default function Dashboard() {
       });
 
       const result = await res.json();
-      const data = result.data || result;
+      const data = Array.isArray(result) ? result : result.result || [];
 
 
       setLeadSource(data)
@@ -350,8 +351,9 @@ export default function Dashboard() {
         }
       );
 
-      const data = await res.json();
-      setLeadFollowups(data || []);
+      const result = await res.json();
+      const data = Array.isArray(result) ? result : result.data || [];
+      setLeadFollowups(data);
     } catch (err) {
       console.log(err);
     }
@@ -372,8 +374,9 @@ export default function Dashboard() {
         }
       );
 
-      const data = await res.json();
-      setVisitorFollowups(data || []);
+      const result = await res.json();
+      const data = Array.isArray(result) ? result : result.data || [];
+      setVisitorFollowups(data);
     } catch (err) {
       console.log(err);
     }

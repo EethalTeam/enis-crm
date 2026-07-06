@@ -36,6 +36,7 @@ import Country from '@/pages/Country'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { DataProvider } from '@/contexts/DataContext';
 import MenuRegistry from '@/pages/MenuRegistry';
+import Backup from '@/pages/Backup';
 import LeadSource from '@/pages/LeadSource';
 import LeadStatus from '@/pages/LeadStatus'
 import VisitorVerient from '@/pages/VisitorVerient';
@@ -84,6 +85,7 @@ function App() {
             <Route path="/masters/employees" element={<Employees />} />
             <Route path="/masters/rolepages" element={<Rolepages />} />
             <Route path="/adminpanel/menu" element={<MenuRegistry />} />
+            <Route path="/adminpanel/backup" element={<Backup />} />
             <Route path="/masters/Document" element={<Document />} />
             <Route path="/masters/state" element={<State />} />
             <Route path="/masters/city" element={<City />} />
